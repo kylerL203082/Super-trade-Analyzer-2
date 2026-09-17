@@ -232,6 +232,8 @@
             { name: "Harrison Mevis", pos: "K", value: 1.0, trend: "📈" }
         ];
 
+                ];
+
         let teamA = [];
         let teamB = [];
 
@@ -345,14 +347,15 @@
 
             const heading = document.getElementById("verdict-heading");
 
+            // Applied reverse outcome rules
             if (teamA.length === 0 && teamB.length === 0) {
                 heading.innerText = "Add players to analyze";
             } else if (Math.abs(totalA - totalB) < 0.2) {
                 heading.innerText = "Even trade";
             } else if (totalA > totalB) {
-                heading.innerText = "Team A wins the trade";
-            } else {
                 heading.innerText = "Team B wins the trade";
+            } else {
+                heading.innerText = "Team A wins the trade";
             }
         }
 
