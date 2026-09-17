@@ -34,8 +34,15 @@
         <option value="dynasty">Dynasty</option>
       </select>
     </label>
+  
+ <label class="league-control">QB Format
+  <select id="qb-select">
+    <option value="oneqb">1QB</option>
+    <option value="superflex">Superflex</option>
+  </select>
+</label>
+  
   </div>
-
   <div class="logo">
     🏈 Super Trade Analyzer
     <span id="format-badge" class="ppr-badge">PPR • Redraft</span>
@@ -270,8 +277,9 @@ let teamA=[];
 let teamB=[];
 let scoringMode="ppr";
 let leagueMode="redraft";
+let qbMode="oneqb";
 
-const scoringMultipliers={
+  const scoringMultipliers={
   RB:{ppr:1.00,half:0.98,standard:0.95},
   WR:{ppr:1.00,half:0.96,standard:0.91},
   TE:{ppr:1.00,half:0.95,standard:0.89},
@@ -280,18 +288,25 @@ const scoringMultipliers={
   DST:{ppr:1.00,half:1.00,standard:1.00}
 };
 
-function getPlayerValue(player){
-  const base=player[leagueMode];
-  const multiplier=scoringMultipliers[player.pos][scoringMode];
-  return Math.max(0.1,Math.min(100,Math.round(base*multiplier*10)/10));
-}
+function setupLeagueControls(){
+  const scoring=document.getElementById("scoring-select");
+  const league=document.getElementById("league-select");
+  const qb=document.getElementById("qb-select");
 
-function getModeLabel(){
-  const scoring=scoringMode==="ppr"?"PPR":scoringMode==="half"?"0.5 PPR":"No PPR";
-  const league=leagueMode==="dynasty"?"Dynasty":leagueMode==="keeper"?"Keeper":"Redraft";
-  return scoring+" • "+league;
-}
+  function changed(){
+    scoringMode=scoring.value;
+    leagueMode=league.value;
+    qbMode=qb.value;
 
+    buildReferenceBoard();
+    renderTeams();
+    calculateTrade();
+  }
+
+  scoring.addEventListener("change",changed);
+  league.addEventListener("change",changed);
+  qb.addEventListener("change",changed);
+}
 function getAdjustedPlayerValue(baseValue){
   if(typeof baseValue!=="number"||baseValue<=0) return 0;
   return 100*Math.pow(baseValue/100,SUPERSTAR_FACTOR);
