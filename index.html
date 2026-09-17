@@ -1437,10 +1437,57 @@ function updateFairSuggestion(){
 document.addEventListener("click",function(){
   setTimeout(updateFairSuggestion,0);
 });
-
 updateFairSuggestion();
-    </script>
+   
+updateFairSuggestion();
 
+const tradeControls=document.createElement("div");
+tradeControls.style.marginTop="15px";
+tradeControls.style.display="flex";
+tradeControls.style.justifyContent="center";
+tradeControls.style.gap="10px";
+
+const clearTradeButton=document.createElement("button");
+clearTradeButton.type="button";
+clearTradeButton.textContent="Clear Trade";
+clearTradeButton.className="toggle-btn";
+
+const swapSidesButton=document.createElement("button");
+swapSidesButton.type="button";
+swapSidesButton.textContent="Swap Sides";
+swapSidesButton.className="toggle-btn";
+
+tradeControls.appendChild(clearTradeButton);
+tradeControls.appendChild(swapSidesButton);
+
+document.querySelector(".verdict-container").appendChild(tradeControls);
+
+clearTradeButton.addEventListener("click",function(){
+
+  teamA.length=0;
+  teamB.length=0;
+
+  renderTeams();
+  calculateTrade();
+  updateFairSuggestion();
+
+});
+
+swapSidesButton.addEventListener("click",function(){
+
+  const oldTeamA=teamA;
+
+  teamA=teamB;
+  teamB=oldTeamA;
+
+  renderTeams();
+  calculateTrade();
+  updateFairSuggestion();
+
+});
+    
+
+    
+</script>
 </body>
-
 </html>
