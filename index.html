@@ -1374,32 +1374,70 @@ fairBox.style.fontSize="18px";
 document.querySelector(".verdict-container").appendChild(fairBox);
 
 function updateFairSuggestion(){
-  if(!teamA.length||!teamB.length){fairBox.textContent="";return;}
 
-  const a=calculateAdjustedTeamValue(teamA), b=calculateAdjustedTeamValue(teamB);
-  const avg=(a+b)/2, diff=avg?Math.abs(a-b)/avg*100:0;
+  if(!teamA.length||!teamB.length){
+    fairBox.textContent="";
+    return;
+  }
 
-  if(diff<=5){fairBox.textContent="✅ This trade is already within the fair range.";return;}
+  const a=calculateAdjustedTeamValue(teamA);
+  const b=calculateAdjustedTeamValue(teamB);
+  const avg=(a+b)/2;
+  const diff=avg?Math.abs(a-b)/(avg/100):0;
 
-  const losing=a<b?teamA:teamB;
-  const losingName=a<b?"Team A":"Team B";
-  const used=new Set([...teamA,...teamB].map(p=>p.rank));
+  if(diff<=5){
+    fairBox.textContent="✅ This trade is already within the fair range.";
+    return;
+  }
 
-  let best=null,bestDiff=Infinity;
+  const losing=a>b?teamB:teamA;
+  const losingName=a>b?"Team B":"Team A";
+  const target=a>b?a:b;
 
-  playerDatabase.forEach(p=>{
-    if(used.has(p.rank))return;
-    const newValue=calculateAdjustedTeamValue([...losing,p]);
-    const d=Math.abs(newValue-(a<b?b:a));
-    if(d<bestDiff){bestDiff=d;best=p;}
+  const used=new Set(
+    teamA.concat(teamB).map(function(p){
+      return p.rank;
+    })
+  );
+
+  let best=null;
+  let bestDiff=Infinity;
+
+  playerDatabase.forEach(function(p){
+
+    if(used.has(p.rank)){
+      return;
+    }
+
+    const testTeam=losing.concat([p]);
+    const newValue=calculateAdjustedTeamValue(testTeam);
+    const difference=Math.abs(newValue-target);
+
+    if(bestDiff>difference){
+      bestDiff=difference;
+      best=p;
+    }
+
   });
 
-  fairBox.textContent=best
-    ?`⚖️ To make it closer: ${losingName} could add ${best.name} (${best.value.toFixed(1)}).`
-    :"";
+  if(best){
+    fairBox.textContent=
+      "⚖️ To make it closer: "+
+      losingName+
+      " could add "+
+      best.name+
+      " ("+
+      best.value.toFixed(1)+
+      ").";
+  }else{
+    fairBox.textContent="";
+  }
 }
 
-document.addEventListener("click",()=>setTimeout(updateFairSuggestion,0));
+document.addEventListener("click",function(){
+  setTimeout(updateFairSuggestion,0);
+});
+
 updateFairSuggestion();
     </script>
 
