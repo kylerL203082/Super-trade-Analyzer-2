@@ -335,3 +335,70 @@ body {
 #verdict:empty {
   display: none;
 }
+/* ===== LEAGUE SETTINGS ===== */
+
+.league-settings {
+  width: 100%;
+  max-width: 900px;
+  margin: 18px auto 24px;
+  padding: 18px 20px;
+
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 14px;
+
+  background: rgba(255,255,255,0.04);
+
+  box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+}
+
+.league-settings-title {
+  font-size: 18px;
+  font-weight: 800;
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+.league-settings-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.league-control {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.league-control span {
+  font-size: 12px;
+  font-weight: 700;
+  opacity: 0.7;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.league-control select {
+  width: 100%;
+  padding: 10px 12px;
+
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.15);
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+@media (max-width: 700px) {
+  .league-settings-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 420px) {
+  .league-settings-grid {
+    grid-template-columns: 1fr;
+  }
+}
