@@ -273,6 +273,29 @@ const playerDatabase=[
 {rank:160,name:"Harrison Mevis",pos:"K",trend:"📈",redraft:2.0,keeper:1.6,dynasty:1.1}
 ];
 
+const dynastyPickDatabase=[
+  {rank:1001,name:"2027 Early 1st",pos:"PICK",trend:"🎯",oneqb:52.0,superflex:58.0},
+  {rank:1002,name:"2027 Mid 1st",pos:"PICK",trend:"🎯",oneqb:44.0,superflex:50.0},
+  {rank:1003,name:"2027 Late 1st",pos:"PICK",trend:"🎯",oneqb:36.0,superflex:42.0},
+  {rank:1004,name:"2027 2nd",pos:"PICK",trend:"🎯",oneqb:22.0,superflex:25.0},
+  {rank:1005,name:"2027 3rd",pos:"PICK",trend:"🎯",oneqb:10.0,superflex:12.0},
+
+  {rank:1006,name:"2028 Early 1st",pos:"PICK",trend:"🎯",oneqb:47.0,superflex:53.0},
+  {rank:1007,name:"2028 Mid 1st",pos:"PICK",trend:"🎯",oneqb:40.0,superflex:46.0},
+  {rank:1008,name:"2028 Late 1st",pos:"PICK",trend:"🎯",oneqb:33.0,superflex:39.0},
+  {rank:1009,name:"2028 2nd",pos:"PICK",trend:"🎯",oneqb:19.0,superflex:22.0},
+  {rank:1010,name:"2028 3rd",pos:"PICK",trend:"🎯",oneqb:8.0,superflex:10.0}
+];
+
+function getAssetDatabase(){
+
+  if(leagueMode==="dynasty"){
+    return playerDatabase.concat(dynastyPickDatabase);
+  }
+
+  return playerDatabase;
+}
+
 let teamA=[];
 let teamB=[];
 let scoringMode="ppr";
@@ -316,7 +339,49 @@ function calculateAdjustedTeamValue(team){
   if(!Array.isArray(team)||!team.length) return 0;
 
   const adjusted=team.map(function(player){
-    return getAdjustedPlayerValue(getPlayerValue(player));
+  function getPlayerValue(player){
+
+  if(player.pos==="PICK"){
+
+    if(qbMode==="superflex"){
+      return player.superflex;
+    }
+
+    return player.oneqb;
+  }
+
+  let value=player[leagueMode];
+
+  const scoringMultiplier=
+    scoringMultipliers[player.pos][scoringMode];
+
+  value=value*scoringMultiplier;
+
+  if(qbMode==="superflex"&&player.pos==="QB"){
+
+    let qbMultiplier=1.35;
+
+    if(leagueMode==="keeper"){
+      qbMultiplier=1.40;
+    }
+
+    if(leagueMode==="dynasty"){
+      qbMultiplier=1.45;
+    }
+
+    value=value*qbMultiplier;
+  }
+
+  return Math.max(
+    0.1,
+    Math.min(
+      100,
+      Math.round(value*10)/10
+    )
+  );
+}
+  
+  
   }).sort(function(a,b){return b-a;});
 
   return adjusted.reduce(function(total,value,index){
