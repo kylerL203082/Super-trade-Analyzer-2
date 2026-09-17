@@ -1,3 +1,5 @@
+:root[data-theme="dark"] { ... }
+:root[data-theme="light"] { ... }
 /* Core Layout Themes */
 :root[data-theme="dark"] {
     --bg-main: #000000;
