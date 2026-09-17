@@ -1757,6 +1757,135 @@ document.addEventListener("click",function(){
 
 updateTradeGrade();
     
+const packageBox=document.createElement("div");
+
+packageBox.style.marginTop="16px";
+packageBox.style.fontSize="18px";
+packageBox.style.textAlign="center";
+packageBox.style.whiteSpace="pre-line";
+
+document.querySelector(".verdict-container").appendChild(packageBox);
+
+function updateSuggestedPackage(){
+
+  if(!teamA.length||!teamB.length){
+    packageBox.textContent="";
+    return;
+  }
+
+  const a=calculateAdjustedTeamValue(teamA);
+  const b=calculateAdjustedTeamValue(teamB);
+
+  const average=(a+b)/2;
+  const currentDiff=average?Math.abs(a-b)/(average/100):0;
+
+  if(currentDiff<=5){
+    packageBox.textContent="";
+    return;
+  }
+
+  const losing=a>b?teamB:teamA;
+  const losingName=a>b?"Team B":"Team A";
+  const target=a>b?a:b;
+
+  if(losing.length>=7){
+    packageBox.textContent="";
+    return;
+  }
+
+  const used=new Set(
+    teamA.concat(teamB).map(function(p){
+      return p.rank;
+    })
+  );
+
+  const available=playerDatabase.filter(function(p){
+    return !used.has(p.rank);
+  });
+
+  const packages=[];
+
+  for(let i=0;i<available.length;i++){
+
+    for(let j=i+1;j<available.length;j++){
+
+      const player1=available[i];
+      const player2=available[j];
+
+      const testTeam=losing.concat([
+        player1,
+        player2
+      ]);
+
+      const newValue=
+        calculateAdjustedTeamValue(testTeam);
+
+      const resultAverage=
+        (newValue+target)/2;
+
+      const resultDiff=
+        resultAverage
+          ? Math.abs(newValue-target)/(resultAverage/100)
+          : 0;
+
+      packages.push({
+        player1:player1,
+        player2:player2,
+        diff:resultDiff
+      });
+
+    }
+
+  }
+
+  packages.sort(function(x,y){
+    return x.diff-y.diff;
+  });
+
+  const bestPackages=
+    packages.slice(0,3);
+
+  if(!bestPackages.length){
+    packageBox.textContent="";
+    return;
+  }
+
+  let message=
+    "📦 Suggested Packages for "+
+    losingName+
+    ":\n";
+
+  bestPackages.forEach(function(option,index){
+
+    message+=
+      (index+1)+
+      ". "+
+      option.player1.name+
+      " + "+
+      option.player2.name+
+      " — "+
+      option.diff.toFixed(1)+
+      "% apart";
+
+    if(option.diff<=5){
+      message+=" — Fair range";
+    }
+
+    if(index<bestPackages.length-1){
+      message+="\n";
+    }
+
+  });
+
+  packageBox.textContent=message;
+
+}
+
+document.addEventListener("click",function(){
+  setTimeout(updateSuggestedPackage,0);
+});
+
+updateSuggestedPackage();
 
 </script>
 </body>
