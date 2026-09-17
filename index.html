@@ -12,13 +12,15 @@
 .league-control select{padding:8px 10px;border-radius:8px;border:1px solid rgba(127,127,127,.35);background:inherit;color:inherit}
 .trade-extra{margin-top:12px;text-align:center;white-space:pre-line}
 .trade-controls{margin-top:15px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
-@media(max-width:760px){.league-controls{width:100%;justify-content:center}}
+#theme-toggle{margin-left:auto}
+@media(max-width:760px){.league-controls{width:100%;justify-content:center}#theme-toggle{margin-left:0}}
 </style>
 </head>
 <body>
 
 <nav class="navbar">
   <div class="league-controls">
+
     <label class="league-control">Scoring
       <select id="scoring-select">
         <option value="ppr">PPR</option>
@@ -34,23 +36,24 @@
         <option value="dynasty">Dynasty</option>
       </select>
     </label>
-  
-<label class="league-control">QB Format
-  <select id="qb-select">
-    <option value="oneqb">1QB</option>
-    <option value="superflex">Superflex</option>
-  </select>
-</label>
 
-<label class="league-control">TE Premium
-  <select id="te-premium-select">
-    <option value="off">Off</option>
-    <option value="half">+0.5 PPR</option>
-    <option value="full">+1.0 PPR</option>
-  </select>
-</label>
-  
+    <label class="league-control">QB Format
+      <select id="qb-select">
+        <option value="oneqb">1QB</option>
+        <option value="superflex">Superflex</option>
+      </select>
+    </label>
+
+    <label class="league-control">TE Premium
+      <select id="te-premium-select">
+        <option value="off">Off</option>
+        <option value="half">+0.5 PPR</option>
+        <option value="full">+1.0 PPR</option>
+      </select>
+    </label>
+
   </div>
+
   <div class="logo">
     🏈 Super Trade Analyzer
     <span id="format-badge" class="ppr-badge">PPR • Redraft</span>
@@ -61,11 +64,27 @@
 
 <section class="value-board-section">
   <h3 id="reference-heading">📊 Top Market Values Reference — PPR • Redraft</h3>
+
   <div class="value-board-grid">
-    <div class="value-card"><h4>Top Running Backs</h4><div id="top-rb"></div></div>
-    <div class="value-card"><h4>Top Wide Receivers</h4><div id="top-wr"></div></div>
-    <div class="value-card"><h4>Top Quarterbacks</h4><div id="top-qb"></div></div>
-    <div class="value-card"><h4>Top Tight Ends</h4><div id="top-te"></div></div>
+    <div class="value-card">
+      <h4>Top Running Backs</h4>
+      <div id="top-rb"></div>
+    </div>
+
+    <div class="value-card">
+      <h4>Top Wide Receivers</h4>
+      <div id="top-wr"></div>
+    </div>
+
+    <div class="value-card">
+      <h4>Top Quarterbacks</h4>
+      <div id="top-qb"></div>
+    </div>
+
+    <div class="value-card">
+      <h4>Top Tight Ends</h4>
+      <div id="top-te"></div>
+    </div>
   </div>
 </section>
 
@@ -75,50 +94,78 @@
     <span id="meter-percentage">50% / 50%</span>
     <span class="right-label">Favors Team B ➡</span>
   </div>
+
   <div class="meter-track">
     <div id="meter-bar" class="meter-fill" style="width:50%;"></div>
   </div>
 </section>
 
 <main class="analyzer-container">
+
   <div class="team-column">
     <h2>Team A</h2>
+
     <div class="search-container">
       <input type="text" id="search-a" placeholder="Type player name..." autocomplete="off">
       <div id="dropdown-a" class="dropdown-list"></div>
     </div>
+
     <div id="team-list-a" class="player-list"></div>
     <div class="total-score" id="total-a">Base: 0.0 | Adjusted: 0.0</div>
   </div>
 
   <div class="team-column">
     <h2>Team B</h2>
+
     <div class="search-container">
       <input type="text" id="search-b" placeholder="Type player name..." autocomplete="off">
       <div id="dropdown-b" class="dropdown-list"></div>
     </div>
+
     <div id="team-list-b" class="player-list"></div>
     <div class="total-score" id="total-b">Base: 0.0 | Adjusted: 0.0</div>
   </div>
+
 </main>
 
 <div class="verdict-container">
+
   <h1 id="verdict-heading">Add players to analyze</h1>
+
   <div id="fair-box" class="trade-extra"></div>
-  <div id="trade-grade-box" class="trade-extra" style="font-size:24px;font-weight:bold;"></div>
+
+  <div
+    id="trade-grade-box"
+    class="trade-extra"
+    style="font-size:24px;font-weight:bold;">
+  </div>
+
   <div id="package-box" class="trade-extra"></div>
 
   <div class="trade-controls">
     <button id="clear-trade-button" class="toggle-btn" type="button">Clear Trade</button>
     <button id="swap-sides-button" class="toggle-btn" type="button">Swap Sides</button>
   </div>
+
 </div>
 
 <script>
+
 const SUPERSTAR_FACTOR=1.25;
-const PACKAGE_WEIGHTS=[1.00,0.95,0.90,0.85,0.80,0.80,0.80,0.80];
+
+const PACKAGE_WEIGHTS=[
+  1.00,
+  0.95,
+  0.90,
+  0.85,
+  0.80,
+  0.80,
+  0.80,
+  0.80
+];
 
 const playerDatabase=[
+
 {rank:1,name:"Bijan Robinson",pos:"RB",trend:"📈",redraft:99.0,keeper:100.0,dynasty:100.0},
 {rank:2,name:"Jahmyr Gibbs",pos:"RB",trend:"📈",redraft:97.8,keeper:100.0,dynasty:100.0},
 {rank:3,name:"Ja'Marr Chase",pos:"WR",trend:"📈",redraft:96.4,keeper:97.7,dynasty:99.3},
@@ -217,7 +264,7 @@ const playerDatabase=[
 {rank:96,name:"Brock Purdy",pos:"QB",trend:"📈",redraft:25.1,keeper:24.5,dynasty:23.8},
 {rank:97,name:"Matthew Stafford",pos:"QB",trend:"📈",redraft:24.5,keeper:17.3,dynasty:8.6},
 {rank:98,name:"Bo Nix",pos:"QB",trend:"📈",redraft:23.9,keeper:25.0,dynasty:26.3},
-{rank:99,name:"Travis Kelce",pos:"TE",trend:"📉",redraft:23.2,keeper:15.4,dynasty:5.8},
+  {rank:99,name:"Travis Kelce",pos:"TE",trend:"📉",redraft:23.2,keeper:15.4,dynasty:5.8},
 {rank:100,name:"Kyle Monangai",pos:"RB",trend:"📈",redraft:22.6,keeper:23.8,dynasty:25.3},
 {rank:101,name:"Jonathon Brooks",pos:"RB",trend:"📈",redraft:22.0,keeper:23.2,dynasty:24.6},
 {rank:102,name:"Chris Godwin Jr.",pos:"WR",trend:"📈",redraft:21.4,keeper:17.5,dynasty:12.8},
@@ -279,9 +326,11 @@ const playerDatabase=[
 {rank:158,name:"Will Reichard",pos:"K",trend:"📈",redraft:3.2,keeper:2.6,dynasty:1.8},
 {rank:159,name:"Cam Little",pos:"K",trend:"📈",redraft:2.6,keeper:2.1,dynasty:1.4},
 {rank:160,name:"Harrison Mevis",pos:"K",trend:"📈",redraft:2.0,keeper:1.6,dynasty:1.1}
+
 ];
 
 const dynastyPickDatabase=[
+
   {rank:1001,name:"2027 Early 1st",pos:"PICK",trend:"🎯",oneqb:52.0,superflex:58.0},
   {rank:1002,name:"2027 Mid 1st",pos:"PICK",trend:"🎯",oneqb:44.0,superflex:50.0},
   {rank:1003,name:"2027 Late 1st",pos:"PICK",trend:"🎯",oneqb:36.0,superflex:42.0},
@@ -293,6 +342,7 @@ const dynastyPickDatabase=[
   {rank:1008,name:"2028 Late 1st",pos:"PICK",trend:"🎯",oneqb:33.0,superflex:39.0},
   {rank:1009,name:"2028 2nd",pos:"PICK",trend:"🎯",oneqb:19.0,superflex:22.0},
   {rank:1010,name:"2028 3rd",pos:"PICK",trend:"🎯",oneqb:8.0,superflex:10.0}
+
 ];
 
 function getAssetDatabase(){
@@ -306,23 +356,52 @@ function getAssetDatabase(){
 
 let teamA=[];
 let teamB=[];
+
 let scoringMode="ppr";
 let leagueMode="redraft";
 let qbMode="oneqb";
 let tePremiumMode="off";
 
-  const scoringMultipliers={
-  RB:{ppr:1.00,half:0.98,standard:0.95},
-  WR:{ppr:1.00,half:0.96,standard:0.91},
-  TE:{ppr:1.00,half:0.95,standard:0.89},
-  QB:{ppr:1.00,half:1.00,standard:1.00},
-  K:{ppr:1.00,half:1.00,standard:1.00},
-  DST:{ppr:1.00,half:1.00,standard:1.00}
+const scoringMultipliers={
+
+  RB:{
+    ppr:1.00,
+    half:0.98,
+    standard:0.95
+  },
+
+  WR:{
+    ppr:1.00,
+    half:0.96,
+    standard:0.91
+  },
+
+  TE:{
+    ppr:1.00,
+    half:0.95,
+    standard:0.89
+  },
+
+  QB:{
+    ppr:1.00,
+    half:1.00,
+    standard:1.00
+  },
+
+  K:{
+    ppr:1.00,
+    half:1.00,
+    standard:1.00
+  },
+
+  DST:{
+    ppr:1.00,
+    half:1.00,
+    standard:1.00
+  }
+
 };
 
-function setupLeagueControls(){
-  const scoring=document.getElementById("scoring-select");
-  const league=document.getElementById("league-select");
 function setupLeagueControls(){
 
   const scoring=
@@ -353,6 +432,7 @@ function setupLeagueControls(){
       teamB=teamB.filter(function(asset){
         return asset.pos!=="PICK";
       });
+
     }
 
     buildReferenceBoard();
@@ -360,27 +440,26 @@ function setupLeagueControls(){
     calculateTrade();
   }
 
-  scoring.addEventListener("change",changed);
-  league.addEventListener("change",changed);
-  qb.addEventListener("change",changed);
-  tePremium.addEventListener("change",changed);
+  scoring.addEventListener(
+    "change",
+    changed
+  );
+
+  league.addEventListener(
+    "change",
+    changed
+  );
+
+  qb.addEventListener(
+    "change",
+    changed
+  );
+
+  tePremium.addEventListener(
+    "change",
+    changed
+  );
 }
-
-      teamB=teamB.filter(function(asset){
-        return asset.pos!=="PICK";
-      });
-    }
-
-    buildReferenceBoard();
-    renderTeams();
-    calculateTrade();
-  }
-
-  scoring.addEventListener("change",changed);
-  league.addEventListener("change",changed);
-  qb.addEventListener("change",changed);
-}
-
 
 function getPlayerValue(player){
 
@@ -393,14 +472,19 @@ function getPlayerValue(player){
     return player.oneqb;
   }
 
-  let value=player[leagueMode];
+  let value=
+    player[leagueMode];
 
   const scoringMultiplier=
     scoringMultipliers[player.pos][scoringMode];
 
-  value=value*scoringMultiplier;
+  value=
+    value*scoringMultiplier;
 
-  if(qbMode==="superflex"&&player.pos==="QB"){
+  if(
+    qbMode==="superflex" &&
+    player.pos==="QB"
+  ){
 
     let qbMultiplier=1.35;
 
@@ -412,10 +496,14 @@ function getPlayerValue(player){
       qbMultiplier=1.45;
     }
 
-    value=value*qbMultiplier;
+    value=
+      value*qbMultiplier;
   }
 
-  if(player.pos==="TE"&&tePremiumMode!=="off"){
+  if(
+    player.pos==="TE" &&
+    tePremiumMode!=="off"
+  ){
 
     let teMultiplier=1.00;
 
@@ -424,12 +512,15 @@ function getPlayerValue(player){
       if(value>=75){
         teMultiplier=1.10;
       }
+
       else if(value>=50){
         teMultiplier=1.08;
       }
+
       else if(value>=25){
         teMultiplier=1.06;
       }
+
       else{
         teMultiplier=1.04;
       }
@@ -440,18 +531,22 @@ function getPlayerValue(player){
       if(value>=75){
         teMultiplier=1.18;
       }
+
       else if(value>=50){
         teMultiplier=1.14;
       }
+
       else if(value>=25){
         teMultiplier=1.10;
       }
+
       else{
         teMultiplier=1.06;
       }
     }
 
-    value=value*teMultiplier;
+    value=
+      value*teMultiplier;
   }
 
   return Math.max(
@@ -484,12 +579,30 @@ function getModeLabel(){
       ?"Superflex"
       :"1QB";
 
-  return scoring+" • "+league+" • "+qbFormat;
-}
-  
-  function getAdjustedPlayerValue(baseValue){
+  let label=
+    scoring+
+    " • "+
+    league+
+    " • "+
+    qbFormat;
 
-  if(typeof baseValue!=="number"||baseValue<=0){
+  if(tePremiumMode==="half"){
+    label+=" • TEP +0.5";
+  }
+
+  if(tePremiumMode==="full"){
+    label+=" • TEP +1.0";
+  }
+
+  return label;
+}
+
+function getAdjustedPlayerValue(baseValue){
+
+  if(
+    typeof baseValue!=="number" ||
+    baseValue<=0
+  ){
     return 0;
   }
 
@@ -501,485 +614,1245 @@ function getModeLabel(){
 
 function calculateAdjustedTeamValue(team){
 
-  if(!Array.isArray(team)||!team.length){
+  if(
+    !Array.isArray(team) ||
+    !team.length
+  ){
     return 0;
   }
 
-  const adjusted=team.map(function(player){
+  const adjusted=
+    team
+      .map(function(player){
 
-    return getAdjustedPlayerValue(
-      getPlayerValue(player)
-    );
+        return getAdjustedPlayerValue(
+          getPlayerValue(player)
+        );
 
-  }).sort(function(a,b){
+      })
+      .sort(function(a,b){
 
-    return b-a;
+        return b-a;
 
-  });
+      });
 
-  return adjusted.reduce(function(total,value,index){
+  return adjusted.reduce(
+    function(total,value,index){
 
-    const weight=
-      PACKAGE_WEIGHTS[index]!==undefined
-        ? PACKAGE_WEIGHTS[index]
-        : 0.80;
+      const weight=
+        PACKAGE_WEIGHTS[index]!==undefined
+          ?PACKAGE_WEIGHTS[index]
+          :0.80;
 
-    return total+(value*weight);
+      return total+
+        (value*weight);
 
-  },0);
+    },
+    0
+  );
 }
-
 function calculateRawValue(team){
-  return team.reduce(function(total,player){
-    return total+getPlayerValue(player);
-  },0);
+
+  return team.reduce(
+    function(total,player){
+
+      return total+
+        getPlayerValue(player);
+
+    },
+    0
+  );
 }
 
 function abbreviateName(name){
-  const parts=name.trim().split(/\s+/);
-  if(parts.length===1) return parts[0];
-  return parts[0].charAt(0)+". "+parts.slice(1).join(" ");
+
+  const parts=
+    name
+      .trim()
+      .split(/\s+/);
+
+  if(parts.length===1){
+    return parts[0];
+  }
+
+  return parts[0].charAt(0)+
+    ". "+
+    parts.slice(1).join(" ");
 }
 
 function buildReferenceBoard(){
-  renderTopPlayers("RB","top-rb");
-  renderTopPlayers("WR","top-wr");
-  renderTopPlayers("QB","top-qb");
-  renderTopPlayers("TE","top-te");
-  document.getElementById("format-badge").textContent=getModeLabel();
-  document.getElementById("reference-heading").textContent="📊 Top Market Values Reference — "+getModeLabel();
+
+  renderTopPlayers(
+    "RB",
+    "top-rb"
+  );
+
+  renderTopPlayers(
+    "WR",
+    "top-wr"
+  );
+
+  renderTopPlayers(
+    "QB",
+    "top-qb"
+  );
+
+  renderTopPlayers(
+    "TE",
+    "top-te"
+  );
+
+  document
+    .getElementById("format-badge")
+    .textContent=
+      getModeLabel();
+
+  document
+    .getElementById("reference-heading")
+    .textContent=
+      "📊 Top Market Values Reference — "+
+      getModeLabel();
 }
 
-function renderTopPlayers(position,elementId){
-  const container=document.getElementById(elementId);
+function renderTopPlayers(
+  position,
+  elementId
+){
 
-  const players=playerDatabase
-    .filter(function(player){return player.pos===position;})
-    .slice()
-    .sort(function(a,b){
-      const diff=getPlayerValue(b)-getPlayerValue(a);
-      return diff!==0?diff:a.rank-b.rank;
-    })
-    .slice(0,3);
+  const container=
+    document.getElementById(
+      elementId
+    );
+
+  const players=
+    playerDatabase
+      .filter(function(player){
+
+        return player.pos===position;
+
+      })
+      .slice()
+      .sort(function(a,b){
+
+        const diff=
+          getPlayerValue(b)-
+          getPlayerValue(a);
+
+        return diff!==0
+          ?diff
+          :a.rank-b.rank;
+
+      })
+      .slice(0,3);
 
   container.innerHTML="";
 
-  players.forEach(function(player,index){
-    const line=document.createElement("p");
-    line.textContent=(index+1)+". "+abbreviateName(player.name)+" ("+getPlayerValue(player).toFixed(1)+")";
-    container.appendChild(line);
-  });
+  players.forEach(
+    function(player,index){
+
+      const line=
+        document.createElement("p");
+
+      line.textContent=
+        (index+1)+
+        ". "+
+        abbreviateName(player.name)+
+        " ("+
+        getPlayerValue(player).toFixed(1)+
+        ")";
+
+      container.appendChild(line);
+    }
+  );
 }
 
-function setupSearch(teamId,getTeam){
-  const input=document.getElementById("search-"+teamId);
-  const dropdown=document.getElementById("dropdown-"+teamId);
+function setupSearch(
+  teamId,
+  getTeam
+){
 
-  input.addEventListener("input",function(){
-    const query=input.value.toLowerCase().trim();
-    dropdown.innerHTML="";
+  const input=
+    document.getElementById(
+      "search-"+teamId
+    );
 
-    if(!query){
-      dropdown.style.display="none";
-      return;
-    }
+  const dropdown=
+    document.getElementById(
+      "dropdown-"+teamId
+    );
 
-    const matches=getAssetDatabase()
-      .filter(function(player){return player.name.toLowerCase().includes(query);})
-      .slice()
-      .sort(function(a,b){
-        const diff=getPlayerValue(b)-getPlayerValue(a);
-        return diff!==0?diff:a.rank-b.rank;
-      });
+  input.addEventListener(
+    "input",
+    function(){
 
-    if(!matches.length){
-      dropdown.style.display="none";
-      return;
-    }
+      const query=
+        input.value
+          .toLowerCase()
+          .trim();
 
-    dropdown.style.display="block";
+      dropdown.innerHTML="";
 
-    matches.forEach(function(player){
-      const item=document.createElement("div");
-      item.className="dropdown-item";
-      item.textContent=player.name+" ("+player.pos+") "+player.trend+" - Value: "+getPlayerValue(player).toFixed(1);
+      if(!query){
 
-      item.addEventListener("click",function(){
-        addPlayerToTrade(player,getTeam());
-        input.value="";
-        dropdown.innerHTML="";
         dropdown.style.display="none";
-      });
+        return;
+      }
 
-      dropdown.appendChild(item);
-    });
-  });
+      const matches=
+        getAssetDatabase()
+          .filter(function(player){
 
-  document.addEventListener("click",function(event){
-    if(!input.contains(event.target)&&!dropdown.contains(event.target)){
-          dropdown.style.display="none";
+            return player.name
+              .toLowerCase()
+              .includes(query);
+
+          })
+          .slice()
+          .sort(function(a,b){
+
+            const diff=
+              getPlayerValue(b)-
+              getPlayerValue(a);
+
+            return diff!==0
+              ?diff
+              :a.rank-b.rank;
+
+          });
+
+      if(!matches.length){
+
+        dropdown.style.display="none";
+        return;
+      }
+
+      dropdown.style.display="block";
+
+      matches.forEach(
+        function(player){
+
+          const item=
+            document.createElement("div");
+
+          item.className=
+            "dropdown-item";
+
+          item.textContent=
+            player.name+
+            " ("+
+            player.pos+
+            ") "+
+            player.trend+
+            " - Value: "+
+            getPlayerValue(player).toFixed(1);
+
+          item.addEventListener(
+            "click",
+            function(){
+
+              addPlayerToTrade(
+                player,
+                getTeam()
+              );
+
+              input.value="";
+              dropdown.innerHTML="";
+              dropdown.style.display="none";
+            }
+          );
+
+          dropdown.appendChild(item);
+        }
+      );
     }
-  });
+  );
+
+  document.addEventListener(
+    "click",
+    function(event){
+
+      if(
+        !input.contains(event.target) &&
+        !dropdown.contains(event.target)
+      ){
+
+        dropdown.style.display="none";
+      }
+    }
+  );
 }
 
-function addPlayerToTrade(player,destinationTeam){
-  const alreadyAdded=teamA.concat(teamB).some(function(selected){
-    return selected.rank===player.rank;
-  });
+function addPlayerToTrade(
+  player,
+  destinationTeam
+){
+
+  const alreadyAdded=
+    teamA
+      .concat(teamB)
+      .some(function(selected){
+
+        return selected.rank===
+          player.rank;
+
+      });
 
   if(alreadyAdded){
-    alert(player.name+" is already included in this trade.");
+
+    alert(
+      player.name+
+      " is already included in this trade."
+    );
+
     return;
   }
 
   if(destinationTeam.length>=8){
-    alert("Maximum capacity reached. Max 8 players per side.");
+
+    alert(
+      "Maximum capacity reached. Max 8 players per side."
+    );
+
     return;
   }
 
   destinationTeam.push(player);
+
   renderTeams();
   calculateTrade();
 }
 
 function renderTeams(){
-  renderTeam("a",teamA);
-  renderTeam("b",teamB);
+
+  renderTeam(
+    "a",
+    teamA
+  );
+
+  renderTeam(
+    "b",
+    teamB
+  );
 }
 
-function renderTeam(teamId,teamArray){
-  const list=document.getElementById("team-list-"+teamId);
+function renderTeam(
+  teamId,
+  teamArray
+){
+
+  const list=
+    document.getElementById(
+      "team-list-"+teamId
+    );
+
   list.innerHTML="";
 
-  teamArray.forEach(function(player,index){
-    const row=document.createElement("div");
-    row.className="player-row";
+  teamArray.forEach(
+    function(player,index){
 
-    const removeButton=document.createElement("button");
-    removeButton.className="remove-btn";
-    removeButton.type="button";
-    removeButton.textContent="✕";
-    removeButton.setAttribute("aria-label","Remove "+player.name);
-    removeButton.addEventListener("click",function(){
-      removePlayer(teamId,index);
-    });
+      const row=
+        document.createElement("div");
 
-    const position=document.createElement("span");
-    position.className="pos-badge";
-    position.textContent=player.pos;
+      row.className=
+        "player-row";
 
-    const playerName=document.createElement("span");
-    playerName.className="player-name";
-    playerName.textContent=player.name;
+      const removeButton=
+        document.createElement("button");
 
-    const trend=document.createElement("span");
-    trend.className="trend-indicator";
-    trend.textContent=player.trend;
+      removeButton.className=
+        "remove-btn";
 
-    const score=document.createElement("span");
-    score.className="player-score-label";
-    score.textContent=getPlayerValue(player).toFixed(1);
+      removeButton.type=
+        "button";
 
-    if(teamId==="a"){
-      row.appendChild(removeButton);
-      row.appendChild(position);
-      row.appendChild(playerName);
-      row.appendChild(trend);
-      row.appendChild(score);
-    }else{
-      row.appendChild(score);
-      row.appendChild(position);
-      row.appendChild(playerName);
-      row.appendChild(trend);
-      row.appendChild(removeButton);
+      removeButton.textContent=
+        "✕";
+
+      removeButton.setAttribute(
+        "aria-label",
+        "Remove "+player.name
+      );
+
+      removeButton.addEventListener(
+        "click",
+        function(){
+
+          removePlayer(
+            teamId,
+            index
+          );
+        }
+      );
+
+      const position=
+        document.createElement("span");
+
+      position.className=
+        "pos-badge";
+
+      position.textContent=
+        player.pos;
+
+      const playerName=
+        document.createElement("span");
+
+      playerName.className=
+        "player-name";
+
+      playerName.textContent=
+        player.name;
+
+      const trend=
+        document.createElement("span");
+
+      trend.className=
+        "trend-indicator";
+
+      trend.textContent=
+        player.trend;
+
+      const score=
+        document.createElement("span");
+
+      score.className=
+        "player-score-label";
+
+      score.textContent=
+        getPlayerValue(player)
+          .toFixed(1);
+
+      if(teamId==="a"){
+
+        row.appendChild(
+          removeButton
+        );
+
+        row.appendChild(
+          position
+        );
+
+        row.appendChild(
+          playerName
+        );
+
+        row.appendChild(
+          trend
+        );
+
+        row.appendChild(
+          score
+        );
+      }
+
+      else{
+
+        row.appendChild(
+          score
+        );
+
+        row.appendChild(
+          position
+        );
+
+        row.appendChild(
+          playerName
+        );
+
+        row.appendChild(
+          trend
+        );
+
+        row.appendChild(
+          removeButton
+        );
+      }
+
+      list.appendChild(row);
     }
-
-    list.appendChild(row);
-  });
+  );
 }
 
-function removePlayer(teamId,index){
-  if(teamId==="a") teamA.splice(index,1);
-  if(teamId==="b") teamB.splice(index,1);
+function removePlayer(
+  teamId,
+  index
+){
+
+  if(teamId==="a"){
+    teamA.splice(index,1);
+  }
+
+  if(teamId==="b"){
+    teamB.splice(index,1);
+  }
+
   renderTeams();
   calculateTrade();
 }
 
 function calculateTrade(){
-  const rawA=calculateRawValue(teamA);
-  const rawB=calculateRawValue(teamB);
-  const adjustedA=calculateAdjustedTeamValue(teamA);
-  const adjustedB=calculateAdjustedTeamValue(teamB);
 
-  document.getElementById("total-a").textContent="Base: "+rawA.toFixed(1)+" | Adjusted: "+adjustedA.toFixed(1);
-  document.getElementById("total-b").textContent="Base: "+rawB.toFixed(1)+" | Adjusted: "+adjustedB.toFixed(1);
+  const rawA=
+    calculateRawValue(teamA);
 
-  updateBalanceMeter(adjustedA,adjustedB);
-  updateVerdict(adjustedA,adjustedB);
+  const rawB=
+    calculateRawValue(teamB);
+
+  const adjustedA=
+    calculateAdjustedTeamValue(teamA);
+
+  const adjustedB=
+    calculateAdjustedTeamValue(teamB);
+
+  document
+    .getElementById("total-a")
+    .textContent=
+      "Base: "+
+      rawA.toFixed(1)+
+      " | Adjusted: "+
+      adjustedA.toFixed(1);
+
+  document
+    .getElementById("total-b")
+    .textContent=
+      "Base: "+
+      rawB.toFixed(1)+
+      " | Adjusted: "+
+      adjustedB.toFixed(1);
+
+  updateBalanceMeter(
+    adjustedA,
+    adjustedB
+  );
+
+  updateVerdict(
+    adjustedA,
+    adjustedB
+  );
+
   updateFairSuggestion();
+
   updateTradeGrade();
+
   updateSuggestedPackage();
 }
 
-function updateBalanceMeter(a,b){
-  const bar=document.getElementById("meter-bar");
-  const text=document.getElementById("meter-percentage");
-  const combined=a+b;
+function updateBalanceMeter(
+  a,
+  b
+){
+
+  const bar=
+    document.getElementById(
+      "meter-bar"
+    );
+
+  const text=
+    document.getElementById(
+      "meter-percentage"
+    );
+
+  const combined=
+    a+b;
 
   if(combined<=0){
-    bar.style.width="50%";
-    text.textContent="50% / 50%";
+
+    bar.style.width=
+      "50%";
+
+    text.textContent=
+      "50% / 50%";
+
     return;
   }
 
-  const percentA=Math.round((a/combined)*100);
-  const percentB=100-percentA;
-  bar.style.width=percentA+"%";
-  text.textContent=percentA+"% / "+percentB+"%";
+  const percentA=
+    Math.round(
+      (a/combined)*100
+    );
+
+  const percentB=
+    100-percentA;
+
+  bar.style.width=
+    percentA+"%";
+
+  text.textContent=
+    percentA+
+    "% / "+
+    percentB+
+    "%";
 }
 
-function updateVerdict(a,b){
-  const heading=document.getElementById("verdict-heading");
+function updateVerdict(
+  a,
+  b
+){
 
-  if(!teamA.length&&!teamB.length){
-    heading.textContent="Add players to analyze";
+  const heading=
+    document.getElementById(
+      "verdict-heading"
+    );
+
+  if(
+    !teamA.length &&
+    !teamB.length
+  ){
+
+    heading.textContent=
+      "Add players to analyze";
+
     return;
   }
 
-  if(!teamA.length||!teamB.length){
-    heading.textContent="Add players to both sides";
+  if(
+    !teamA.length ||
+    !teamB.length
+  ){
+
+    heading.textContent=
+      "Add players to both sides";
+
     return;
   }
 
-  const average=(a+b)/2;
+  const average=
+    (a+b)/2;
 
   if(average<=0){
-    heading.textContent="Unable to analyze trade";
+
+    heading.textContent=
+      "Unable to analyze trade";
+
     return;
   }
 
-  const diff=Math.abs(a-b)/(average/100);
-  const winner=a>b?"Team A":"Team B";
+  const diff=
+    Math.abs(a-b)/
+    (average/100);
 
-  if(diff<=5) heading.textContent="Fair Trade";
-  else if(diff<=10) heading.textContent="Slight Advantage: "+winner;
-  else if(diff<=20) heading.textContent="Advantage: "+winner;
-  else heading.textContent="Major Advantage: "+winner;
+  const winner=
+    a>b
+      ?"Team A"
+      :"Team B";
+
+  if(diff<=5){
+
+    heading.textContent=
+      "Fair Trade";
+  }
+
+  else if(diff<=10){
+
+    heading.textContent=
+      "Slight Advantage: "+
+      winner;
+  }
+
+  else if(diff<=20){
+
+    heading.textContent=
+      "Advantage: "+
+      winner;
+  }
+
+  else{
+
+    heading.textContent=
+      "Major Advantage: "+
+      winner;
+  }
 }
 
 function updateFairSuggestion(){
-  const box=document.getElementById("fair-box");
 
-  if(!teamA.length||!teamB.length){
+  const box=
+    document.getElementById(
+      "fair-box"
+    );
+
+  if(
+    !teamA.length ||
+    !teamB.length
+  ){
+
     box.textContent="";
     return;
   }
 
-  const a=calculateAdjustedTeamValue(teamA);
-  const b=calculateAdjustedTeamValue(teamB);
-  const avg=(a+b)/2;
-  const diff=avg?Math.abs(a-b)/(avg/100):0;
+  const a=
+    calculateAdjustedTeamValue(
+      teamA
+    );
+
+  const b=
+    calculateAdjustedTeamValue(
+      teamB
+    );
+
+  const avg=
+    (a+b)/2;
+
+  const diff=
+    avg
+      ?Math.abs(a-b)/(avg/100)
+      :0;
 
   if(diff<=5){
-    box.textContent="✅ This trade is already within the fair range.";
+
+    box.textContent=
+      "✅ This trade is already within the fair range.";
+
     return;
   }
 
-  const losing=a>b?teamB:teamA;
-  const losingName=a>b?"Team B":"Team A";
-  const target=a>b?a:b;
+  const losing=
+    a>b
+      ?teamB
+      :teamA;
+
+  const losingName=
+    a>b
+      ?"Team B"
+      :"Team A";
+
+  const target=
+    a>b
+      ?a
+      :b;
 
   if(losing.length>=8){
-    box.textContent="⚖️ "+losingName+" is already at the 8-player limit.";
+
+    box.textContent=
+      "⚖️ "+
+      losingName+
+      " is already at the 8-player limit.";
+
     return;
   }
 
-  const used=new Set(teamA.concat(teamB).map(function(p){return p.rank;}));
+  const used=
+    new Set(
+      teamA
+        .concat(teamB)
+        .map(function(player){
+
+          return player.rank;
+
+        })
+    );
+
   const options=[];
 
-    getAssetDatabase().forEach(function(player){
-    if(used.has(player.rank)) return;
+  getAssetDatabase()
+    .forEach(function(player){
 
-    const testTeam=losing.concat([player]);
-    const newValue=calculateAdjustedTeamValue(testTeam);
-    const resultAvg=(newValue+target)/2;
-    const resultDiff=resultAvg?Math.abs(newValue-target)/(resultAvg/100):0;
+      if(used.has(player.rank)){
+        return;
+      }
 
-    options.push({player:player,diff:resultDiff});
-  });
+      const testTeam=
+        losing.concat([player]);
 
-  options.sort(function(x,y){return x.diff-y.diff;});
-  const top=options.slice(0,3);
+      const newValue=
+        calculateAdjustedTeamValue(
+          testTeam
+        );
 
-  let message="⚖️ Best ways to make this closer for "+losingName+":\n";
+      const resultAvg=
+        (newValue+target)/2;
 
-  top.forEach(function(option,index){
-    message+=(index+1)+". Add "+option.player.name+" ("+getPlayerValue(option.player).toFixed(1)+") - "+option.diff.toFixed(1)+"% apart";
+      const resultDiff=
+        resultAvg
+          ?Math.abs(
+              newValue-target
+            )/(resultAvg/100)
+          :0;
 
-    if(option.diff<=5) message+=" - Fair range";
-        if(index<top.length-1) message+="\n";
-  });
+      options.push({
+        player:player,
+        diff:resultDiff
+      });
+    });
 
-  box.textContent=message;
+  options.sort(
+    function(x,y){
+
+      return x.diff-y.diff;
+
+    }
+  );
+
+  const top=
+    options.slice(0,3);
+
+  let message=
+    "⚖️ Best ways to make this closer for "+
+    losingName+
+    ":\n";
+
+  top.forEach(
+    function(option,index){
+
+      message+=
+        (index+1)+
+        ". Add "+
+        option.player.name+
+        " ("+
+        getPlayerValue(
+          option.player
+        ).toFixed(1)+
+        ") - "+
+        option.diff.toFixed(1)+
+        "% apart";
+
+      if(option.diff<=5){
+
+        message+=
+          " - Fair range";
+      }
+
+      if(
+        index<
+        top.length-1
+      ){
+
+        message+="\n";
+      }
+    }
+  );
+
+  box.textContent=
+    message;
 }
 
 function updateTradeGrade(){
-  const box=document.getElementById("trade-grade-box");
 
-  if(!teamA.length||!teamB.length){
+  const box=
+    document.getElementById(
+      "trade-grade-box"
+    );
+
+  if(
+    !teamA.length ||
+    !teamB.length
+  ){
+
     box.textContent="";
     return;
   }
 
-  const a=calculateAdjustedTeamValue(teamA);
-  const b=calculateAdjustedTeamValue(teamB);
-  const average=(a+b)/2;
+  const a=
+    calculateAdjustedTeamValue(
+      teamA
+    );
+
+  const b=
+    calculateAdjustedTeamValue(
+      teamB
+    );
+
+  const average=
+    (a+b)/2;
 
   if(!average){
+
     box.textContent="";
     return;
   }
 
-  const diff=Math.abs(a-b)/(average/100);
+  const diff=
+    Math.abs(a-b)/
+    (average/100);
+
   let grade="";
   let description="";
 
-  if(diff<=5){grade="A+";description="Excellent Balance";}
-  else if(diff<=10){grade="A";description="Very Good Balance";}
-  else if(diff<=20){grade="B";description="Good Trade";}
-  else if(diff<=30){grade="C";description="Noticeable Advantage";}
-  else if(diff<=40){grade="D";description="Lopsided Trade";}
-  else{grade="F";description="Very Lopsided Trade";}
+  if(diff<=5){
 
-  box.textContent="Trade Grade: "+grade+" — "+description;
+    grade="A+";
+    description="Excellent Balance";
+  }
+
+  else if(diff<=10){
+
+    grade="A";
+    description="Very Good Balance";
+  }
+
+  else if(diff<=20){
+
+    grade="B";
+    description="Good Trade";
+  }
+
+  else if(diff<=30){
+
+    grade="C";
+    description="Noticeable Advantage";
+  }
+
+  else if(diff<=40){
+
+    grade="D";
+    description="Lopsided Trade";
+  }
+
+  else{
+
+    grade="F";
+    description="Very Lopsided Trade";
+  }
+
+  box.textContent=
+    "Trade Grade: "+
+    grade+
+    " — "+
+    description;
 }
 
-function findBestTwoPlayerPackages(targetTeam,targetValue,used){
-const available=getAssetDatabase().filter(function(player){
-    return !used.has(player.rank);
-  });
+function findBestTwoPlayerPackages(
+  targetTeam,
+  targetValue,
+  used
+){
+
+  const available=
+    getAssetDatabase()
+      .filter(function(player){
+
+        return !used.has(
+          player.rank
+        );
+
+      });
 
   const packages=[];
 
-  for(let i=0;i<available.length;i++){
-    for(let j=i+1;j<available.length;j++){
-      const p1=available[i];
-      const p2=available[j];
-      const testTeam=targetTeam.concat([p1,p2]);
-      const value=calculateAdjustedTeamValue(testTeam);
-      const average=(value+targetValue)/2;
-      const diff=average?Math.abs(value-targetValue)/(average/100):0;
+  for(
+    let i=0;
+    i<available.length;
+    i++
+  ){
 
-      packages.push({p1:p1,p2:p2,diff:diff});
+    for(
+      let j=i+1;
+      j<available.length;
+      j++
+    ){
+
+      const p1=
+        available[i];
+
+      const p2=
+        available[j];
+
+      const testTeam=
+        targetTeam.concat([
+          p1,
+          p2
+        ]);
+
+      const value=
+        calculateAdjustedTeamValue(
+          testTeam
+        );
+
+      const average=
+        (value+targetValue)/2;
+
+      const diff=
+        average
+          ?Math.abs(
+              value-targetValue
+            )/(average/100)
+          :0;
+
+      packages.push({
+        p1:p1,
+        p2:p2,
+        diff:diff
+      });
     }
   }
 
-  packages.sort(function(a,b){return a.diff-b.diff;});
-  return packages.slice(0,3);
+  packages.sort(
+    function(a,b){
+
+      return a.diff-b.diff;
+
+    }
+  );
+
+  return packages.slice(
+    0,
+    3
+  );
 }
 
 function updateSuggestedPackage(){
-  const box=document.getElementById("package-box");
 
-  if(!teamA.length&&!teamB.length){
+  const box=
+    document.getElementById(
+      "package-box"
+    );
+
+  if(
+    !teamA.length &&
+    !teamB.length
+  ){
+
     box.textContent="";
     return;
   }
 
-  const used=new Set(teamA.concat(teamB).map(function(p){return p.rank;}));
+  const used=
+    new Set(
+      teamA
+        .concat(teamB)
+        .map(function(player){
+
+          return player.rank;
+
+        })
+    );
 
   let targetTeam=[];
   let targetValue=0;
   let packageTeamName="";
 
-  if(teamA.length&&!teamB.length){
+  if(
+    teamA.length &&
+    !teamB.length
+  ){
+
     targetTeam=[];
-    targetValue=calculateAdjustedTeamValue(teamA);
-    packageTeamName="Team B";
+
+    targetValue=
+      calculateAdjustedTeamValue(
+        teamA
+      );
+
+    packageTeamName=
+      "Team B";
   }
-  else if(teamB.length&&!teamA.length){
+
+  else if(
+    teamB.length &&
+    !teamA.length
+  ){
+
     targetTeam=[];
-    targetValue=calculateAdjustedTeamValue(teamB);
-    packageTeamName="Team A";
+
+    targetValue=
+      calculateAdjustedTeamValue(
+        teamB
+      );
+
+    packageTeamName=
+      "Team A";
   }
+
   else{
-    const a=calculateAdjustedTeamValue(teamA);
-    const b=calculateAdjustedTeamValue(teamB);
-    const average=(a+b)/2;
-    const diff=average?Math.abs(a-b)/(average/100):0;
+
+    const a=
+      calculateAdjustedTeamValue(
+        teamA
+      );
+
+    const b=
+      calculateAdjustedTeamValue(
+        teamB
+      );
+
+    const average=
+      (a+b)/2;
+
+    const diff=
+      average
+        ?Math.abs(a-b)/(average/100)
+        :0;
 
     if(diff<=5){
+
       box.textContent="";
       return;
     }
 
-    targetTeam=a>b?teamB:teamA;
-    targetValue=a>b?a:b;
-    packageTeamName=a>b?"Team B":"Team A";
+    targetTeam=
+      a>b
+        ?teamB
+        :teamA;
+
+    targetValue=
+      a>b
+        ?a
+        :b;
+
+    packageTeamName=
+      a>b
+        ?"Team B"
+        :"Team A";
 
     if(targetTeam.length>=7){
+
       box.textContent="";
       return;
     }
   }
 
-  const best=findBestTwoPlayerPackages(targetTeam,targetValue,used);
+  const best=
+    findBestTwoPlayerPackages(
+      targetTeam,
+      targetValue,
+      used
+    );
 
   if(!best.length){
+
     box.textContent="";
     return;
   }
 
-  let message="📦 Suggested 2-Player Packages for "+packageTeamName+":\n";
+  let message=
+    "📦 Suggested 2-Player Packages for "+
+    packageTeamName+
+    ":\n";
 
-  best.forEach(function(option,index){
-    message+=(index+1)+". "+option.p1.name+" + "+option.p2.name+" — "+option.diff.toFixed(1)+"% apart";
+  best.forEach(
+    function(option,index){
 
-    if(option.diff<=5) message+=" — Fair range";
-    if(index<best.length-1) message+="\n";
-  });
+      message+=
+        (index+1)+
+        ". "+
+        option.p1.name+
+        " + "+
+        option.p2.name+
+        " — "+
+        option.diff.toFixed(1)+
+        "% apart";
 
-  box.textContent=message;
+      if(option.diff<=5){
+
+        message+=
+          " — Fair range";
+      }
+
+      if(
+        index<
+        best.length-1
+      ){
+
+        message+="\n";
+      }
+    }
+  );
+
+  box.textContent=
+    message;
 }
 
 function setupThemeToggle(){
-  const button=document.getElementById("theme-toggle");
-  const html=document.documentElement;
 
-  button.addEventListener("click",function(){
-    const current=html.getAttribute("data-theme");
-    html.setAttribute("data-theme",current==="dark"?"light":"dark");
-  });
+  const button=
+    document.getElementById(
+      "theme-toggle"
+    );
+
+  const html=
+    document.documentElement;
+
+  button.addEventListener(
+    "click",
+    function(){
+
+      const current=
+        html.getAttribute(
+          "data-theme"
+        );
+
+      html.setAttribute(
+        "data-theme",
+        current==="dark"
+          ?"light"
+          :"dark"
+      );
+    }
+  );
 }
-
 
 function setupTradeButtons(){
-  document.getElementById("clear-trade-button").addEventListener("click",function(){
-    teamA.length=0;
-    teamB.length=0;
-    renderTeams();
-    calculateTrade();
-  });
 
-  document.getElementById("swap-sides-button").addEventListener("click",function(){
-    const oldTeamA=teamA;
-    teamA=teamB;
-    teamB=oldTeamA;
-    renderTeams();
-    calculateTrade();
-  });
+  document
+    .getElementById(
+      "clear-trade-button"
+    )
+    .addEventListener(
+      "click",
+      function(){
+
+        teamA.length=0;
+        teamB.length=0;
+
+        renderTeams();
+        calculateTrade();
+      }
+    );
+
+  document
+    .getElementById(
+      "swap-sides-button"
+    )
+    .addEventListener(
+      "click",
+      function(){
+
+        const oldTeamA=
+          teamA;
+
+        teamA=
+          teamB;
+
+        teamB=
+          oldTeamA;
+
+        renderTeams();
+        calculateTrade();
+      }
+    );
 }
 
-document.addEventListener("DOMContentLoaded",function(){
-  setupSearch("a",function(){return teamA;});
-  setupSearch("b",function(){return teamB;});
-  setupThemeToggle();
-  setupLeagueControls();
-  setupTradeButtons();
-  buildReferenceBoard();
-  renderTeams();
-  calculateTrade();
-});
+document.addEventListener(
+  "DOMContentLoaded",
+  function(){
+
+    setupSearch(
+      "a",
+      function(){
+        return teamA;
+      }
+    );
+
+    setupSearch(
+      "b",
+      function(){
+        return teamB;
+      }
+    );
+
+    setupThemeToggle();
+
+    setupLeagueControls();
+
+    setupTradeButtons();
+
+    buildReferenceBoard();
+
+    renderTeams();
+
+    calculateTrade();
+  }
+);
+
 </script>
 
 </body>
