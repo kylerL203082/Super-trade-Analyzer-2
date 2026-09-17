@@ -35,10 +35,18 @@
       </select>
     </label>
   
- <label class="league-control">QB Format
+<label class="league-control">QB Format
   <select id="qb-select">
     <option value="oneqb">1QB</option>
     <option value="superflex">Superflex</option>
+  </select>
+</label>
+
+<label class="league-control">TE Premium
+  <select id="te-premium-select">
+    <option value="off">Off</option>
+    <option value="half">+0.5 PPR</option>
+    <option value="full">+1.0 PPR</option>
   </select>
 </label>
   
@@ -301,6 +309,7 @@ let teamB=[];
 let scoringMode="ppr";
 let leagueMode="redraft";
 let qbMode="oneqb";
+let tePremiumMode="off";
 
   const scoringMultipliers={
   RB:{ppr:1.00,half:0.98,standard:0.95},
@@ -314,14 +323,29 @@ let qbMode="oneqb";
 function setupLeagueControls(){
   const scoring=document.getElementById("scoring-select");
   const league=document.getElementById("league-select");
-  const qb=document.getElementById("qb-select");
+function setupLeagueControls(){
+
+  const scoring=
+    document.getElementById("scoring-select");
+
+  const league=
+    document.getElementById("league-select");
+
+  const qb=
+    document.getElementById("qb-select");
+
+  const tePremium=
+    document.getElementById("te-premium-select");
 
   function changed(){
+
     scoringMode=scoring.value;
     leagueMode=league.value;
     qbMode=qb.value;
+    tePremiumMode=tePremium.value;
 
     if(leagueMode!=="dynasty"){
+
       teamA=teamA.filter(function(asset){
         return asset.pos!=="PICK";
       });
@@ -339,7 +363,24 @@ function setupLeagueControls(){
   scoring.addEventListener("change",changed);
   league.addEventListener("change",changed);
   qb.addEventListener("change",changed);
+  tePremium.addEventListener("change",changed);
 }
+
+      teamB=teamB.filter(function(asset){
+        return asset.pos!=="PICK";
+      });
+    }
+
+    buildReferenceBoard();
+    renderTeams();
+    calculateTrade();
+  }
+
+  scoring.addEventListener("change",changed);
+  league.addEventListener("change",changed);
+  qb.addEventListener("change",changed);
+}
+
 
 function getPlayerValue(player){
 
@@ -372,6 +413,45 @@ function getPlayerValue(player){
     }
 
     value=value*qbMultiplier;
+  }
+
+  if(player.pos==="TE"&&tePremiumMode!=="off"){
+
+    let teMultiplier=1.00;
+
+    if(tePremiumMode==="half"){
+
+      if(value>=75){
+        teMultiplier=1.10;
+      }
+      else if(value>=50){
+        teMultiplier=1.08;
+      }
+      else if(value>=25){
+        teMultiplier=1.06;
+      }
+      else{
+        teMultiplier=1.04;
+      }
+    }
+
+    if(tePremiumMode==="full"){
+
+      if(value>=75){
+        teMultiplier=1.18;
+      }
+      else if(value>=50){
+        teMultiplier=1.14;
+      }
+      else if(value>=25){
+        teMultiplier=1.10;
+      }
+      else{
+        teMultiplier=1.06;
+      }
+    }
+
+    value=value*teMultiplier;
   }
 
   return Math.max(
