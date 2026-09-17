@@ -1,4 +1,9 @@
-/* Core Structural Theme Configurations */
+
+### 2. CSS Style Sheet (`styles.css`)
+Make sure your separate `styles.css` file contains this corresponding layout file code block:
+
+```css
+/* Core Layout Themes */
 :root[data-theme="dark"] {
     --bg-main: #000000;
     --text-main: #ffffff;
@@ -6,6 +11,7 @@
     --bg-surface: #111111;
     --border-ui: #27272a;
     --brand-color: #38bdf8;
+    --meter-track-color: #27272a;
 }
 
 :root[data-theme="light"] {
@@ -15,14 +21,15 @@
     --bg-surface: #f3f4f6;
     --border-ui: #e5e7eb;
     --brand-color: #0284c7;
+    --meter-track-color: #e5e7eb;
 }
 
-/* Engine Resets */
+/* Global Engine Setup */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 body {
@@ -34,7 +41,7 @@ body {
     flex-direction: column;
 }
 
-/* Nav Elements */
+/* Navbar Controls */
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -48,6 +55,19 @@ body {
     font-size: 1.4rem;
     font-weight: 800;
     color: var(--brand-color);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.ppr-badge {
+    font-size: 0.75rem;
+    background-color: var(--brand-color);
+    color: #ffffff;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-weight: bold;
+    text-transform: uppercase;
 }
 
 .toggle-btn {
@@ -58,17 +78,94 @@ body {
     border-radius: 20px;
     cursor: pointer;
     font-weight: 600;
-    font-size: 0.85rem;
 }
 
-/* Flex Grid Containers */
+/* Global Value Cheat-Sheet Header */
+.value-board-section {
+    width: 90%;
+    max-width: 1200px;
+    margin: 1.5rem auto 0 auto;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-ui);
+    border-radius: 10px;
+    padding: 1.25rem;
+}
+
+.value-board-section h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+    color: var(--brand-color);
+    text-align: center;
+}
+
+.value-board-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.value-card {
+    background-color: var(--bg-main);
+    border: 1px solid var(--border-ui);
+    padding: 0.75rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+
+.value-card h4 {
+    color: var(--brand-color);
+    margin-bottom: 0.25rem;
+    border-bottom: 1px solid var(--border-ui);
+}
+
+.value-card p {
+    color: var(--text-muted);
+}
+
+/* Visual Dashboard Balance Meter Rules */
+.meter-dashboard {
+    width: 90%;
+    max-width: 1200px;
+    margin: 1.5rem auto 0 auto;
+    text-align: center;
+}
+
+.meter-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.left-label { color: #38bdf8; }
+.right-label { color: #f43f5e; }
+
+.meter-track {
+    width: 100%;
+    height: 18px;
+    background-color: #f43f5e;
+    border-radius: 9px;
+    overflow: hidden;
+    border: 1px solid var(--border-ui);
+    position: relative;
+}
+
+.meter-fill {
+    height: 100%;
+    background-color: #38bdf8;
+    width: 50%;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Main Display Panels */
 .analyzer-container {
     display: flex;
     flex: 1;
     width: 90%;
     max-width: 1200px;
-    margin: 2rem auto;
-    gap: 3rem;
+    margin: 1.5rem auto;
+    gap: 2rem;
 }
 
 .team-column {
@@ -82,12 +179,12 @@ body {
 }
 
 .team-column h2 {
-    font-size: 1.75rem;
-    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    margin-bottom: 1.25rem;
     text-align: center;
 }
 
-/* Dynamic Lookup Controls */
+/* Input Fields & Suggestion Box Layouts */
 .search-container {
     position: relative;
     margin-bottom: 1.5rem;
@@ -109,18 +206,15 @@ body {
 
 .dropdown-list {
     position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
+    top: 100%; left: 0; right: 0;
     background-color: var(--bg-surface);
     border: 1px solid var(--border-ui);
     border-radius: 8px;
-    max-height: 250px;
+    max-height: 200px;
     overflow-y: auto;
     z-index: 50;
     display: none;
     margin-top: 0.25rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 .dropdown-item {
@@ -134,7 +228,7 @@ body {
     color: #ffffff;
 }
 
-/* Player Render Cards & Mirrored Utilities */
+/* Player Identity Components & Ordering Layout rules */
 .player-list {
     flex: 1;
     display: flex;
@@ -169,6 +263,11 @@ body {
     font-weight: bold;
 }
 
+.trend-indicator {
+    margin-left: 0.25rem;
+    font-size: 0.9rem;
+}
+
 .player-score-label {
     font-weight: 700;
     color: var(--brand-color);
@@ -179,13 +278,12 @@ body {
     border: none;
     color: #ef4444;
     cursor: pointer;
-    font-size: 1rem;
-    padding: 0 0.25rem;
+    font-size: 1.1rem;
 }
 
-/* Bottom Calculation Banners */
+/* Footer Banner Summaries */
 .total-score {
-    font-size: 1.25rem;
+    font-size: 1.2rem;
     font-weight: 700;
     text-align: center;
     border-top: 2px dashed var(--border-ui);
@@ -194,21 +292,20 @@ body {
 
 .verdict-container {
     text-align: center;
-    padding: 2.5rem 1rem;
+    padding: 2rem 1rem;
     background-color: var(--bg-surface);
     border-top: 1px solid var(--border-ui);
 }
 
 .verdict-container h1 {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
     font-weight: 800;
 }
 
-/* Responsive Viewports */
+/* Responsive Structural Collapse */
 @media (max-width: 768px) {
     .analyzer-container {
         flex-direction: column;
         gap: 1.5rem;
     }
 }
-
