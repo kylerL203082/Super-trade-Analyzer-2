@@ -1,1382 +1,558 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
-
 <head>
-    <meta charset="UTF-8">
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>Super Trade Analyzer</title>
-
-    <link
-        rel="stylesheet"
-        href="styles.css?v=3"
-    >
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Super Trade Analyzer</title>
+<link rel="stylesheet" href="styles.css?v=3">
+<style>
+.navbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.league-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.league-control{display:flex;align-items:center;gap:6px;font-size:14px}
+.league-control select{padding:8px 10px;border-radius:8px;border:1px solid rgba(127,127,127,.35);background:inherit;color:inherit}
+.trade-extra{margin-top:12px;text-align:center;white-space:pre-line}
+.trade-controls{margin-top:15px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+@media(max-width:760px){.league-controls{width:100%;justify-content:center}}
+</style>
 </head>
-
-
 <body>
 
-    <!-- =====================================================
-         HEADER
-    ====================================================== -->
+<nav class="navbar">
+  <div class="league-controls">
+    <label class="league-control">Scoring
+      <select id="scoring-select">
+        <option value="ppr">PPR</option>
+        <option value="half">0.5 PPR</option>
+        <option value="standard">No PPR</option>
+      </select>
+    </label>
 
-    <nav class="navbar">
+    <label class="league-control">League
+      <select id="league-select">
+        <option value="redraft">Redraft</option>
+        <option value="keeper">Keeper</option>
+        <option value="dynasty">Dynasty</option>
+      </select>
+    </label>
+  </div>
 
-        <div class="logo">
-            🏈 Super Trade Analyzer
-            <span class="ppr-badge">PPR Format</span>
-        </div>
+  <div class="logo">
+    🏈 Super Trade Analyzer
+    <span id="format-badge" class="ppr-badge">PPR • Redraft</span>
+  </div>
 
-        <button
-            id="theme-toggle"
-            class="toggle-btn"
-            type="button"
-        >
-            Toggle Theme
-        </button>
+  <button id="theme-toggle" class="toggle-btn" type="button">Toggle Theme</button>
+</nav>
 
-    </nav>
+<section class="value-board-section">
+  <h3 id="reference-heading">📊 Top Market Values Reference — PPR • Redraft</h3>
+  <div class="value-board-grid">
+    <div class="value-card"><h4>Top Running Backs</h4><div id="top-rb"></div></div>
+    <div class="value-card"><h4>Top Wide Receivers</h4><div id="top-wr"></div></div>
+    <div class="value-card"><h4>Top Quarterbacks</h4><div id="top-qb"></div></div>
+    <div class="value-card"><h4>Top Tight Ends</h4><div id="top-te"></div></div>
+  </div>
+</section>
 
+<section class="meter-dashboard">
+  <div class="meter-labels">
+    <span class="left-label">⬅ Favors Team A</span>
+    <span id="meter-percentage">50% / 50%</span>
+    <span class="right-label">Favors Team B ➡</span>
+  </div>
+  <div class="meter-track">
+    <div id="meter-bar" class="meter-fill" style="width:50%;"></div>
+  </div>
+</section>
 
-    <!-- =====================================================
-         TOP VALUE REFERENCE BOARD
-         Generated automatically from playerDatabase
-    ====================================================== -->
-
-    <section class="value-board-section">
-
-        <h3>
-            📊 Top Market Values Reference (Custom PPR Rankings)
-        </h3>
-
-        <div class="value-board-grid">
-
-            <div class="value-card">
-                <h4>Top Running Backs</h4>
-                <div id="top-rb"></div>
-            </div>
-
-            <div class="value-card">
-                <h4>Top Wide Receivers</h4>
-                <div id="top-wr"></div>
-            </div>
-
-            <div class="value-card">
-                <h4>Top Quarterbacks</h4>
-                <div id="top-qb"></div>
-            </div>
-
-            <div class="value-card">
-                <h4>Top Tight Ends</h4>
-                <div id="top-te"></div>
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         TRADE BALANCE METER
-    ====================================================== -->
-
-    <section class="meter-dashboard">
-
-        <div class="meter-labels">
-
-            <span class="left-label">
-                ⬅ Favors Team A
-            </span>
-
-            <span id="meter-percentage">
-                50% / 50%
-            </span>
-
-            <span class="right-label">
-                Favors Team B ➡
-            </span>
-
-        </div>
-
-        <div class="meter-track">
-
-            <div
-                id="meter-bar"
-                class="meter-fill"
-                style="width: 50%;"
-            ></div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         TRADE WORKSPACE
-    ====================================================== -->
-
-    <main class="analyzer-container">
-
-        <!-- TEAM A -->
-
-        <div class="team-column">
-
-            <h2>Team A</h2>
-
-            <div class="search-container">
-
-                <input
-                    type="text"
-                    id="search-a"
-                    placeholder="Type player name..."
-                    autocomplete="off"
-                >
-
-                <div
-                    id="dropdown-a"
-                    class="dropdown-list"
-                ></div>
-
-            </div>
-
-            <div
-                id="team-list-a"
-                class="player-list"
-            ></div>
-
-            <div
-                class="total-score"
-                id="total-a"
-            >
-                Base: 0.0 | Adjusted: 0.0
-            </div>
-
-        </div>
-
-
-        <!-- TEAM B -->
-
-        <div class="team-column">
-
-            <h2>Team B</h2>
-
-            <div class="search-container">
-
-                <input
-                    type="text"
-                    id="search-b"
-                    placeholder="Type player name..."
-                    autocomplete="off"
-                >
-
-                <div
-                    id="dropdown-b"
-                    class="dropdown-list"
-                ></div>
-
-            </div>
-
-            <div
-                id="team-list-b"
-                class="player-list"
-            ></div>
-
-            <div
-                class="total-score"
-                id="total-b"
-            >
-                Base: 0.0 | Adjusted: 0.0
-            </div>
-
-        </div>
-
-    </main>
-
-
-    <!-- =====================================================
-         TRADE VERDICT
-    ====================================================== -->
-
-    <div class="verdict-container">
-
-        <h1 id="verdict-heading">
-            Add players to analyze
-        </h1>
-
+<main class="analyzer-container">
+  <div class="team-column">
+    <h2>Team A</h2>
+    <div class="search-container">
+      <input type="text" id="search-a" placeholder="Type player name..." autocomplete="off">
+      <div id="dropdown-a" class="dropdown-list"></div>
     </div>
-
-
-    <!-- =====================================================
-         JAVASCRIPT
-    ====================================================== -->
-
-    <script>
-
-        /* =====================================================
-           TRADE MODEL SETTINGS
-        ====================================================== */
-
-        const SUPERSTAR_FACTOR = 1.25;
-
-        const PACKAGE_WEIGHTS = [
-            1.00,
-            0.95,
-            0.90,
-            0.85,
-            0.80,
-            0.80,
-            0.80,
-            0.80
-        ];
-
-
-        /* =====================================================
-           PLAYER DATABASE
-        ====================================================== */
-
-        const playerDatabase = [
-
-            { rank: 1, name: "Bijan Robinson", pos: "RB", value: 99.0, trend: "📈" },
-            { rank: 2, name: "Jahmyr Gibbs", pos: "RB", value: 97.8, trend: "📈" },
-            { rank: 3, name: "Ja'Marr Chase", pos: "WR", value: 96.4, trend: "📈" },
-            { rank: 4, name: "Puka Nacua", pos: "WR", value: 94.1, trend: "📈" },
-            { rank: 5, name: "Jaxon Smith-Njigba", pos: "WR", value: 92.9, trend: "📈" },
-            { rank: 6, name: "Christian McCaffrey", pos: "RB", value: 91.8, trend: "📈" },
-            { rank: 7, name: "Jonathan Taylor", pos: "RB", value: 91.7, trend: "📈" },
-            { rank: 8, name: "De'Von Achane", pos: "RB", value: 90.5, trend: "📈" },
-            { rank: 9, name: "Amon-Ra St. Brown", pos: "WR", value: 89.3, trend: "📈" },
-            { rank: 10, name: "James Cook III", pos: "RB", value: 88.0, trend: "📈" },
-
-            { rank: 11, name: "Derrick Henry", pos: "RB", value: 86.8, trend: "📈" },
-            { rank: 12, name: "Justin Jefferson", pos: "WR", value: 86.2, trend: "📈" },
-            { rank: 13, name: "CeeDee Lamb", pos: "WR", value: 85.0, trend: "📉" },
-            { rank: 14, name: "Chase Brown", pos: "RB", value: 83.7, trend: "📈" },
-            { rank: 15, name: "Kenneth Walker III", pos: "RB", value: 83.1, trend: "📈" },
-            { rank: 16, name: "Trey McBride", pos: "TE", value: 82.5, trend: "📈" },
-            { rank: 17, name: "Drake London", pos: "WR", value: 81.3, trend: "📈" },
-            { rank: 18, name: "Brock Bowers", pos: "TE", value: 80.1, trend: "📈" },
-            { rank: 19, name: "Rashee Rice", pos: "WR", value: 78.9, trend: "📈" },
-            { rank: 20, name: "Jeremiyah Love", pos: "RB", value: 77.6, trend: "📈" },
-
-            { rank: 21, name: "Saquon Barkley", pos: "RB", value: 77.0, trend: "📈" },
-            { rank: 22, name: "Omarion Hampton", pos: "RB", value: 75.8, trend: "📈" },
-            { rank: 23, name: "Ashton Jeanty", pos: "RB", value: 75.4, trend: "📈" },
-            { rank: 24, name: "Javonte Williams", pos: "RB", value: 74.2, trend: "📈" },
-            { rank: 25, name: "Malik Nabers", pos: "WR", value: 73.0, trend: "📈" },
-            { rank: 26, name: "A.J. Brown", pos: "WR", value: 71.8, trend: "📈" },
-            { rank: 27, name: "Chris Olave", pos: "WR", value: 71.2, trend: "📈" },
-            { rank: 28, name: "Josh Allen", pos: "QB", value: 70.6, trend: "📈" },
-            { rank: 29, name: "George Pickens", pos: "WR", value: 69.4, trend: "📈" },
-            { rank: 30, name: "Colston Loveland", pos: "TE", value: 67.6, trend: "📈" },
-
-            { rank: 31, name: "Kyren Williams", pos: "RB", value: 67.5, trend: "📈" },
-            { rank: 32, name: "Travis Etienne Jr.", pos: "RB", value: 66.3, trend: "📈" },
-            { rank: 33, name: "Emeka Egbuka", pos: "WR", value: 65.7, trend: "📈" },
-            { rank: 34, name: "Garrett Wilson", pos: "WR", value: 65.1, trend: "📈" },
-            { rank: 35, name: "Breece Hall", pos: "RB", value: 64.4, trend: "📈" },
-            { rank: 36, name: "Lamar Jackson", pos: "QB", value: 63.8, trend: "📈" },
-            { rank: 37, name: "Quinshon Judkins", pos: "RB", value: 62.6, trend: "📈" },
-            { rank: 38, name: "D'Andre Swift", pos: "RB", value: 62.0, trend: "📈" },
-            { rank: 39, name: "Nico Collins", pos: "WR", value: 61.2, trend: "📈" },
-            { rank: 40, name: "Jayden Daniels", pos: "QB", value: 60.6, trend: "📈" },
-
-            { rank: 41, name: "Zay Flowers", pos: "WR", value: 59.4, trend: "📈" },
-            { rank: 42, name: "Tetairoa McMillan", pos: "WR", value: 58.8, trend: "📈" },
-            { rank: 43, name: "DeVonta Smith", pos: "WR", value: 58.2, trend: "📈" },
-            { rank: 44, name: "Jaylen Waddle", pos: "WR", value: 57.6, trend: "📈" },
-            { rank: 45, name: "Cam Skattebo", pos: "RB", value: 56.4, trend: "📈" },
-            { rank: 46, name: "Tyler Warren", pos: "TE", value: 55.8, trend: "📈" },
-            { rank: 47, name: "Bucky Irving", pos: "RB", value: 55.2, trend: "📈" },
-            { rank: 48, name: "Drake Maye", pos: "QB", value: 54.6, trend: "📈" },
-            { rank: 49, name: "Bhayshul Tuten", pos: "RB", value: 53.9, trend: "📈" },
-            { rank: 50, name: "Davante Adams", pos: "WR", value: 53.3, trend: "📈" },
-
-            { rank: 51, name: "Ladd McConkey", pos: "WR", value: 52.7, trend: "📈" },
-            { rank: 52, name: "Jalen Hurts", pos: "QB", value: 52.1, trend: "📈" },
-            { rank: 53, name: "Harold Fannin Jr.", pos: "TE", value: 51.5, trend: "📈" },
-            { rank: 54, name: "Jadarian Price", pos: "RB", value: 50.9, trend: "📈" },
-            { rank: 55, name: "Josh Jacobs", pos: "RB", value: 50.3, trend: "📈" },
-            { rank: 56, name: "David Montgomery", pos: "RB", value: 49.6, trend: "📈" },
-            { rank: 57, name: "Tee Higgins", pos: "WR", value: 49.0, trend: "📈" },
-            { rank: 58, name: "Kyle Pitts Sr.", pos: "TE", value: 48.4, trend: "📈" },
-            { rank: 59, name: "Justin Herbert", pos: "QB", value: 47.8, trend: "📈" },
-            { rank: 60, name: "Terry McLaurin", pos: "WR", value: 47.2, trend: "📈" },
-
-            { rank: 61, name: "Carnell Tate", pos: "WR", value: 46.6, trend: "📈" },
-            { rank: 62, name: "Rhamondre Stevenson", pos: "RB", value: 46.0, trend: "📈" },
-            { rank: 63, name: "Tony Pollard", pos: "RB", value: 45.3, trend: "📈" },
-            { rank: 64, name: "George Kittle", pos: "TE", value: 44.7, trend: "📈" },
-            { rank: 65, name: "Chuba Hubbard", pos: "RB", value: 44.1, trend: "📈" },
-            { rank: 66, name: "TreVeyon Henderson", pos: "RB", value: 43.5, trend: "📈" },
-            { rank: 67, name: "Rome Odunze", pos: "WR", value: 42.9, trend: "📈" },
-            { rank: 68, name: "DK Metcalf", pos: "WR", value: 42.3, trend: "📈" },
-            { rank: 69, name: "Kenneth Gainwell", pos: "RB", value: 41.7, trend: "📈" },
-            { rank: 70, name: "Jaxson Dart", pos: "QB", value: 41.0, trend: "📈" },
-
-            { rank: 71, name: "Jaylen Warren", pos: "RB", value: 40.4, trend: "📈" },
-            { rank: 72, name: "DJ Moore", pos: "WR", value: 39.8, trend: "📈" },
-            { rank: 73, name: "Joe Burrow", pos: "QB", value: 39.2, trend: "📈" },
-            { rank: 74, name: "Marvin Harrison Jr.", pos: "WR", value: 38.6, trend: "📈" },
-            { rank: 75, name: "Trevor Lawrence", pos: "QB", value: 38.0, trend: "📈" },
-            { rank: 76, name: "Christian Watson", pos: "WR", value: 37.4, trend: "📈" },
-            { rank: 77, name: "Luther Burden III", pos: "WR", value: 36.7, trend: "📈" },
-            { rank: 78, name: "Parker Washington", pos: "WR", value: 36.1, trend: "📈" },
-            { rank: 79, name: "Jameson Williams", pos: "WR", value: 35.5, trend: "📈" },
-            { rank: 80, name: "Wan'Dale Robinson", pos: "WR", value: 34.9, trend: "📈" },
-
-            { rank: 81, name: "Rachaad White", pos: "RB", value: 34.3, trend: "📈" },
-            { rank: 82, name: "Sam LaPorta", pos: "TE", value: 33.7, trend: "📈" },
-            { rank: 83, name: "Aaron Jones Sr.", pos: "RB", value: 33.1, trend: "📈" },
-            { rank: 84, name: "Stefon Diggs", pos: "WR", value: 32.4, trend: "📈" },
-            { rank: 85, name: "Michael Wilson", pos: "WR", value: 31.8, trend: "📈" },
-            { rank: 86, name: "Mike Evans", pos: "WR", value: 31.2, trend: "📈" },
-            { rank: 87, name: "Courtland Sutton", pos: "WR", value: 30.6, trend: "📈" },
-            { rank: 88, name: "Tucker Kraft", pos: "TE", value: 30.0, trend: "📈" },
-            { rank: 89, name: "Dak Prescott", pos: "QB", value: 29.4, trend: "📈" },
-            { rank: 90, name: "Patrick Mahomes", pos: "QB", value: 28.8, trend: "📉" },
-
-            { rank: 91, name: "Michael Pittman Jr.", pos: "WR", value: 28.2, trend: "📈" },
-            { rank: 92, name: "Jake Ferguson", pos: "TE", value: 27.5, trend: "📈" },
-            { rank: 93, name: "Jakobi Meyers", pos: "WR", value: 26.9, trend: "📈" },
-            { rank: 94, name: "Dallas Goedert", pos: "TE", value: 26.3, trend: "📈" },
-            { rank: 95, name: "MarShawn Lloyd", pos: "RB", value: 25.7, trend: "📈" },
-            { rank: 96, name: "Brock Purdy", pos: "QB", value: 25.1, trend: "📈" },
-            { rank: 97, name: "Matthew Stafford", pos: "QB", value: 24.5, trend: "📈" },
-            { rank: 98, name: "Bo Nix", pos: "QB", value: 23.9, trend: "📈" },
-            { rank: 99, name: "Travis Kelce", pos: "TE", value: 23.2, trend: "📉" },
-            { rank: 100, name: "Kyle Monangai", pos: "RB", value: 22.6, trend: "📈" },
-
-            { rank: 101, name: "Jonathon Brooks", pos: "RB", value: 22.0, trend: "📈" },
-            { rank: 102, name: "Chris Godwin Jr.", pos: "WR", value: 21.4, trend: "📈" },
-            { rank: 103, name: "Matthew Golden", pos: "WR", value: 20.8, trend: "📈" },
-            { rank: 104, name: "Alec Pierce", pos: "WR", value: 20.2, trend: "📈" },
-            { rank: 105, name: "Josh Downs", pos: "WR", value: 19.6, trend: "📈" },
-            { rank: 106, name: "Caleb Williams", pos: "QB", value: 19.0, trend: "📈" },
-            { rank: 107, name: "Brian Thomas Jr.", pos: "WR", value: 18.3, trend: "📈" },
-            { rank: 108, name: "De'Zhaun Stribling", pos: "WR", value: 17.7, trend: "📈" },
-            { rank: 109, name: "J.K. Dobbins", pos: "RB", value: 17.1, trend: "📈" },
-            { rank: 110, name: "RJ Harvey", pos: "RB", value: 16.5, trend: "📈" },
-
-            { rank: 111, name: "Jacory Croskey-Merritt", pos: "RB", value: 15.9, trend: "📈" },
-            { rank: 112, name: "Jordan Love", pos: "QB", value: 15.3, trend: "📈" },
-            { rank: 113, name: "Daniel Jones", pos: "QB", value: 14.7, trend: "📈" },
-            { rank: 114, name: "Blake Corum", pos: "RB", value: 14.1, trend: "📈" },
-            { rank: 115, name: "Romeo Doubs", pos: "WR", value: 13.4, trend: "📈" },
-            { rank: 116, name: "Rico Dowdle", pos: "RB", value: 12.8, trend: "📈" },
-            { rank: 117, name: "Jordan Addison", pos: "WR", value: 12.2, trend: "📈" },
-            { rank: 118, name: "Juwan Johnson", pos: "TE", value: 11.6, trend: "📈" },
-            { rank: 119, name: "Hunter Henry", pos: "TE", value: 11.0, trend: "📈" },
-            { rank: 120, name: "Jalen Coker", pos: "WR", value: 10.4, trend: "📈" },
-
-            { rank: 121, name: "Dalton Schultz", pos: "TE", value: 9.8, trend: "📈" },
-            { rank: 122, name: "Tyler Shough", pos: "QB", value: 9.1, trend: "📈" },
-            { rank: 123, name: "Tyjae Spears", pos: "RB", value: 8.5, trend: "📈" },
-            { rank: 124, name: "Zach Charbonnet", pos: "RB", value: 7.9, trend: "📈" },
-            { rank: 125, name: "Woody Marks", pos: "RB", value: 7.3, trend: "📈" },
-            { rank: 126, name: "Jordan Mason", pos: "RB", value: 6.7, trend: "📈" },
-            { rank: 127, name: "Isaiah Likely", pos: "TE", value: 6.1, trend: "📈" },
-            { rank: 128, name: "Kyler Murray", pos: "QB", value: 5.5, trend: "📈" },
-            { rank: 129, name: "Khalil Shakir", pos: "WR", value: 4.9, trend: "📈" },
-            { rank: 130, name: "Deebo Samuel", pos: "WR", value: 4.3, trend: "📈" },
-
-            { rank: 131, name: "Keenan Allen", pos: "WR", value: 3.6, trend: "📈" },
-            { rank: 132, name: "Calvin Ridley", pos: "WR", value: 3.0, trend: "📈" },
-            { rank: 133, name: "Alvin Kamara", pos: "RB", value: 2.4, trend: "📈" },
-            { rank: 134, name: "Quentin Johnston", pos: "WR", value: 1.8, trend: "📈" },
-            { rank: 135, name: "Jayden Reed", pos: "WR", value: 1.2, trend: "📈" },
-            { rank: 136, name: "Xavier Worthy", pos: "WR", value: 0.6, trend: "📈" },
-            { rank: 137, name: "Tank Dell", pos: "WR", value: 0.1, trend: "📈" },
-            { rank: 138, name: "Tyler Allgeier", pos: "RB", value: 0.1, trend: "📈" },
-            { rank: 139, name: "Keaton Mitchell", pos: "RB", value: 0.1, trend: "📈" },
-            { rank: 140, name: "Isiah Pacheco", pos: "RB", value: 0.1, trend: "📈" },
-
-            { rank: 141, name: "Brandon Aubrey", pos: "K", value: 12.4, trend: "📈" },
-            { rank: 142, name: "Cameron Dicker", pos: "K", value: 11.8, trend: "📈" },
-            { rank: 143, name: "Houston Texans DST", pos: "DST", value: 11.2, trend: "📈" },
-            { rank: 144, name: "Denver Broncos DST", pos: "DST", value: 10.6, trend: "📈" },
-            { rank: 145, name: "Seattle Seahawks DST", pos: "DST", value: 10.0, trend: "📈" },
-            { rank: 146, name: "Los Angeles Rams DST", pos: "DST", value: 9.4, trend: "📈" },
-            { rank: 147, name: "Pittsburgh Steelers DST", pos: "DST", value: 8.8, trend: "📈" },
-            { rank: 148, name: "Ka'imi Fairbairn", pos: "K", value: 8.2, trend: "📈" },
-            { rank: 149, name: "Eddy Pineiro", pos: "K", value: 7.6, trend: "📈" },
-            { rank: 150, name: "Chris Boswell", pos: "K", value: 7.0, trend: "📈" },
-
-            { rank: 151, name: "Los Angeles Chargers DST", pos: "DST", value: 6.4, trend: "📈" },
-            { rank: 152, name: "New England Patriots DST", pos: "DST", value: 5.8, trend: "📈" },
-            { rank: 153, name: "Minnesota Vikings DST", pos: "DST", value: 5.2, trend: "📈" },
-            { rank: 154, name: "Philadelphia Eagles DST", pos: "DST", value: 4.6, trend: "📈" },
-            { rank: 155, name: "Green Bay Packers DST", pos: "DST", value: 4.0, trend: "📈" },
-            { rank: 156, name: "Harrison Butker", pos: "K", value: 3.9, trend: "📈" },
-            { rank: 157, name: "Jason Myers", pos: "K", value: 3.8, trend: "📈" },
-            { rank: 158, name: "Will Reichard", pos: "K", value: 3.2, trend: "📈" },
-            { rank: 159, name: "Cam Little", pos: "K", value: 2.6, trend: "📈" },
-            { rank: 160, name: "Harrison Mevis", pos: "K", value: 2.0, trend: "📈" }
-
-        ];
-
-
-        /* =====================================================
-           CURRENT TRADE
-        ====================================================== */
-
-        let teamA = [];
-        let teamB = [];
-
-
-        /* =====================================================
-           START APP
-        ====================================================== */
-
-        document.addEventListener(
-            "DOMContentLoaded",
-            function () {
-
-                buildReferenceBoard();
-
-                setupSearch("a", teamA);
-                setupSearch("b", teamB);
-
-                setupThemeToggle();
-
-                renderTeams();
-                calculateTrade();
-
-            }
-        );
-
-
-        /* =====================================================
-           REFERENCE BOARD
-        ====================================================== */
-
-        function buildReferenceBoard() {
-
-            renderTopPlayers("RB", "top-rb");
-            renderTopPlayers("WR", "top-wr");
-            renderTopPlayers("QB", "top-qb");
-            renderTopPlayers("TE", "top-te");
-
-        }
-
-
-        function renderTopPlayers(position, elementId) {
-
-            const container =
-                document.getElementById(elementId);
-
-            const players =
-                playerDatabase
-                    .filter(function (player) {
-                        return player.pos === position;
-                    })
-                    .sort(function (a, b) {
-                        return a.rank - b.rank;
-                    })
-                    .slice(0, 3);
-
-            container.innerHTML = "";
-
-            players.forEach(
-                function (player) {
-
-                    const line =
-                        document.createElement("p");
-
-                    line.textContent =
-                        player.rank +
-                        ". " +
-                        abbreviateName(player.name) +
-                        " (" +
-                        player.value.toFixed(1) +
-                        ")";
-
-                    container.appendChild(line);
-
-                }
-            );
-
-        }
-
-
-        function abbreviateName(name) {
-
-            const parts =
-                name.trim().split(/\s+/);
-
-            if (parts.length === 1) {
-                return parts[0];
-            }
-
-            const firstInitial =
-                parts[0].charAt(0) + ".";
-
-            const lastName =
-                parts.slice(1).join(" ");
-
-            return (
-                firstInitial +
-                " " +
-                lastName
-            );
-
-        }
-
-
-        /* =====================================================
-           SUPERSTAR VALUE CURVE
-        ====================================================== */
-
-        function getAdjustedPlayerValue(baseValue) {
-
-            if (
-                typeof baseValue !== "number" ||
-                baseValue <= 0
-            ) {
-
-                return 0;
-
-            }
-
-            return (
-                100 *
-                Math.pow(
-                    baseValue / 100,
-                    SUPERSTAR_FACTOR
-                )
-            );
-
-        }
-
-
-        /* =====================================================
-           PACKAGE / CONSOLIDATION VALUE
-        ====================================================== */
-
-        function calculateAdjustedTeamValue(team) {
-
-            if (
-                !Array.isArray(team) ||
-                team.length === 0
-            ) {
-
-                return 0;
-
-            }
-
-            const adjustedPlayers =
-                team.map(
-                    function (player) {
-
-                        return {
-                            player: player,
-                            adjustedValue:
-                                getAdjustedPlayerValue(
-                                    player.value
-                                )
-                        };
-
-                    }
-                );
-
-            adjustedPlayers.sort(
-                function (a, b) {
-
-                    return (
-                        b.adjustedValue -
-                        a.adjustedValue
-                    );
-
-                }
-            );
-
-            return adjustedPlayers.reduce(
-                function (total, item, index) {
-
-                    const weight =
-                        PACKAGE_WEIGHTS[index] !== undefined
-                            ? PACKAGE_WEIGHTS[index]
-                            : 0.80;
-
-                    return (
-                        total +
-                        item.adjustedValue *
-                        weight
-                    );
-
-                },
-                0
-            );
-
-        }
-
-
-        /* =====================================================
-           SEARCH
-        ====================================================== */
-
-        function setupSearch(
-            teamId,
-            teamArray
-        ) {
-
-            const input =
-                document.getElementById(
-                    "search-" + teamId
-                );
-
-            const dropdown =
-                document.getElementById(
-                    "dropdown-" + teamId
-                );
-
-            input.addEventListener(
-                "input",
-                function () {
-
-                    const query =
-                        input.value
-                            .toLowerCase()
-                            .trim();
-
-                    dropdown.innerHTML = "";
-
-                    if (!query) {
-
-                        dropdown.style.display =
-                            "none";
-
-                        return;
-
-                    }
-
-                    const matches =
-                        playerDatabase
-                            .filter(
-                                function (player) {
-
-                                    return player.name
-                                        .toLowerCase()
-                                        .includes(query);
-
-                                }
-                            )
-                            .sort(
-                                function (a, b) {
-
-                                    return (
-                                        a.rank -
-                                        b.rank
-                                    );
-
-                                }
-                            );
-
-                    if (
-                        matches.length === 0
-                    ) {
-
-                        dropdown.style.display =
-                            "none";
-
-                        return;
-
-                    }
-
-                    dropdown.style.display =
-                        "block";
-
-                    matches.forEach(
-                        function (player) {
-
-                            const item =
-                                document.createElement(
-                                    "div"
-                                );
-
-                            item.className =
-                                "dropdown-item";
-
-                            item.textContent =
-                                "#" +
-                                player.rank +
-                                " " +
-                                player.name +
-                                " (" +
-                                player.pos +
-                                ") " +
-                                player.trend +
-                                " - Value: " +
-                                player.value.toFixed(1);
-
-                            item.addEventListener(
-                                "click",
-                                function () {
-
-                                    addPlayerToTrade(
-                                        player,
-                                        teamArray
-                                    );
-
-                                    input.value =
-                                        "";
-
-                                    dropdown.innerHTML =
-                                        "";
-
-                                    dropdown.style.display =
-                                        "none";
-
-                                }
-                            );
-
-                            dropdown.appendChild(
-                                item
-                            );
-
-                        }
-                    );
-
-                }
-            );
-
-            document.addEventListener(
-                "click",
-                function (event) {
-
-                    if (
-                        !input.contains(
-                            event.target
-                        ) &&
-                        !dropdown.contains(
-                            event.target
-                        )
-                    ) {
-
-                        dropdown.style.display =
-                            "none";
-
-                    }
-
-                }
-            );
-
-        }
-
-
-        /* =====================================================
-           ADD PLAYER
-        ====================================================== */
-
-        function addPlayerToTrade(
-            player,
-            destinationTeam
-        ) {
-
-            const playerAlreadyAdded =
-                teamA
-                    .concat(teamB)
-                    .some(
-                        function (selectedPlayer) {
-
-                            return (
-                                selectedPlayer.rank ===
-                                player.rank
-                            );
-
-                        }
-                    );
-
-            if (playerAlreadyAdded) {
-
-                alert(
-                    player.name +
-                    " is already included in this trade."
-                );
-
-                return;
-
-            }
-
-            if (
-                destinationTeam.length >= 8
-            ) {
-
-                alert(
-                    "Maximum capacity reached. Max 8 players per side."
-                );
-
-                return;
-
-            }
-
-            destinationTeam.push(player);
-
-            renderTeams();
-
-            calculateTrade();
-
-        }
-
-
-        /* =====================================================
-           RENDER TEAMS
-        ====================================================== */
-
-        function renderTeams() {
-
-            renderTeam(
-                "a",
-                teamA
-            );
-
-            renderTeam(
-                "b",
-                teamB
-            );
-
-        }
-
-
-        function renderTeam(
-            teamId,
-            teamArray
-        ) {
-
-            const list =
-                document.getElementById(
-                    "team-list-" + teamId
-                );
-
-            list.innerHTML = "";
-
-            teamArray.forEach(
-                function (player, index) {
-
-                    const row =
-                        document.createElement(
-                            "div"
-                        );
-
-                    row.className =
-                        "player-row";
-
-
-                    const removeButton =
-                        document.createElement(
-                            "button"
-                        );
-
-                    removeButton.className =
-                        "remove-btn";
-
-                    removeButton.type =
-                        "button";
-
-                    removeButton.textContent =
-                        "✕";
-
-                    removeButton.setAttribute(
-                        "aria-label",
-                        "Remove " +
-                        player.name
-                    );
-
-                    removeButton.addEventListener(
-                        "click",
-                        function () {
-
-                            removePlayer(
-                                teamId,
-                                index
-                            );
-
-                        }
-                    );
-
-
-                    const position =
-                        document.createElement(
-                            "span"
-                        );
-
-                    position.className =
-                        "pos-badge";
-
-                    position.textContent =
-                        player.pos;
-
-
-                    const playerName =
-                        document.createElement(
-                            "span"
-                        );
-
-                    playerName.className =
-                        "player-name";
-
-                    playerName.textContent =
-                        player.name;
-
-
-                    const trend =
-                        document.createElement(
-                            "span"
-                        );
-
-                    trend.className =
-                        "trend-indicator";
-
-                    trend.textContent =
-                        player.trend;
-
-
-                    const score =
-                        document.createElement(
-                            "span"
-                        );
-
-                    score.className =
-                        "player-score-label";
-
-                    score.textContent =
-                        player.value.toFixed(1);
-
-
-                    if (
-                        teamId === "a"
-                    ) {
-
-                        row.appendChild(
-                            removeButton
-                        );
-
-                        row.appendChild(
-                            position
-                        );
-
-                        row.appendChild(
-                            playerName
-                        );
-
-                        row.appendChild(
-                            trend
-                        );
-
-                        row.appendChild(
-                            score
-                        );
-
-                    }
-
-                    else {
-
-                        row.appendChild(
-                            score
-                        );
-
-                        row.appendChild(
-                            position
-                        );
-
-                        row.appendChild(
-                            playerName
-                        );
-
-                        row.appendChild(
-                            trend
-                        );
-
-                        row.appendChild(
-                            removeButton
-                        );
-
-                    }
-
-                    list.appendChild(
-                        row
-                    );
-
-                }
-            );
-
-        }
-
-
-        /* =====================================================
-           REMOVE PLAYER
-        ====================================================== */
-
-        function removePlayer(
-            teamId,
-            index
-        ) {
-
-            if (
-                teamId === "a"
-            ) {
-
-                teamA.splice(
-                    index,
-                    1
-                );
-
-            }
-
-            else if (
-                teamId === "b"
-            ) {
-
-                teamB.splice(
-                    index,
-                    1
-                );
-
-            }
-
-            renderTeams();
-
-            calculateTrade();
-
-        }
-
-
-        /* =====================================================
-           TRADE CALCULATION
-        ====================================================== */
-
-        function calculateTrade() {
-
-            const rawTotalA =
-                calculateRawValue(
-                    teamA
-                );
-
-            const rawTotalB =
-                calculateRawValue(
-                    teamB
-                );
-
-            const adjustedA =
-                calculateAdjustedTeamValue(
-                    teamA
-                );
-
-            const adjustedB =
-                calculateAdjustedTeamValue(
-                    teamB
-                );
-
-
-            document.getElementById(
-                "total-a"
-            ).textContent =
-                "Base: " +
-                rawTotalA.toFixed(1) +
-                " | Adjusted: " +
-                adjustedA.toFixed(1);
-
-
-            document.getElementById(
-                "total-b"
-            ).textContent =
-                "Base: " +
-                rawTotalB.toFixed(1) +
-                " | Adjusted: " +
-                adjustedB.toFixed(1);
-
-
-            updateBalanceMeter(
-                adjustedA,
-                adjustedB
-            );
-
-
-            updateVerdict(
-                adjustedA,
-                adjustedB
-            );
-
-        }
-
-
-        function calculateRawValue(team) {
-
-            return team.reduce(
-                function (
-                    total,
-                    player
-                ) {
-
-                    return (
-                        total +
-                        player.value
-                    );
-
-                },
-                0
-            );
-
-        }
-
-
-        /* =====================================================
-           BALANCE METER
-        ====================================================== */
-
-        function updateBalanceMeter(
-            adjustedA,
-            adjustedB
-        ) {
-
-            const meterBar =
-                document.getElementById(
-                    "meter-bar"
-                );
-
-            const meterText =
-                document.getElementById(
-                    "meter-percentage"
-                );
-
-
-            const combinedValue =
-                adjustedA +
-                adjustedB;
-
-
-            if (
-                combinedValue <= 0
-            ) {
-
-                meterBar.style.width =
-                    "50%";
-
-                meterText.textContent =
-                    "50% / 50%";
-
-                return;
-
-            }
-
-
-            const percentageA =
-                Math.round(
-                    (
-                        adjustedA /
-                        combinedValue
-                    ) *
-                    100
-                );
-
-
-            const percentageB =
-                100 -
-                percentageA;
-
-
-            meterBar.style.width =
-                percentageA +
-                "%";
-
-
-            meterText.textContent =
-                percentageA +
-                "% / " +
-                percentageB +
-                "%";
-
-        }
-
-
-        /* =====================================================
-           VERDICT
-        ====================================================== */
-
-        function updateVerdict(
-            adjustedA,
-            adjustedB
-        ) {
-
-            const heading =
-                document.getElementById(
-                    "verdict-heading"
-                );
-
-
-            if (
-                teamA.length === 0 &&
-                teamB.length === 0
-            ) {
-
-                heading.textContent =
-                    "Add players to analyze";
-
-                return;
-
-            }
-
-
-            if (
-                teamA.length === 0 ||
-                teamB.length === 0
-            ) {
-
-                heading.textContent =
-                    "Add players to both sides";
-
-                return;
-
-            }
-
-
-            const averageValue =
-                (
-                    adjustedA +
-                    adjustedB
-                ) /
-                2;
-
-
-            if (
-                averageValue <= 0
-            ) {
-
-                heading.textContent =
-                    "Unable to analyze trade";
-
-                return;
-
-            }
-
-
-            const difference =
-                Math.abs(
-                    adjustedA -
-                    adjustedB
-                );
-
-
-            const differencePercent =
-                (
-                    difference /
-                    averageValue
-                ) *
-                100;
-
-
-            let winningTeam = "";
-
-            if (
-                adjustedA >
-                adjustedB
-            ) {
-
-                winningTeam =
-                    "Team A";
-
-            }
-
-            else if (
-                adjustedB >
-                adjustedA
-            ) {
-
-                winningTeam =
-                    "Team B";
-
-            }
-
-
-            if (
-                differencePercent <= 5
-            ) {
-
-                heading.textContent =
-                    "Fair Trade";
-
-            }
-
-            else if (
-                differencePercent <= 10
-            ) {
-
-                heading.textContent =
-                    "Slight Advantage: " +
-                    winningTeam;
-
-            }
-
-            else if (
-                differencePercent <= 20
-            ) {
-
-                heading.textContent =
-                    "Advantage: " +
-                    winningTeam;
-
-            }
-
-            else {
-
-                heading.textContent =
-                    "Major Advantage: " +
-                    winningTeam;
-
-            }
-
-        }
-
-
-        /* =====================================================
-           THEME TOGGLE
-        ====================================================== */
-
-        function setupThemeToggle() {
-
-            const toggleButton =
-                document.getElementById(
-                    "theme-toggle"
-                );
-
-            const htmlElement =
-                document.documentElement;
-
-
-            toggleButton.addEventListener(
-                "click",
-                function () {
-
-                    const currentTheme =
-                        htmlElement.getAttribute(
-                            "data-theme"
-                        );
-
-                    const newTheme =
-                        currentTheme === "dark"
-                            ? "light"
-                            : "dark";
-
-                    htmlElement.setAttribute(
-                        "data-theme",
-                        newTheme
-                    );
-
-                }
-            );
-
-        }
-const fairBox=document.createElement("div");
-fairBox.style.marginTop="10px";
-fairBox.style.fontSize="18px";
-document.querySelector(".verdict-container").appendChild(fairBox);
-
-function updateFairSuggestion(){
+    <div id="team-list-a" class="player-list"></div>
+    <div class="total-score" id="total-a">Base: 0.0 | Adjusted: 0.0</div>
+  </div>
+
+  <div class="team-column">
+    <h2>Team B</h2>
+    <div class="search-container">
+      <input type="text" id="search-b" placeholder="Type player name..." autocomplete="off">
+      <div id="dropdown-b" class="dropdown-list"></div>
+    </div>
+    <div id="team-list-b" class="player-list"></div>
+    <div class="total-score" id="total-b">Base: 0.0 | Adjusted: 0.0</div>
+  </div>
+</main>
+
+<div class="verdict-container">
+  <h1 id="verdict-heading">Add players to analyze</h1>
+  <div id="fair-box" class="trade-extra"></div>
+  <div id="trade-grade-box" class="trade-extra" style="font-size:24px;font-weight:bold;"></div>
+  <div id="package-box" class="trade-extra"></div>
+
+  <div class="trade-controls">
+    <button id="clear-trade-button" class="toggle-btn" type="button">Clear Trade</button>
+    <button id="swap-sides-button" class="toggle-btn" type="button">Swap Sides</button>
+  </div>
+</div>
+
+<script>
+const SUPERSTAR_FACTOR=1.25;
+const PACKAGE_WEIGHTS=[1.00,0.95,0.90,0.85,0.80,0.80,0.80,0.80];
+
+const playerDatabase=[
+{rank:1,name:"Bijan Robinson",pos:"RB",trend:"📈",redraft:99.0,keeper:100.0,dynasty:100.0},
+{rank:2,name:"Jahmyr Gibbs",pos:"RB",trend:"📈",redraft:97.8,keeper:100.0,dynasty:100.0},
+{rank:3,name:"Ja'Marr Chase",pos:"WR",trend:"📈",redraft:96.4,keeper:97.7,dynasty:99.3},
+{rank:4,name:"Puka Nacua",pos:"WR",trend:"📈",redraft:94.1,keeper:96.6,dynasty:99.7},
+{rank:5,name:"Jaxon Smith-Njigba",pos:"WR",trend:"📈",redraft:92.9,keeper:96.2,dynasty:100.0},
+{rank:6,name:"Christian McCaffrey",pos:"RB",trend:"📈",redraft:91.8,keeper:77.3,dynasty:59.7},
+{rank:7,name:"Jonathan Taylor",pos:"RB",trend:"📈",redraft:91.7,keeper:88.4,dynasty:84.4},
+{rank:8,name:"De'Von Achane",pos:"RB",trend:"📈",redraft:90.5,keeper:92.5,dynasty:95.0},
+{rank:9,name:"Amon-Ra St. Brown",pos:"WR",trend:"📈",redraft:89.3,keeper:90.5,dynasty:92.0},
+{rank:10,name:"James Cook III",pos:"RB",trend:"📈",redraft:88.0,keeper:86.0,dynasty:83.6},
+{rank:11,name:"Derrick Henry",pos:"RB",trend:"📈",redraft:86.8,keeper:69.2,dynasty:47.7},
+{rank:12,name:"Justin Jefferson",pos:"WR",trend:"📈",redraft:86.2,keeper:86.2,dynasty:86.2},
+{rank:13,name:"CeeDee Lamb",pos:"WR",trend:"📉",redraft:85.0,keeper:85.0,dynasty:85.0},
+{rank:14,name:"Chase Brown",pos:"RB",trend:"📈",redraft:83.7,keeper:81.8,dynasty:79.5},
+{rank:15,name:"Kenneth Walker III",pos:"RB",trend:"📈",redraft:83.1,keeper:81.2,dynasty:78.9},
+{rank:16,name:"Trey McBride",pos:"TE",trend:"📈",redraft:82.5,keeper:85.5,dynasty:89.1},
+{rank:17,name:"Drake London",pos:"WR",trend:"📈",redraft:81.3,keeper:84.2,dynasty:87.8},
+{rank:18,name:"Brock Bowers",pos:"TE",trend:"📈",redraft:80.1,keeper:84.4,dynasty:89.7},
+{rank:19,name:"Rashee Rice",pos:"WR",trend:"📈",redraft:78.9,keeper:78.2,dynasty:77.3},
+{rank:20,name:"Jeremiyah Love",pos:"RB",trend:"📈",redraft:77.6,keeper:86.3,dynasty:97.0},
+{rank:21,name:"Saquon Barkley",pos:"RB",trend:"📈",redraft:77.0,keeper:66.6,dynasty:53.9},
+{rank:22,name:"Omarion Hampton",pos:"RB",trend:"📈",redraft:75.8,keeper:82.6,dynasty:91.0},
+{rank:23,name:"Ashton Jeanty",pos:"RB",trend:"📈",redraft:75.4,keeper:83.9,dynasty:94.2},
+{rank:24,name:"Javonte Williams",pos:"RB",trend:"📈",redraft:74.2,keeper:70.2,dynasty:65.3},
+{rank:25,name:"Malik Nabers",pos:"WR",trend:"📈",redraft:73.0,keeper:78.9,dynasty:86.1},
+{rank:26,name:"A.J. Brown",pos:"WR",trend:"📈",redraft:71.8,keeper:66.0,dynasty:58.9},
+{rank:27,name:"Chris Olave",pos:"WR",trend:"📈",redraft:71.2,keeper:70.6,dynasty:69.8},
+{rank:28,name:"Josh Allen",pos:"QB",trend:"📈",redraft:70.6,keeper:70.6,dynasty:70.6},
+{rank:29,name:"George Pickens",pos:"WR",trend:"📈",redraft:69.4,keeper:68.8,dynasty:68.0},
+{rank:30,name:"Colston Loveland",pos:"TE",trend:"📈",redraft:67.6,keeper:74.3,dynasty:82.5},
+{rank:31,name:"Kyren Williams",pos:"RB",trend:"📈",redraft:67.5,keeper:65.1,dynasty:62.1},
+{rank:32,name:"Travis Etienne Jr.",pos:"RB",trend:"📈",redraft:66.3,keeper:60.3,dynasty:53.0},
+{rank:33,name:"Emeka Egbuka",pos:"WR",trend:"📈",redraft:65.7,keeper:71.6,dynasty:78.8},
+{rank:34,name:"Garrett Wilson",pos:"WR",trend:"📈",redraft:65.1,keeper:64.5,dynasty:63.8},
+{rank:35,name:"Breece Hall",pos:"RB",trend:"📈",redraft:64.4,keeper:65.0,dynasty:65.7},
+{rank:36,name:"Lamar Jackson",pos:"QB",trend:"📈",redraft:63.8,keeper:63.2,dynasty:62.5},
+{rank:37,name:"Quinshon Judkins",pos:"RB",trend:"📈",redraft:62.6,keeper:66.8,dynasty:72.0},
+{rank:38,name:"D'Andre Swift",pos:"RB",trend:"📈",redraft:62.0,keeper:57.5,dynasty:52.1},
+{rank:39,name:"Nico Collins",pos:"WR",trend:"📈",redraft:61.2,keeper:61.2,dynasty:61.2},
+{rank:40,name:"Jayden Daniels",pos:"QB",trend:"📈",redraft:60.6,keeper:64.7,dynasty:69.7},
+{rank:41,name:"Zay Flowers",pos:"WR",trend:"📈",redraft:59.4,keeper:60.7,dynasty:62.4},
+{rank:42,name:"Tetairoa McMillan",pos:"WR",trend:"📈",redraft:58.8,keeper:64.1,dynasty:70.6},
+{rank:43,name:"DeVonta Smith",pos:"WR",trend:"📈",redraft:58.2,keeper:56.9,dynasty:55.3},
+{rank:44,name:"Jaylen Waddle",pos:"WR",trend:"📈",redraft:57.6,keeper:56.3,dynasty:54.7},
+{rank:45,name:"Cam Skattebo",pos:"RB",trend:"📈",redraft:56.4,keeper:61.0,dynasty:66.6},
+{rank:46,name:"Tyler Warren",pos:"TE",trend:"📈",redraft:55.8,keeper:60.8,dynasty:67.0},
+{rank:47,name:"Bucky Irving",pos:"RB",trend:"📈",redraft:55.2,keeper:58.2,dynasty:61.8},
+{rank:48,name:"Drake Maye",pos:"QB",trend:"📈",redraft:54.6,keeper:58.5,dynasty:63.3},
+{rank:49,name:"Bhayshul Tuten",pos:"RB",trend:"📈",redraft:53.9,keeper:57.5,dynasty:62.0},
+{rank:50,name:"Davante Adams",pos:"WR",trend:"📈",redraft:53.3,keeper:42.5,dynasty:29.3},
+{rank:51,name:"Ladd McConkey",pos:"WR",trend:"📈",redraft:52.7,keeper:56.3,dynasty:60.6},
+{rank:52,name:"Jalen Hurts",pos:"QB",trend:"📈",redraft:52.1,keeper:50.9,dynasty:49.5},
+{rank:53,name:"Harold Fannin Jr.",pos:"TE",trend:"📈",redraft:51.5,keeper:55.7,dynasty:60.8},
+{rank:54,name:"Jadarian Price",pos:"RB",trend:"📈",redraft:50.9,keeper:55.0,dynasty:60.1},
+{rank:55,name:"Josh Jacobs",pos:"RB",trend:"📈",redraft:50.3,keeper:45.3,dynasty:39.2},
+{rank:56,name:"David Montgomery",pos:"RB",trend:"📈",redraft:49.6,keeper:42.9,dynasty:34.7},
+{rank:57,name:"Tee Higgins",pos:"WR",trend:"📈",redraft:49.0,keeper:46.8,dynasty:44.1},
+{rank:58,name:"Kyle Pitts Sr.",pos:"TE",trend:"📈",redraft:48.4,keeper:48.0,dynasty:47.4},
+{rank:59,name:"Justin Herbert",pos:"QB",trend:"📈",redraft:47.8,keeper:46.7,dynasty:45.4},
+{rank:60,name:"Terry McLaurin",pos:"WR",trend:"📈",redraft:47.2,keeper:39.8,dynasty:30.7},
+{rank:61,name:"Carnell Tate",pos:"WR",trend:"📈",redraft:46.6,keeper:51.8,dynasty:58.2},
+{rank:62,name:"Rhamondre Stevenson",pos:"RB",trend:"📈",redraft:46.0,keeper:40.8,dynasty:34.5},
+{rank:63,name:"Tony Pollard",pos:"RB",trend:"📈",redraft:45.3,keeper:38.8,dynasty:30.8},
+{rank:64,name:"George Kittle",pos:"TE",trend:"📈",redraft:44.7,keeper:36.7,dynasty:26.8},
+{rank:65,name:"Chuba Hubbard",pos:"RB",trend:"📈",redraft:44.1,keeper:41.1,dynasty:37.5},
+{rank:66,name:"TreVeyon Henderson",pos:"RB",trend:"📈",redraft:43.5,keeper:47.0,dynasty:51.3},
+{rank:67,name:"Rome Odunze",pos:"WR",trend:"📈",redraft:42.9,keeper:46.4,dynasty:50.6},
+{rank:68,name:"DK Metcalf",pos:"WR",trend:"📈",redraft:42.3,keeper:39.4,dynasty:36.0},
+{rank:69,name:"Kenneth Gainwell",pos:"RB",trend:"📈",redraft:41.7,keeper:36.1,dynasty:29.2},
+{rank:70,name:"Jaxson Dart",pos:"QB",trend:"📈",redraft:41.0,keeper:43.8,dynasty:47.1},
+{rank:71,name:"Jaylen Warren",pos:"RB",trend:"📈",redraft:40.4,keeper:35.9,dynasty:30.3},
+{rank:72,name:"DJ Moore",pos:"WR",trend:"📈",redraft:39.8,keeper:36.2,dynasty:31.8},
+{rank:73,name:"Joe Burrow",pos:"QB",trend:"📈",redraft:39.2,keeper:37.8,dynasty:36.1},
+{rank:74,name:"Marvin Harrison Jr.",pos:"WR",trend:"📈",redraft:38.6,keeper:41.7,dynasty:45.5},
+{rank:75,name:"Trevor Lawrence",pos:"QB",trend:"📈",redraft:38.0,keeper:36.3,dynasty:34.2},
+{rank:76,name:"Christian Watson",pos:"WR",trend:"📈",redraft:37.4,keeper:35.7,dynasty:33.7},
+{rank:77,name:"Luther Burden III",pos:"WR",trend:"📈",redraft:36.7,keeper:40.0,dynasty:44.0},
+{rank:78,name:"Parker Washington",pos:"WR",trend:"📈",redraft:36.1,keeper:36.4,dynasty:36.8},
+{rank:79,name:"Jameson Williams",pos:"WR",trend:"📈",redraft:35.5,keeper:34.7,dynasty:33.7},
+{rank:80,name:"Wan'Dale Robinson",pos:"WR",trend:"📈",redraft:34.9,keeper:33.6,dynasty:32.1},
+{rank:81,name:"Rachaad White",pos:"RB",trend:"📈",redraft:34.3,keeper:30.9,dynasty:26.8},
+{rank:82,name:"Sam LaPorta",pos:"TE",trend:"📈",redraft:33.7,keeper:34.5,dynasty:35.4},
+{rank:83,name:"Aaron Jones Sr.",pos:"RB",trend:"📈",redraft:33.1,keeper:25.7,dynasty:16.6},
+{rank:84,name:"Stefon Diggs",pos:"WR",trend:"📈",redraft:32.4,keeper:24.4,dynasty:14.6},
+{rank:85,name:"Michael Wilson",pos:"WR",trend:"📈",redraft:31.8,keeper:31.1,dynasty:30.2},
+{rank:86,name:"Mike Evans",pos:"WR",trend:"📈",redraft:31.2,keeper:22.1,dynasty:10.9},
+{rank:87,name:"Courtland Sutton",pos:"WR",trend:"📈",redraft:30.6,keeper:25.1,dynasty:18.4},
+{rank:88,name:"Tucker Kraft",pos:"TE",trend:"📈",redraft:30.0,keeper:31.1,dynasty:32.4},
+{rank:89,name:"Dak Prescott",pos:"QB",trend:"📈",redraft:29.4,keeper:26.5,dynasty:22.9},
+{rank:90,name:"Patrick Mahomes",pos:"QB",trend:"📉",redraft:28.8,keeper:27.5,dynasty:25.9},
+{rank:91,name:"Michael Pittman Jr.",pos:"WR",trend:"📈",redraft:28.2,keeper:25.7,dynasty:22.6},
+{rank:92,name:"Jake Ferguson",pos:"TE",trend:"📈",redraft:27.5,keeper:26.9,dynasty:26.1},
+{rank:93,name:"Jakobi Meyers",pos:"WR",trend:"📈",redraft:26.9,keeper:22.7,dynasty:17.5},
+{rank:94,name:"Dallas Goedert",pos:"TE",trend:"📈",redraft:26.3,keeper:20.4,dynasty:13.2},
+{rank:95,name:"MarShawn Lloyd",pos:"RB",trend:"📈",redraft:25.7,keeper:26.9,dynasty:28.3},
+{rank:96,name:"Brock Purdy",pos:"QB",trend:"📈",redraft:25.1,keeper:24.5,dynasty:23.8},
+{rank:97,name:"Matthew Stafford",pos:"QB",trend:"📈",redraft:24.5,keeper:17.3,dynasty:8.6},
+{rank:98,name:"Bo Nix",pos:"QB",trend:"📈",redraft:23.9,keeper:25.0,dynasty:26.3},
+{rank:99,name:"Travis Kelce",pos:"TE",trend:"📉",redraft:23.2,keeper:15.4,dynasty:5.8},
+{rank:100,name:"Kyle Monangai",pos:"RB",trend:"📈",redraft:22.6,keeper:23.8,dynasty:25.3},
+{rank:101,name:"Jonathon Brooks",pos:"RB",trend:"📈",redraft:22.0,keeper:23.2,dynasty:24.6},
+{rank:102,name:"Chris Godwin Jr.",pos:"WR",trend:"📈",redraft:21.4,keeper:17.5,dynasty:12.8},
+{rank:103,name:"Matthew Golden",pos:"WR",trend:"📈",redraft:20.8,keeper:22.7,dynasty:25.0},
+{rank:104,name:"Alec Pierce",pos:"WR",trend:"📈",redraft:20.2,keeper:18.8,dynasty:17.2},
+{rank:105,name:"Josh Downs",pos:"WR",trend:"📈",redraft:19.6,keeper:20.0,dynasty:20.6},
+{rank:106,name:"Caleb Williams",pos:"QB",trend:"📈",redraft:19.0,keeper:20.0,dynasty:21.3},
+{rank:107,name:"Brian Thomas Jr.",pos:"WR",trend:"📈",redraft:18.3,keeper:19.9,dynasty:22.0},
+{rank:108,name:"De'Zhaun Stribling",pos:"WR",trend:"📈",redraft:17.7,keeper:18.9,dynasty:20.4},
+{rank:109,name:"J.K. Dobbins",pos:"RB",trend:"📈",redraft:17.1,keeper:13.6,dynasty:9.4},
+{rank:110,name:"RJ Harvey",pos:"RB",trend:"📈",redraft:16.5,keeper:17.6,dynasty:19.0},
+{rank:111,name:"Jacory Croskey-Merritt",pos:"RB",trend:"📈",redraft:15.9,keeper:16.8,dynasty:17.8},
+{rank:112,name:"Jordan Love",pos:"QB",trend:"📈",redraft:15.3,keeper:15.2,dynasty:15.0},
+{rank:113,name:"Daniel Jones",pos:"QB",trend:"📈",redraft:14.7,keeper:12.1,dynasty:8.8},
+{rank:114,name:"Blake Corum",pos:"RB",trend:"📈",redraft:14.1,keeper:14.6,dynasty:15.2},
+{rank:115,name:"Romeo Doubs",pos:"WR",trend:"📈",redraft:13.4,keeper:12.8,dynasty:12.1},
+{rank:116,name:"Rico Dowdle",pos:"RB",trend:"📈",redraft:12.8,keeper:11.4,dynasty:9.6},
+{rank:117,name:"Jordan Addison",pos:"WR",trend:"📈",redraft:12.2,keeper:12.3,dynasty:12.4},
+{rank:118,name:"Juwan Johnson",pos:"TE",trend:"📈",redraft:11.6,keeper:9.8,dynasty:7.5},
+{rank:119,name:"Hunter Henry",pos:"TE",trend:"📈",redraft:11.0,keeper:8.3,dynasty:5.0},
+{rank:120,name:"Jalen Coker",pos:"WR",trend:"📈",redraft:10.4,keeper:10.6,dynasty:10.9},
+{rank:121,name:"Dalton Schultz",pos:"TE",trend:"📈",redraft:9.8,keeper:7.8,dynasty:5.4},
+{rank:122,name:"Tyler Shough",pos:"QB",trend:"📈",redraft:9.1,keeper:9.5,dynasty:10.0},
+{rank:123,name:"Tyjae Spears",pos:"RB",trend:"📈",redraft:8.5,keeper:8.1,dynasty:7.7},
+{rank:124,name:"Zach Charbonnet",pos:"RB",trend:"📈",redraft:7.9,keeper:8.0,dynasty:8.1},
+{rank:125,name:"Woody Marks",pos:"RB",trend:"📈",redraft:7.3,keeper:7.7,dynasty:8.2},
+{rank:126,name:"Jordan Mason",pos:"RB",trend:"📈",redraft:6.7,keeper:6.4,dynasty:6.0},
+{rank:127,name:"Isaiah Likely",pos:"TE",trend:"📈",redraft:6.1,keeper:6.2,dynasty:6.4},
+{rank:128,name:"Kyler Murray",pos:"QB",trend:"📈",redraft:5.5,keeper:5.0,dynasty:4.4},
+{rank:129,name:"Khalil Shakir",pos:"WR",trend:"📈",redraft:4.9,keeper:4.9,dynasty:4.9},
+{rank:130,name:"Deebo Samuel",pos:"WR",trend:"📈",redraft:4.3,keeper:3.3,dynasty:2.1},
+{rank:131,name:"Keenan Allen",pos:"WR",trend:"📈",redraft:3.6,keeper:2.4,dynasty:0.9},
+{rank:132,name:"Calvin Ridley",pos:"WR",trend:"📈",redraft:3.0,keeper:2.3,dynasty:1.5},
+{rank:133,name:"Alvin Kamara",pos:"RB",trend:"📈",redraft:2.4,keeper:1.6,dynasty:0.7},
+{rank:134,name:"Quentin Johnston",pos:"WR",trend:"📈",redraft:1.8,keeper:1.8,dynasty:1.7},
+{rank:135,name:"Jayden Reed",pos:"WR",trend:"📈",redraft:1.2,keeper:1.2,dynasty:1.1},
+{rank:136,name:"Xavier Worthy",pos:"WR",trend:"📈",redraft:0.6,keeper:0.6,dynasty:0.7},
+{rank:137,name:"Tank Dell",pos:"WR",trend:"📈",redraft:0.1,keeper:0.1,dynasty:0.1},
+{rank:138,name:"Tyler Allgeier",pos:"RB",trend:"📈",redraft:0.1,keeper:0.1,dynasty:0.1},
+{rank:139,name:"Keaton Mitchell",pos:"RB",trend:"📈",redraft:0.1,keeper:0.1,dynasty:0.1},
+{rank:140,name:"Isiah Pacheco",pos:"RB",trend:"📈",redraft:0.1,keeper:0.1,dynasty:0.1},
+{rank:141,name:"Brandon Aubrey",pos:"K",trend:"📈",redraft:12.4,keeper:9.9,dynasty:6.8},
+{rank:142,name:"Cameron Dicker",pos:"K",trend:"📈",redraft:11.8,keeper:9.4,dynasty:6.5},
+{rank:143,name:"Houston Texans DST",pos:"DST",trend:"📈",redraft:11.2,keeper:8.4,dynasty:5.0},
+{rank:144,name:"Denver Broncos DST",pos:"DST",trend:"📈",redraft:10.6,keeper:8.0,dynasty:4.8},
+{rank:145,name:"Seattle Seahawks DST",pos:"DST",trend:"📈",redraft:10.0,keeper:7.5,dynasty:4.5},
+{rank:146,name:"Los Angeles Rams DST",pos:"DST",trend:"📈",redraft:9.4,keeper:7.1,dynasty:4.2},
+{rank:147,name:"Pittsburgh Steelers DST",pos:"DST",trend:"📈",redraft:8.8,keeper:6.6,dynasty:4.0},
+{rank:148,name:"Ka'imi Fairbairn",pos:"K",trend:"📈",redraft:8.2,keeper:6.5,dynasty:4.5},
+{rank:149,name:"Eddy Pineiro",pos:"K",trend:"📈",redraft:7.6,keeper:6.1,dynasty:4.2},
+{rank:150,name:"Chris Boswell",pos:"K",trend:"📈",redraft:7.0,keeper:5.6,dynasty:3.9},
+{rank:151,name:"Los Angeles Chargers DST",pos:"DST",trend:"📈",redraft:6.4,keeper:4.8,dynasty:2.9},
+{rank:152,name:"New England Patriots DST",pos:"DST",trend:"📈",redraft:5.8,keeper:4.4,dynasty:2.6},
+{rank:153,name:"Minnesota Vikings DST",pos:"DST",trend:"📈",redraft:5.2,keeper:3.9,dynasty:2.3},
+{rank:154,name:"Philadelphia Eagles DST",pos:"DST",trend:"📈",redraft:4.6,keeper:3.5,dynasty:2.1},
+{rank:155,name:"Green Bay Packers DST",pos:"DST",trend:"📈",redraft:4.0,keeper:3.0,dynasty:1.8},
+{rank:156,name:"Harrison Butker",pos:"K",trend:"📈",redraft:3.9,keeper:3.1,dynasty:2.1},
+{rank:157,name:"Jason Myers",pos:"K",trend:"📈",redraft:3.8,keeper:3.0,dynasty:2.1},
+{rank:158,name:"Will Reichard",pos:"K",trend:"📈",redraft:3.2,keeper:2.6,dynasty:1.8},
+{rank:159,name:"Cam Little",pos:"K",trend:"📈",redraft:2.6,keeper:2.1,dynasty:1.4},
+{rank:160,name:"Harrison Mevis",pos:"K",trend:"📈",redraft:2.0,keeper:1.6,dynasty:1.1}
+];
+
+let teamA=[];
+let teamB=[];
+let scoringMode="ppr";
+let leagueMode="redraft";
+
+const scoringMultipliers={
+  RB:{ppr:1.00,half:0.98,standard:0.95},
+  WR:{ppr:1.00,half:0.96,standard:0.91},
+  TE:{ppr:1.00,half:0.95,standard:0.89},
+  QB:{ppr:1.00,half:1.00,standard:1.00},
+  K:{ppr:1.00,half:1.00,standard:1.00},
+  DST:{ppr:1.00,half:1.00,standard:1.00}
+};
+
+function getPlayerValue(player){
+  const base=player[leagueMode];
+  const multiplier=scoringMultipliers[player.pos][scoringMode];
+  return Math.max(0.1,Math.min(100,Math.round(base*multiplier*10)/10));
+}
+
+function getModeLabel(){
+  const scoring=scoringMode==="ppr"?"PPR":scoringMode==="half"?"0.5 PPR":"No PPR";
+  const league=leagueMode==="dynasty"?"Dynasty":leagueMode==="keeper"?"Keeper":"Redraft";
+  return scoring+" • "+league;
+}
+
+function getAdjustedPlayerValue(baseValue){
+  if(typeof baseValue!=="number"||baseValue<=0) return 0;
+  return 100*Math.pow(baseValue/100,SUPERSTAR_FACTOR);
+}
+
+function calculateAdjustedTeamValue(team){
+  if(!Array.isArray(team)||!team.length) return 0;
+
+  const adjusted=team.map(function(player){
+    return getAdjustedPlayerValue(getPlayerValue(player));
+  }).sort(function(a,b){return b-a;});
+
+  return adjusted.reduce(function(total,value,index){
+    const weight=PACKAGE_WEIGHTS[index]!==undefined?PACKAGE_WEIGHTS[index]:0.80;
+    return total+(value*weight);
+  },0);
+}
+
+function calculateRawValue(team){
+  return team.reduce(function(total,player){
+    return total+getPlayerValue(player);
+  },0);
+}
+
+function abbreviateName(name){
+  const parts=name.trim().split(/\s+/);
+  if(parts.length===1) return parts[0];
+  return parts[0].charAt(0)+". "+parts.slice(1).join(" ");
+}
+
+function buildReferenceBoard(){
+  renderTopPlayers("RB","top-rb");
+  renderTopPlayers("WR","top-wr");
+  renderTopPlayers("QB","top-qb");
+  renderTopPlayers("TE","top-te");
+  document.getElementById("format-badge").textContent=getModeLabel();
+  document.getElementById("reference-heading").textContent="📊 Top Market Values Reference — "+getModeLabel();
+}
+
+function renderTopPlayers(position,elementId){
+  const container=document.getElementById(elementId);
+
+  const players=playerDatabase
+    .filter(function(player){return player.pos===position;})
+    .slice()
+    .sort(function(a,b){
+      const diff=getPlayerValue(b)-getPlayerValue(a);
+      return diff!==0?diff:a.rank-b.rank;
+    })
+    .slice(0,3);
+
+  container.innerHTML="";
+
+  players.forEach(function(player,index){
+    const line=document.createElement("p");
+    line.textContent=(index+1)+". "+abbreviateName(player.name)+" ("+getPlayerValue(player).toFixed(1)+")";
+    container.appendChild(line);
+  });
+}
+
+function setupSearch(teamId,getTeam){
+  const input=document.getElementById("search-"+teamId);
+  const dropdown=document.getElementById("dropdown-"+teamId);
+
+  input.addEventListener("input",function(){
+    const query=input.value.toLowerCase().trim();
+    dropdown.innerHTML="";
+
+    if(!query){
+      dropdown.style.display="none";
+      return;
+    }
+
+    const matches=playerDatabase
+      .filter(function(player){return player.name.toLowerCase().includes(query);})
+      .slice()
+      .sort(function(a,b){
+        const diff=getPlayerValue(b)-getPlayerValue(a);
+        return diff!==0?diff:a.rank-b.rank;
+      });
+
+    if(!matches.length){
+      dropdown.style.display="none";
+      return;
+    }
+
+    dropdown.style.display="block";
+
+    matches.forEach(function(player){
+      const item=document.createElement("div");
+      item.className="dropdown-item";
+      item.textContent=player.name+" ("+player.pos+") "+player.trend+" - Value: "+getPlayerValue(player).toFixed(1);
+
+      item.addEventListener("click",function(){
+        addPlayerToTrade(player,getTeam());
+        input.value="";
+        dropdown.innerHTML="";
+        dropdown.style.display="none";
+      });
+
+      dropdown.appendChild(item);
+    });
+  });
+
+  document.addEventListener("click",function(event){
+    if(!input.contains(event.target)&&!dropdown.contains(event.target)){
+          dropdown.style.display="none";
+    }
+  });
+}
+
+function addPlayerToTrade(player,destinationTeam){
+  const alreadyAdded=teamA.concat(teamB).some(function(selected){
+    return selected.rank===player.rank;
+  });
+
+  if(alreadyAdded){
+    alert(player.name+" is already included in this trade.");
+    return;
+  }
+
+  if(destinationTeam.length>=8){
+    alert("Maximum capacity reached. Max 8 players per side.");
+    return;
+  }
+
+  destinationTeam.push(player);
+  renderTeams();
+  calculateTrade();
+}
+
+function renderTeams(){
+  renderTeam("a",teamA);
+  renderTeam("b",teamB);
+}
+
+function renderTeam(teamId,teamArray){
+  const list=document.getElementById("team-list-"+teamId);
+  list.innerHTML="";
+
+  teamArray.forEach(function(player,index){
+    const row=document.createElement("div");
+    row.className="player-row";
+
+    const removeButton=document.createElement("button");
+    removeButton.className="remove-btn";
+    removeButton.type="button";
+    removeButton.textContent="✕";
+    removeButton.setAttribute("aria-label","Remove "+player.name);
+    removeButton.addEventListener("click",function(){
+      removePlayer(teamId,index);
+    });
+
+    const position=document.createElement("span");
+    position.className="pos-badge";
+    position.textContent=player.pos;
+
+    const playerName=document.createElement("span");
+    playerName.className="player-name";
+    playerName.textContent=player.name;
+
+    const trend=document.createElement("span");
+    trend.className="trend-indicator";
+    trend.textContent=player.trend;
+
+    const score=document.createElement("span");
+    score.className="player-score-label";
+    score.textContent=getPlayerValue(player).toFixed(1);
+
+    if(teamId==="a"){
+      row.appendChild(removeButton);
+      row.appendChild(position);
+      row.appendChild(playerName);
+      row.appendChild(trend);
+      row.appendChild(score);
+    }else{
+      row.appendChild(score);
+      row.appendChild(position);
+      row.appendChild(playerName);
+      row.appendChild(trend);
+      row.appendChild(removeButton);
+    }
+
+    list.appendChild(row);
+  });
+}
+
+function removePlayer(teamId,index){
+  if(teamId==="a") teamA.splice(index,1);
+  if(teamId==="b") teamB.splice(index,1);
+  renderTeams();
+  calculateTrade();
+}
+
+function calculateTrade(){
+  const rawA=calculateRawValue(teamA);
+  const rawB=calculateRawValue(teamB);
+  const adjustedA=calculateAdjustedTeamValue(teamA);
+  const adjustedB=calculateAdjustedTeamValue(teamB);
+
+  document.getElementById("total-a").textContent="Base: "+rawA.toFixed(1)+" | Adjusted: "+adjustedA.toFixed(1);
+  document.getElementById("total-b").textContent="Base: "+rawB.toFixed(1)+" | Adjusted: "+adjustedB.toFixed(1);
+
+  updateBalanceMeter(adjustedA,adjustedB);
+  updateVerdict(adjustedA,adjustedB);
+  updateFairSuggestion();
+  updateTradeGrade();
+  updateSuggestedPackage();
+}
+
+function updateBalanceMeter(a,b){
+  const bar=document.getElementById("meter-bar");
+  const text=document.getElementById("meter-percentage");
+  const combined=a+b;
+
+  if(combined<=0){
+    bar.style.width="50%";
+    text.textContent="50% / 50%";
+    return;
+  }
+
+  const percentA=Math.round((a/combined)*100);
+  const percentB=100-percentA;
+  bar.style.width=percentA+"%";
+  text.textContent=percentA+"% / "+percentB+"%";
+}
+
+function updateVerdict(a,b){
+  const heading=document.getElementById("verdict-heading");
+
+  if(!teamA.length&&!teamB.length){
+    heading.textContent="Add players to analyze";
+    return;
+  }
 
   if(!teamA.length||!teamB.length){
-    fairBox.textContent="";
+    heading.textContent="Add players to both sides";
+    return;
+  }
+
+  const average=(a+b)/2;
+
+  if(average<=0){
+    heading.textContent="Unable to analyze trade";
+    return;
+  }
+
+  const diff=Math.abs(a-b)/(average/100);
+  const winner=a>b?"Team A":"Team B";
+
+  if(diff<=5) heading.textContent="Fair Trade";
+  else if(diff<=10) heading.textContent="Slight Advantage: "+winner;
+  else if(diff<=20) heading.textContent="Advantage: "+winner;
+  else heading.textContent="Major Advantage: "+winner;
+}
+
+function updateFairSuggestion(){
+  const box=document.getElementById("fair-box");
+
+  if(!teamA.length||!teamB.length){
+    box.textContent="";
     return;
   }
 
@@ -1386,7 +562,7 @@ function updateFairSuggestion(){
   const diff=avg?Math.abs(a-b)/(avg/100):0;
 
   if(diff<=5){
-    fairBox.textContent="✅ This trade is already within the fair range.";
+    box.textContent="✅ This trade is already within the fair range.";
     return;
   }
 
@@ -1394,54 +570,213 @@ function updateFairSuggestion(){
   const losingName=a>b?"Team B":"Team A";
   const target=a>b?a:b;
 
-  const used=new Set(
-    teamA.concat(teamB).map(function(p){
-      return p.rank;
-    })
-  );
+  if(losing.length>=8){
+    box.textContent="⚖️ "+losingName+" is already at the 8-player limit.";
+    return;
+  }
 
-  let best=null;
-  let bestDiff=Infinity;
+  const used=new Set(teamA.concat(teamB).map(function(p){return p.rank;}));
+  const options=[];
 
-  playerDatabase.forEach(function(p){
+  playerDatabase.forEach(function(player){
+    if(used.has(player.rank)) return;
 
-    if(used.has(p.rank)){
+    const testTeam=losing.concat([player]);
+    const newValue=calculateAdjustedTeamValue(testTeam);
+    const resultAvg=(newValue+target)/2;
+    const resultDiff=resultAvg?Math.abs(newValue-target)/(resultAvg/100):0;
+
+    options.push({player:player,diff:resultDiff});
+  });
+
+  options.sort(function(x,y){return x.diff-y.diff;});
+  const top=options.slice(0,3);
+
+  let message="⚖️ Best ways to make this closer for "+losingName+":\n";
+
+  top.forEach(function(option,index){
+    message+=(index+1)+". Add "+option.player.name+" ("+getPlayerValue(option.player).toFixed(1)+") - "+option.diff.toFixed(1)+"% apart";
+
+    if(option.diff<=5) message+=" - Fair range";
+        if(index<top.length-1) message+="\n";
+  });
+
+  box.textContent=message;
+}
+
+function updateTradeGrade(){
+  const box=document.getElementById("trade-grade-box");
+
+  if(!teamA.length||!teamB.length){
+    box.textContent="";
+    return;
+  }
+
+  const a=calculateAdjustedTeamValue(teamA);
+  const b=calculateAdjustedTeamValue(teamB);
+  const average=(a+b)/2;
+
+  if(!average){
+    box.textContent="";
+    return;
+  }
+
+  const diff=Math.abs(a-b)/(average/100);
+  let grade="";
+  let description="";
+
+  if(diff<=5){grade="A+";description="Excellent Balance";}
+  else if(diff<=10){grade="A";description="Very Good Balance";}
+  else if(diff<=20){grade="B";description="Good Trade";}
+  else if(diff<=30){grade="C";description="Noticeable Advantage";}
+  else if(diff<=40){grade="D";description="Lopsided Trade";}
+  else{grade="F";description="Very Lopsided Trade";}
+
+  box.textContent="Trade Grade: "+grade+" — "+description;
+}
+
+function findBestTwoPlayerPackages(targetTeam,targetValue,used){
+  const available=playerDatabase.filter(function(player){
+    return !used.has(player.rank);
+  });
+
+  const packages=[];
+
+  for(let i=0;i<available.length;i++){
+    for(let j=i+1;j<available.length;j++){
+      const p1=available[i];
+      const p2=available[j];
+      const testTeam=targetTeam.concat([p1,p2]);
+      const value=calculateAdjustedTeamValue(testTeam);
+      const average=(value+targetValue)/2;
+      const diff=average?Math.abs(value-targetValue)/(average/100):0;
+
+      packages.push({p1:p1,p2:p2,diff:diff});
+    }
+  }
+
+  packages.sort(function(a,b){return a.diff-b.diff;});
+  return packages.slice(0,3);
+}
+
+function updateSuggestedPackage(){
+  const box=document.getElementById("package-box");
+
+  if(!teamA.length&&!teamB.length){
+    box.textContent="";
+    return;
+  }
+
+  const used=new Set(teamA.concat(teamB).map(function(p){return p.rank;}));
+
+  let targetTeam=[];
+  let targetValue=0;
+  let packageTeamName="";
+
+  if(teamA.length&&!teamB.length){
+    targetTeam=[];
+    targetValue=calculateAdjustedTeamValue(teamA);
+    packageTeamName="Team B";
+  }
+  else if(teamB.length&&!teamA.length){
+    targetTeam=[];
+    targetValue=calculateAdjustedTeamValue(teamB);
+    packageTeamName="Team A";
+  }
+  else{
+    const a=calculateAdjustedTeamValue(teamA);
+    const b=calculateAdjustedTeamValue(teamB);
+    const average=(a+b)/2;
+    const diff=average?Math.abs(a-b)/(average/100):0;
+
+    if(diff<=5){
+      box.textContent="";
       return;
     }
 
-    const testTeam=losing.concat([p]);
-    const newValue=calculateAdjustedTeamValue(testTeam);
-    const difference=Math.abs(newValue-target);
+    targetTeam=a>b?teamB:teamA;
+    targetValue=a>b?a:b;
+    packageTeamName=a>b?"Team B":"Team A";
 
-    if(bestDiff>difference){
-      bestDiff=difference;
-      best=p;
+    if(targetTeam.length>=7){
+      box.textContent="";
+      return;
     }
+  }
 
+  const best=findBestTwoPlayerPackages(targetTeam,targetValue,used);
+
+  if(!best.length){
+    box.textContent="";
+    return;
+  }
+
+  let message="📦 Suggested 2-Player Packages for "+packageTeamName+":\n";
+
+  best.forEach(function(option,index){
+    message+=(index+1)+". "+option.p1.name+" + "+option.p2.name+" — "+option.diff.toFixed(1)+"% apart";
+
+    if(option.diff<=5) message+=" — Fair range";
+    if(index<best.length-1) message+="\n";
   });
 
-  if(best){
-    fairBox.textContent=
-      "⚖️ To make it closer: "+
-      losingName+
-      " could add "+
-      best.name+
-      " ("+
-      best.value.toFixed(1)+
-      ").";
-  }else{
-    fairBox.textContent="";
-  }
+  box.textContent=message;
 }
 
-document.addEventListener("click",function(){
-  setTimeout(updateFairSuggestion,0);
+function setupThemeToggle(){
+  const button=document.getElementById("theme-toggle");
+  const html=document.documentElement;
+
+  button.addEventListener("click",function(){
+    const current=html.getAttribute("data-theme");
+    html.setAttribute("data-theme",current==="dark"?"light":"dark");
+  });
+}
+
+function setupLeagueControls(){
+  const scoring=document.getElementById("scoring-select");
+  const league=document.getElementById("league-select");
+
+  function changed(){
+    scoringMode=scoring.value;
+    leagueMode=league.value;
+    buildReferenceBoard();
+    renderTeams();
+    calculateTrade();
+  }
+
+  scoring.addEventListener("change",changed);
+  league.addEventListener("change",changed);
+}
+
+function setupTradeButtons(){
+  document.getElementById("clear-trade-button").addEventListener("click",function(){
+    teamA.length=0;
+    teamB.length=0;
+    renderTeams();
+    calculateTrade();
+  });
+
+  document.getElementById("swap-sides-button").addEventListener("click",function(){
+    const oldTeamA=teamA;
+    teamA=teamB;
+    teamB=oldTeamA;
+    renderTeams();
+    calculateTrade();
+  });
+}
+
+document.addEventListener("DOMContentLoaded",function(){
+  setupSearch("a",function(){return teamA;});
+  setupSearch("b",function(){return teamB;});
+  setupThemeToggle();
+  setupLeagueControls();
+  setupTradeButtons();
+  buildReferenceBoard();
+  renderTeams();
+  calculateTrade();
 });
-
-updateFairSuggestion();
-
-    
-
 </script>
+
 </body>
 </html>
