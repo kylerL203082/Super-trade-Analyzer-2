@@ -10,14 +10,37 @@
 
     <!-- Header Navigation -->
     <nav class="navbar">
-        <div class="logo">🏈 Super Trade Analyzer</div>
+        <div class="logo">🏈 Super Trade Analyzer <span class="ppr-badge">PPR Format</span></div>
         <button id="theme-toggle" class="toggle-btn">Toggle Theme</button>
     </nav>
 
-    <!-- Main Workspace -->
+    <!-- Global Value Board Reference Sheet -->
+    <section class="value-board-section">
+        <h3>📊 Top Market Values Reference (Custom PPR Rankings)</h3>
+        <div class="value-board-grid">
+            <div class="value-card"><h4>Top Running Backs</h4><p>1. B. Robinson (99.0)</p><p>2. J. Gibbs (97.8)</p><p>3. C. McCaffrey (96.6)</p></div>
+            <div class="value-card"><h4>Top Wide Receivers</h4><p>4. J. Chase (95.4)</p><p>5. P. Nacua (94.1)</p><p>6. J. Smith-Njigba (92.9)</p></div>
+            <div class="value-card"><h4>Top Quarterbacks</h4><p>28. J. Allen (70.6)</p><p>36. L. Jackson (63.8)</p><p>40. J. Daniels (60.6)</p></div>
+            <div class="value-card"><h4>Top Specialists</h4><p>16. B. Bowers (TE1 - 82.5)</p><p>141. B. Aubrey (K1 - 12.4)</p><p>143. Texans (DST1 - 11.2)</p></div>
+        </div>
+    </section>
+
+    <!-- Trade Breakdown Balance Meter Dashboard -->
+    <section class="meter-dashboard">
+        <div class="meter-labels">
+            <span class="left-label">⬅ Favors Team A</span>
+            <span id="meter-percentage">50% / 50%</span>
+            <span class="right-label">Favors Team B ➡</span>
+        </div>
+        <div class="meter-track">
+            <div id="meter-bar" class="meter-fill" style="width: 50%;"></div>
+        </div>
+    </section>
+
+    <!-- Main Workspace Area -->
     <main class="analyzer-container">
         
-        <!-- Team A (Left Side) -->
+        <!-- Team A Column (Left Side) -->
         <div class="team-column">
             <h2>Team A</h2>
             <div class="search-container">
@@ -25,12 +48,12 @@
                 <div id="dropdown-a" class="dropdown-list"></div>
             </div>
             <div id="team-list-a" class="player-list">
-                <!-- Players dynamically added here -->
+                <!-- Dynamic Player Rows Rendered Here -->
             </div>
             <div class="total-score" id="total-a">Total Value: 0</div>
         </div>
 
-        <!-- Team B (Right Side) -->
+        <!-- Team B Column (Right Side) -->
         <div class="team-column">
             <h2>Team B</h2>
             <div class="search-container">
@@ -38,46 +61,157 @@
                 <div id="dropdown-b" class="dropdown-list"></div>
             </div>
             <div id="team-list-b" class="player-list">
-                <!-- Players dynamically added here -->
+                <!-- Dynamic Player Rows Rendered Here -->
             </div>
             <div class="total-score" id="total-b">Total Value: 0</div>
         </div>
 
     </main>
 
-    <!-- Verdict Banner -->
+    <!-- Bottom Dynamic Verdict Header Banner -->
     <div class="verdict-container">
         <h1 id="verdict-heading">Add players to analyze</h1>
     </div>
 
-    <!-- Application Logic -->
+    <!-- Application Script Engine -->
     <script>
-        // Starter Player database with realistic baseline evaluation scores
         const playerDatabase = [
-            { name: "Josh Allen", pos: "QB", value: 92 },
-            { name: "Patrick Mahomes", pos: "QB", value: 88 },
-            { name: "Lamar Jackson", pos: "QB", value: 94 },
-            { name: "Jalen Hurts", pos: "QB", value: 89 },
-            { name: "Aaron Rodgers", pos: "QB", value: 65 },
-            { name: "Christian McCaffrey", pos: "RB", value: 96 },
-            { name: "Breece Hall", pos: "RB", value: 93 },
-            { name: "Bijan Robinson", pos: "RB", value: 91 },
-            { name: "Saquon Barkley", pos: "RB", value: 92 },
-            { name: "Justin Jefferson", pos: "WR", value: 97 },
-            { name: "CeeDee Lamb", pos: "WR", value: 95 },
-            { name: "Ja'Marr Chase", pos: "WR", value: 94 },
-            { name: "Amon-Ra St. Brown", pos: "WR", value: 93 },
-            { name: "Travis Kelce", pos: "TE", value: 84 },
-            { name: "Sam LaPorta", pos: "TE", value: 86 },
-            { name: "Justin Tucker", pos: "K", value: 45 },
-            { name: "49ers Defense", pos: "DST", value: 55 }
+            { name: "Bijan Robinson", pos: "RB", value: 99.0, trend: "📈" },
+            { name: "Jahmyr Gibbs", pos: "RB", value: 97.8, trend: "📈" },
+            { name: "Christian McCaffrey", pos: "RB", value: 96.6, trend: "📈" },
+            { name: "Ja'Marr Chase", pos: "WR", value: 95.4, trend: "📈" },
+            { name: "Puka Nacua", pos: "WR", value: 94.1, trend: "📈" },
+            { name: "Jaxon Smith-Njigba", pos: "WR", value: 92.9, trend: "📈" },
+            { name: "Jonathan Taylor", pos: "RB", value: 91.7, trend: "📈" },
+            { name: "De'Von Achane", pos: "RB", value: 90.5, trend: "📈" },
+            { name: "Amon-Ra St. Brown", pos: "WR", value: 89.3, trend: "📈" },
+            { name: "James Cook III", pos: "RB", value: 88.0, trend: "📈" },
+            { name: "Derrick Henry", pos: "RB", value: 86.8, trend: "📈" },
+            { name: "Justin Jefferson", pos: "WR", value: 86.2, trend: "📈" },
+            { name: "CeeDee Lamb", pos: "WR", value: 85.0, trend: "📉" },
+            { name: "Chase Brown", pos: "RB", value: 83.7, trend: "📈" },
+            { name: "Kenneth Walker III", pos: "RB", value: 83.1, trend: "📈" },
+            { name: "Brock Bowers", pos: "TE", value: 82.5, trend: "📈" },
+            { name: "Drake London", pos: "WR", value: 81.3, trend: "📈" },
+            { name: "Trey McBride", pos: "TE", value: 80.1, trend: "📈" },
+            { name: "Rashee Rice", pos: "WR", value: 78.9, trend: "📈" },
+            { name: "Jeremiyah Love", pos: "RB", value: 77.6, trend: "📈" },
+            { name: "Saquon Barkley", pos: "RB", value: 77.0, trend: "📈" },
+            { name: "Omarion Hampton", pos: "RB", value: 75.8, trend: "📈" },
+            { name: "Ashton Jeanty", pos: "RB", value: 75.4, trend: "📈" },
+            { name: "Javonte Williams", pos: "RB", value: 74.2, trend: "📈" },
+            { name: "Malik Nabers", pos: "WR", value: 73.0, trend: "📈" },
+            { name: "A.J. Brown", pos: "WR", value: 71.8, trend: "📈" },
+            { name: "Chris Olave", pos: "WR", value: 71.2, trend: "📈" },
+            { name: "Josh Allen", pos: "QB", value: 70.6, trend: "📈" },
+            { name: "George Pickens", pos: "WR", value: 69.4, trend: "📈" },
+            { name: "Breece Hall", pos: "RB", value: 68.1, trend: "📈" },
+            { name: "Kyren Williams", pos: "RB", value: 67.5, trend: "📈" },
+            { name: "Travis Etienne Jr.", pos: "RB", value: 66.3, trend: "📈" },
+            { name: "Emeka Egbuka", pos: "WR", value: 65.7, trend: "📈" },
+            { name: "Garrett Wilson", pos: "WR", value: 65.1, trend: "📈" },
+            { name: "Colston Loveland", pos: "TE", value: 64.4, trend: "📈" },
+            { name: "Lamar Jackson", pos: "QB", value: 63.8, trend: "📈" },
+            { name: "Quinshon Judkins", pos: "RB", value: 62.6, trend: "📈" },
+            { name: "D'Andre Swift", pos: "RB", value: 62.0, trend: "📈" },
+            { name: "Nico Collins", pos: "WR", value: 61.2, trend: "📈" },
+            { name: "Jayden Daniels", pos: "QB", value: 60.6, trend: "📈" },
+            { name: "Zay Flowers", pos: "WR", value: 59.4, trend: "📈" },
+            { name: "Tetairoa McMillan", pos: "WR", value: 58.8, trend: "📈" },
+            { name: "DeVonta Smith", pos: "WR", value: 58.2, trend: "📈" },
+            { name: "Jaylen Waddle", pos: "WR", value: 57.6, trend: "📈" },
+            { name: "Cam Skattebo", pos: "RB", value: 56.4, trend: "📈" },
+            { name: "Tyler Warren", pos: "TE", value: 55.8, trend: "📈" },
+            { name: "Bucky Irving", pos: "RB", value: 55.2, trend: "📈" },
+            { name: "Drake Maye", pos: "QB", value: 54.6, trend: "📈" },
+            { name: "Bhayshul Tuten", pos: "RB", value: 53.9, trend: "📈" },
+            { name: "Davante Adams", pos: "WR", value: 53.3, trend: "📈" },
+            { name: "Ladd McConkey", pos: "WR", value: 52.7, trend: "📈" },
+            { name: "Jalen Hurts", pos: "QB", value: 52.1, trend: "📈" },
+            { name: "Harold Fannin Jr.", pos: "TE", value: 51.5, trend: "📈" },
+            { name: "Jadarian Price", pos: "RB", value: 50.9, trend: "📈" },
+            { name: "Josh Jacobs", pos: "RB", value: 50.3, trend: "📈" },
+            { name: "David Montgomery", pos: "RB", value: 49.6, trend: "📈" },
+            { name: "Tee Higgins", pos: "WR", value: 49.0, trend: "📈" },
+            { name: "Kyle Pitts Sr.", pos: "TE", value: 48.4, trend: "📈" },
+            { name: "Justin Herbert", pos: "QB", value: 47.8, trend: "📈" },
+            { name: "Terry McLaurin", pos: "WR", value: 47.2, trend: "📈" },
+            { name: "Carnell Tate", pos: "WR", value: 46.6, trend: "📈" },
+            { name: "Rhamondre Stevenson", pos: "RB", value: 46.0, trend: "📈" },
+            { name: "Tony Pollard", pos: "RB", value: 45.3, trend: "📈" },
+            { name: "George Kittle", pos: "TE", value: 44.7, trend: "📈" },
+            { name: "Chuba Hubbard", pos: "RB", value: 44.1, trend: "📈" },
+            { name: "TreVeyon Henderson", pos: "RB", value: 43.5, trend: "📈" },
+            { name: "Rome Odunze", pos: "WR", value: 42.9, trend: "📈" },
+            { name: "DK Metcalf", pos: "WR", value: 42.3, trend: "📈" },
+            { name: "Kenneth Gainwell", pos: "RB", value: 41.7, trend: "📈" },
+            { name: "Jaxson Dart", pos: "QB", value: 41.0, trend: "📈" },
+            { name: "Jaylen Warren", pos: "RB", value: 40.4, trend: "📈" },
+            { name: "DJ Moore", pos: "WR", value: 39.8, trend: "📈" },
+            { name: "Joe Burrow", pos: "QB", value: 39.2, trend: "📈" },
+            { name: "Marvin Harrison Jr.", pos: "WR", value: 38.6, trend: "📈" },
+            { name: "Trevor Lawrence", pos: "QB", value: 38.0, trend: "📈" },
+            { name: "Christian Watson", pos: "WR", value: 37.4, trend: "📈" },
+            { name: "Luther Burden III", pos: "WR", value: 36.7, trend: "📈" },
+            { name: "Parker Washington", pos: "WR", value: 36.1, trend: "📈" },
+            { name: "Jameson Williams", pos: "WR", value: 35.5, trend: "📈" },
+            { name: "Wan'Dale Robinson", pos: "WR", value: 34.9, trend: "📈" },
+            { name: "Rachaad White", pos: "RB", value: 34.3, trend: "📈" },
+            { name: "Sam LaPorta", pos: "TE", value: 33.7, trend: "📈" },
+            { name: "Aaron Jones Sr.", pos: "RB", value: 33.1, trend: "📈" },
+            { name: "Stefon Diggs", pos: "WR", value: 32.4, trend: "📈" },
+            { name: "Michael Wilson", pos: "WR", value: 31.8, trend: "📈" },
+            { name: "Mike Evans", pos: "WR", value: 31.2, trend: "📈" },
+            { name: "Courtland Sutton", pos: "WR", value: 30.6, trend: "📈" },
+            { name: "Tucker Kraft", pos: "TE", value: 30.0, trend: "📈" },
+            { name: "Dak Prescott", pos: "QB", value: 29.4, trend: "📈" },
+            { name: "Patrick Mahomes", pos: "QB", value: 28.8, trend: "📉" },
+            { name: "Michael Pittman Jr.", pos: "WR", value: 28.2, trend: "📈" },
+            { name: "Jake Ferguson", pos: "TE", value: 27.5, trend: "📈" },
+            { name: "Jakobi Meyers", pos: "WR", value: 26.9, trend: "📈" },
+            { name: "Dallas Goedert", pos: "TE", value: 26.3, trend: "📈" },
+            { name: "MarShawn Lloyd", pos: "RB", value: 25.7, trend: "📈" },
+            { name: "Brock Purdy", pos: "QB", value: 25.1, trend: "📈" },
+            { name: "Matthew Stafford", pos: "QB", value: 24.5, trend: "📈" },
+            { name: "Bo Nix", pos: "QB", value: 23.9, trend: "📈" },
+            { name: "Travis Kelce", pos: "TE", value: 23.2, trend: "📉" },
+            { name: "Kyle Monangai", pos: "RB", value: 22.6, trend: "📈" },
+            { name: "Jonathon Brooks", pos: "RB", value: 22.0, trend: "📈" },
+            { name: "Chris Godwin Jr.", pos: "WR", value: 21.4, trend: "📈" },
+            { name: "Matthew Golden", pos: "WR", value: 20.8, trend: "📈" },
+            { name: "Alec Pierce", pos: "WR", value: 20.2, trend: "📈" },
+            { name: "Josh Downs", pos: "WR", value: 19.6, trend: "📈" },
+            { name: "Caleb Williams", pos: "QB", value: 19.0, trend: "📈" },
+            { name: "Brian Thomas Jr.", pos: "WR", value: 18.3, trend: "📈" },
+            { name: "De'Zhaun Stribling", pos: "WR", value: 17.7, trend: "📈" },
+            { name: "J.K. Dobbins", pos: "RB", value: 17.1, trend: "📈" },
+            { name: "RJ Harvey", pos: "RB", value: 16.5, trend: "📈" },
+            { name: "Jacory Croskey-Merritt", pos: "RB", value: 15.9, trend: "📈" },
+            { name: "Jordan Love", pos: "QB", value: 15.3, trend: "📈" },
+            { name: "Daniel Jones", pos: "QB", value: 14.7, trend: "📈" },
+            { name: "Blake Corum", pos: "RB", value: 14.1, trend: "📈" },
+            { name: "Romeo Doubs", pos: "WR", value: 13.4, trend: "📈" },
+            { name: "Rico Dowdle", pos: "RB", value: 12.8, trend: "📈" },
+            { name: "Jordan Addison", pos: "WR", value: 12.2, trend: "📈" },
+            { name: "Juwan Johnson", pos: "TE", value: 11.6, trend: "📈" },
+            { name: "Hunter Henry", pos: "TE", value: 11.0, trend: "📈" },
+            { name: "Jalen Coker", pos: "WR", value: 10.4, trend: "📈" },
+            { name: "Dalton Schultz", pos: "TE", value: 9.8, trend: "📈" },
+            { name: "Tyler Shough", pos: "QB", value: 9.1, trend: "📈" },
+            { name: "Tyjae Spears", pos: "RB", value: 8.5, trend: "📈" },
+            { name: "Zach Charbonnet", pos: "RB", value: 7.9, trend: "📈" },
+            { name: "Woody Marks", pos: "RB", value: 7.3, trend: "📈" },
+            { name: "Jordan Mason", pos: "RB", value: 6.7, trend: "📈" },
+            { name: "Isaiah Likely", pos: "TE", value: 6.1, trend: "📈" },
+            { name: "Kyler Murray", pos: "QB", value: 5.5, trend: "📈" },
+            { name: "Khalil Shakir", pos: "WR", value: 4.9, trend: "📈" },
+            { name: "Deebo Samuel", pos: "WR", value: 4.3, trend: "📈" },
+```javascript
         ];
 
-        // Roster State tracking arrays
         let teamA = [];
         let teamB = [];
 
-        // Application initializations
         document.addEventListener("DOMContentLoaded", () => {
             setupSearch("a", teamA);
             setupSearch("b", teamB);
@@ -85,7 +219,6 @@
             calculateTrade();
         });
 
-        // Search engine logic mapping
         function setupSearch(teamId, teamArray) {
             const input = document.getElementById(`search-${teamId}`);
             const dropdown = document.getElementById(`dropdown-${teamId}`);
@@ -110,7 +243,7 @@
                 matches.forEach(player => {
                     const item = document.createElement("div");
                     item.className = "dropdown-item";
-                    item.innerText = `${player.name} (${player.pos}) - Value: ${player.value}`;
+                    item.innerText = `${player.name} (${player.pos}) ${player.trend} - Value: ${player.value.toFixed(1)}`;
                     item.addEventListener("click", () => {
                         if (teamArray.length < 8) {
                             teamArray.push(player);
@@ -127,7 +260,6 @@
                 });
             });
 
-            // Hide dropdown if clicked outside element structure bounds
             document.addEventListener("click", (e) => {
                 if (!input.contains(e.target) && !dropdown.contains(e.target)) {
                     dropdown.style.display = "none";
@@ -135,9 +267,7 @@
             });
         }
 
-        // Structural UI rendering mechanics
         function renderTeams() {
-            // Render Left Column (Team A)
             const listA = document.getElementById("team-list-a");
             listA.innerHTML = "";
             teamA.forEach((player, index) => {
@@ -145,28 +275,26 @@
                 row.className = "player-row";
                 row.innerHTML = `
                     <button class="remove-btn" onclick="removePlayer('a', ${index})">✕</button>
-                    <span class="pos-badge">${player.pos}</span> ${player.name}</span>
-                    <span class="player-score-label">${player.value}</span>
+                    <span class="pos-badge">${player.pos}</span> ${player.name} <span class="trend-indicator">${player.trend}</span></span>
+                    <span class="player-score-label">${player.value.toFixed(1)}</span>
                 `;
                 listA.appendChild(row);
             });
 
-            // Render Right Column (Team B)
             const listB = document.getElementById("team-list-b");
             listB.innerHTML = "";
             teamB.forEach((player, index) => {
                 const row = document.createElement("div");
                 row.className = "player-row";
                 row.innerHTML = `
-                    <span class="player-score-label">${player.value}</span>
-                    ${player.name} <span class="pos-badge">${player.pos}</span></span>
+                    <span class="player-score-label">${player.value.toFixed(1)}</span>
+                    <span class="pos-badge">${player.pos}</span> ${player.name} <span class="trend-indicator">${player.trend}</span></span>
                     <button class="remove-btn" onclick="removePlayer('b', ${index})">✕</button>
                 `;
                 listB.appendChild(row);
             });
         }
 
-        // Global scoped event handler for index removals
         window.removePlayer = function(teamId, index) {
             if (teamId === 'a') {
                 teamA.splice(index, 1);
@@ -177,19 +305,33 @@
             calculateTrade();
         };
 
-        // Algorithmic computation evaluations
         function calculateTrade() {
             const totalA = teamA.reduce((sum, p) => sum + p.value, 0);
             const totalB = teamB.reduce((sum, p) => sum + p.value, 0);
 
-            document.getElementById("total-a").innerText = `Total Value: ${totalA}`;
-            document.getElementById("total-b").innerText = `Total Value: ${totalB}`;
+            document.getElementById("total-a").innerText = `Total Value: ${totalA.toFixed(1)}`;
+            document.getElementById("total-b").innerText = `Total Value: ${totalB.toFixed(1)}`;
+
+            const meterBar = document.getElementById("meter-bar");
+            const meterText = document.getElementById("meter-percentage");
+            
+            if (totalA === 0 && totalB === 0) {
+                meterBar.style.width = "50%";
+                meterText.innerText = "50% / 50%";
+            } else {
+                const combinedScore = totalA + totalB;
+                const percentageA = Math.round((totalA / combinedScore) * 100);
+                const percentageB = 100 - percentageA;
+                
+                meterBar.style.width = `${percentageA}%`;
+                meterText.innerText = `${percentageA}% / ${percentageB}%`;
+            }
 
             const heading = document.getElementById("verdict-heading");
 
             if (teamA.length === 0 && teamB.length === 0) {
                 heading.innerText = "Add players to analyze";
-            } else if (totalA === totalB) {
+            } else if (Math.abs(totalA - totalB) < 0.2) {
                 heading.innerText = "Even trade";
             } else if (totalA > totalB) {
                 heading.innerText = "Team A wins the trade";
@@ -198,7 +340,6 @@
             }
         }
 
-        // Local UI styling toggle controls
         function setupThemeToggle() {
             const toggleBtn = document.getElementById('theme-toggle');
             const htmlElement = document.documentElement;
@@ -212,4 +353,3 @@
     </script>
 </body>
 </html>
-
