@@ -21,7 +21,12 @@
 <nav class="navbar">
   <div class="league-controls">
 
-    <label class="league-control">Scoring
+<div class="league-settings">
+  <div class="league-settings-title">League Settings</div>
+
+  <div class="league-settings-grid">
+    <label class="league-control">
+      <span>Scoring</span>
       <select id="scoring-select">
         <option value="ppr">PPR</option>
         <option value="half">0.5 PPR</option>
@@ -29,7 +34,8 @@
       </select>
     </label>
 
-    <label class="league-control">League
+    <label class="league-control">
+      <span>League</span>
       <select id="league-select">
         <option value="redraft">Redraft</option>
         <option value="keeper">Keeper</option>
@@ -37,21 +43,25 @@
       </select>
     </label>
 
-    <label class="league-control">QB Format
+    <label class="league-control">
+      <span>QB Format</span>
       <select id="qb-select">
         <option value="oneqb">1QB</option>
         <option value="superflex">Superflex</option>
       </select>
     </label>
 
-    <label class="league-control">TE Premium
+    <label class="league-control">
+      <span>TE Premium</span>
       <select id="te-premium-select">
         <option value="off">Off</option>
         <option value="half">+0.5 PPR</option>
         <option value="full">+1.0 PPR</option>
       </select>
     </label>
-
+  </div>
+</div>
+    
   </div>
 
   <div class="logo">
