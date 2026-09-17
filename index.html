@@ -1470,8 +1470,105 @@ clearTradeButton.addEventListener("click",function(){
   renderTeams();
   calculateTrade();
   updateFairSuggestion();
-
 });
+updateFairSuggestion=function(){
+
+  fairBox.style.whiteSpace="pre-line";
+
+  if(!teamA.length||!teamB.length){
+    fairBox.textContent="";
+    return;
+  }
+
+  const a=calculateAdjustedTeamValue(teamA);
+  const b=calculateAdjustedTeamValue(teamB);
+  const avg=(a+b)/2;
+  const diff=avg?Math.abs(a-b)/(avg/100):0;
+
+  if(diff<=5){
+    fairBox.textContent="✅ This trade is already within the fair range.";
+    return;
+  }
+
+  const losing=a>b?teamB:teamA;
+  const losingName=a>b?"Team B":"Team A";
+  const target=a>b?a:b;
+
+  if(losing.length>=8){
+    fairBox.textContent=
+      "⚖️ "+losingName+
+      " is already at the 8-player limit, so a one-player add is not available.";
+    return;
+  }
+
+  const used=new Set(
+    teamA.concat(teamB).map(function(p){
+      return p.rank;
+    })
+  );
+
+  const options=[];
+
+  playerDatabase.forEach(function(p){
+
+    if(used.has(p.rank)){
+      return;
+    }
+
+    const testTeam=losing.concat([p]);
+    const newValue=calculateAdjustedTeamValue(testTeam);
+    const resultAvg=(newValue+target)/2;
+    const resultDiff=
+      resultAvg?Math.abs(newValue-target)/(resultAvg/100):0;
+
+    options.push({
+      player:p,
+      diff:resultDiff
+    });
+
+  });
+
+  options.sort(function(x,y){
+    return x.diff-y.diff;
+  });
+
+  const topOptions=options.slice(0,3);
+
+  if(!topOptions.length){
+    fairBox.textContent="";
+    return;
+  }
+
+  let message=
+    "⚖️ Best ways to make this closer for "+
+    losingName+
+    ":\n";
+
+  topOptions.forEach(function(option,index){
+
+    message+=
+      (index+1)+
+      ". Add "+
+      option.player.name+
+      " ("+
+      option.player.value.toFixed(1)+
+      ") - "+
+      option.diff.toFixed(1)+
+      "% apart";
+
+    if(option.diff<=5){
+      message+=" - Fair range";
+    }
+
+    if(index<topOptions.length-1){
+      message+="\n";
+    }
+
+  });
+
+  fairBox.textContent=message;
+
+};
 
 swapSidesButton.addEventListener("click",function(){
 
@@ -1479,7 +1576,106 @@ swapSidesButton.addEventListener("click",function(){
 
   teamA=teamB;
   teamB=oldTeamA;
+updateFairSuggestion=function(){
 
+  fairBox.style.whiteSpace="pre-line";
+
+  if(!teamA.length||!teamB.length){
+    fairBox.textContent="";
+    return;
+  }
+
+  const a=calculateAdjustedTeamValue(teamA);
+  const b=calculateAdjustedTeamValue(teamB);
+  const avg=(a+b)/2;
+  const diff=avg?Math.abs(a-b)/(avg/100):0;
+
+  if(diff<=5){
+    fairBox.textContent="✅ This trade is already within the fair range.";
+    return;
+  }
+
+  const losing=a>b?teamB:teamA;
+  const losingName=a>b?"Team B":"Team A";
+  const target=a>b?a:b;
+
+  if(losing.length>=8){
+    fairBox.textContent=
+      "⚖️ "+losingName+
+      " is already at the 8-player limit, so a one-player add is not available.";
+    return;
+  }
+
+  const used=new Set(
+    teamA.concat(teamB).map(function(p){
+      return p.rank;
+    })
+  );
+
+  const options=[];
+
+  playerDatabase.forEach(function(p){
+
+    if(used.has(p.rank)){
+      return;
+    }
+
+    const testTeam=losing.concat([p]);
+    const newValue=calculateAdjustedTeamValue(testTeam);
+    const resultAvg=(newValue+target)/2;
+    const resultDiff=
+      resultAvg?Math.abs(newValue-target)/(resultAvg/100):0;
+
+    options.push({
+      player:p,
+      diff:resultDiff
+    });
+
+  });
+
+  options.sort(function(x,y){
+    return x.diff-y.diff;
+  });
+
+  const topOptions=options.slice(0,3);
+
+  if(!topOptions.length){
+    fairBox.textContent="";
+    return;
+  }
+
+  let message=
+    "⚖️ Best ways to make this closer for "+
+    losingName+
+    ":\n";
+
+  topOptions.forEach(function(option,index){
+
+    message+=
+      (index+1)+
+      ". Add "+
+      option.player.name+
+      " ("+
+      option.player.value.toFixed(1)+
+      ") - "+
+      option.diff.toFixed(1)+
+      "% apart";
+
+    if(option.diff<=5){
+      message+=" - Fair range";
+    }
+
+    if(index<topOptions.length-1){
+      message+="\n";
+    }
+
+  });
+
+  fairBox.textContent=message;
+
+};
+
+updateFairSuggestion();
   renderTeams();
   calculateTrade();
   updateFairSuggestion();
