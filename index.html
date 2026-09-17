@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Super Trade Analyzer</title>
-    <link rel="stylesheet" href="styles.css?v=2">
+    <link rel="stylesheet" href="styles.css?v=3">
 </head>
 <body>
 
@@ -39,7 +39,6 @@
 
     <!-- Main Workspace Area -->
     <main class="analyzer-container">
-        
         <!-- Team A Column (Left Side) -->
         <div class="team-column">
             <h2>Team A</h2>
@@ -47,9 +46,7 @@
                 <input type="text" id="search-a" placeholder="Type player name..." autocomplete="off">
                 <div id="dropdown-a" class="dropdown-list"></div>
             </div>
-            <div id="team-list-a" class="player-list">
-                <!-- Dynamic Player Rows Rendered Here -->
-            </div>
+            <div id="team-list-a" class="player-list"></div>
             <div class="total-score" id="total-a">Total Value: 0</div>
         </div>
 
@@ -60,12 +57,9 @@
                 <input type="text" id="search-b" placeholder="Type player name..." autocomplete="off">
                 <div id="dropdown-b" class="dropdown-list"></div>
             </div>
-            <div id="team-list-b" class="player-list">
-                <!-- Dynamic Player Rows Rendered Here -->
-            </div>
+            <div id="team-list-b" class="player-list"></div>
             <div class="total-score" id="total-b">Total Value: 0</div>
         </div>
-
     </main>
 
     <!-- Bottom Dynamic Verdict Header Banner -->
@@ -146,7 +140,17 @@
             { name: "DK Metcalf", pos: "WR", value: 42.3, trend: "📈" },
             { name: "Kenneth Gainwell", pos: "RB", value: 41.7, trend: "📈" },
             { name: "Jaxson Dart", pos: "QB", value: 41.0, trend: "📈" },
-            { name: "Jaylen             { name: "Rachaad White", pos: "RB", value: 34.3, trend: "📈" },
+            { name: "Jaylen Warren", pos: "RB", value: 40.4, trend: "📈" },
+            { name: "DJ Moore", pos: "WR", value: 39.8, trend: "📈" },
+            { name: "Joe Burrow", pos: "QB", value: 39.2, trend: "📈" },
+            { name: "Marvin Harrison Jr.", pos: "WR", value: 38.6, trend: "📈" },
+            { name: "Trevor Lawrence", pos: "QB", value: 38.0, trend: "📈" },
+            { name: "Christian Watson", pos: "WR", value: 37.4, trend: "📈" },
+            { name: "Luther Burden III", pos: "WR", value: 36.7, trend: "📈" },
+            { name: "Parker Washington", pos: "WR", value: 36.1, trend: "📈" },
+            { name: "Jameson Williams", pos: "WR", value: 35.5, trend: "📈" },
+            { name: "Wan'Dale Robinson", pos: "WR", value: 34.9, trend: "📈" },
+            { name: "Rachaad White", pos: "RB", value: 34.3, trend: "📈" },
             { name: "Sam LaPorta", pos: "TE", value: 33.7, trend: "📈" },
             { name: "Aaron Jones Sr.", pos: "RB", value: 33.1, trend: "📈" },
             { name: "Stefon Diggs", pos: "WR", value: 32.4, trend: "📈" },
@@ -226,78 +230,21 @@
             { name: "Will Reichard", pos: "K", value: 2.2, trend: "📈" },
             { name: "Cam Little", pos: "K", value: 1.6, trend: "📈" },
             { name: "Harrison Mevis", pos: "K", value: 1.0, trend: "📈" }
-Warren", pos: "RB", value: 40.4, trend: "📈" },
-            { name: "DJ Moore", pos: "WR", value: 39.8, trend: "📈" },
-            { name: "Joe Burrow", pos: "QB", value: 39.2, trend: "📈" },
-            { name: "Marvin Harrison Jr.", pos: "WR", value: 38.6, trend: "📈" },
-            { name: "Trevor Lawrence", pos: "QB", value: 38.0, trend: "📈" },
-            { name: "Christian Watson", pos: "WR", value: 37.4, trend: "📈" },
-            { name: "Luther Burden III", pos: "WR", value: 36.7, trend: "📈" },
-            { name: "Parker Washington", pos: "WR", value: 36.1, trend: "📈" },
-            { name: "Jameson Williams", pos: "WR", value: 35.5, trend: "📈" },
-            { name: "Wan'Dale Robinson", pos: "WR", value: 34.9, trend: "📈" },
         ];
 
         let teamA = [];
         let teamB = [];
 
-            // Re-engineered Independent Dual Search Script Engine
-        function setupSearch(teamId, teamArray) {
-            const input = document.getElementById('search-' + teamId);
-            const dropdown = document.getElementById('dropdown-' + teamId);
-
-            input.addEventListener('input', () => {
-                const query = input.value.toLowerCase().trim();
-                dropdown.innerHTML = '';
-                
-                if (!query) {
-                    dropdown.style.display = 'none';
-                    return;
-                }
-
-                // Filters through your complete 160 records seamlessly
-                const matches = playerDatabase.filter(p => p.name.toLowerCase().includes(query));
-                
-                if (matches.length === 0) {
-                    dropdown.style.display = 'none';
-                    return;
-                }
-
-                dropdown.style.display = 'block';
-                matches.forEach(player => {
-                    const item = document.createElement('div');
-                    item.className = 'dropdown-item';
-                    item.innerText = player.name + ' (' + player.pos + ') ' + player.trend + ' - Value: ' + player.value.toFixed(1);
-                    
-                    item.addEventListener('click', () => {
-                        if (teamArray.length < 8) {
-                            teamArray.push(player);
-                            renderTeams();
-                            calculateTrade();
-                        } else {
-                            alert('Maximum capacity limit reached. Max 8 players per side.');
-                        }
-                        input.value = '';
-                        dropdown.innerHTML = '';
-                        dropdown.style.display = 'none';
-                    });
-                    dropdown.appendChild(item);
-                });
-            });
-
-            // Hide the active suggestion list if user clicks away
-            document.addEventListener('click', (e) => {
-                if (!input.contains(e.target) && !dropdown.contains(e.target)) {
-                    dropdown.style.display = 'none';
-                }
-            });
-        }
-
+        document.addEventListener("DOMContentLoaded", () => {
+            setupSearch("a", teamA);
+            setupSearch("b", teamB);
+            setupThemeToggle();
+            calculateTrade();
         });
 
         function setupSearch(teamId, teamArray) {
-            const input = document.getElementById(`search-${teamId}`);
-            const dropdown = document.getElementById(`dropdown-${teamId}`);
+            const input = document.getElementById("search-" + teamId);
+            const dropdown = document.getElementById("dropdown-" + teamId);
 
             input.addEventListener("input", () => {
                 const query = input.value.toLowerCase().trim();
@@ -319,7 +266,8 @@ Warren", pos: "RB", value: 40.4, trend: "📈" },
                 matches.forEach(player => {
                     const item = document.createElement("div");
                     item.className = "dropdown-item";
-                    item.innerText = `${player.name} (${player.pos}) ${player.trend} - Value: ${player.value.toFixed(1)}`;
+                    item.innerText = player.name + " (" + player.pos + ") " + player.trend + " - Value: " + player.value.toFixed(1);
+                    
                     item.addEventListener("click", () => {
                         if (teamArray.length < 8) {
                             teamArray.push(player);
@@ -349,11 +297,7 @@ Warren", pos: "RB", value: 40.4, trend: "📈" },
             teamA.forEach((player, index) => {
                 const row = document.createElement("div");
                 row.className = "player-row";
-                row.innerHTML = `
-                    <button class="remove-btn" onclick="removePlayer('a', ${index})">✕</button>
-                    <span class="pos-badge">${player.pos}</span> ${player.name} <span class="trend-indicator">${player.trend}</span></span>
-                    <span class="player-score-label">${player.value.toFixed(1)}</span>
-                `;
+                row.innerHTML = '<button class="remove-btn" onclick="removePlayer(\'a\', ' + index + ')">✕</button><span class="pos-badge">' + player.pos + '</span> ' + player.name + ' <span class="trend-indicator">' + player.trend + '</span></span><span class="player-score-label">' + player.value.toFixed(1) + '</span>';
                 listA.appendChild(row);
             });
 
@@ -362,11 +306,7 @@ Warren", pos: "RB", value: 40.4, trend: "📈" },
             teamB.forEach((player, index) => {
                 const row = document.createElement("div");
                 row.className = "player-row";
-                row.innerHTML = `
-                    <span class="player-score-label">${player.value.toFixed(1)}</span>
-                    <span class="pos-badge">${player.pos}</span> ${player.name} <span class="trend-indicator">${player.trend}</span></span>
-                    <button class="remove-btn" onclick="removePlayer('b', ${index})">✕</button>
-                `;
+                row.innerHTML = '<span class="player-score-label">' + player.value.toFixed(1) + '</span><span class="pos-badge">' + player.pos + '</span> ' + player.name + ' <span class="trend-indicator">' + player.trend + '</span></span><button class="remove-btn" onclick="removePlayer(\'b\', ' + index + ')">✕</button>';
                 listB.appendChild(row);
             });
         }
@@ -385,8 +325,8 @@ Warren", pos: "RB", value: 40.4, trend: "📈" },
             const totalA = teamA.reduce((sum, p) => sum + p.value, 0);
             const totalB = teamB.reduce((sum, p) => sum + p.value, 0);
 
-            document.getElementById("total-a").innerText = `Total Value: ${totalA.toFixed(1)}`;
-            document.getElementById("total-b").innerText = `Total Value: ${totalB.toFixed(1)}`;
+            document.getElementById("total-a").innerText = "Total Value: " + totalA.toFixed(1);
+            document.getElementById("total-b").innerText = "Total Value: " + totalB.toFixed(1);
 
             const meterBar = document.getElementById("meter-bar");
             const meterText = document.getElementById("meter-percentage");
@@ -399,8 +339,8 @@ Warren", pos: "RB", value: 40.4, trend: "📈" },
                 const percentageA = Math.round((totalA / combinedScore) * 100);
                 const percentageB = 100 - percentageA;
                 
-                meterBar.style.width = `${percentageA}%`;
-                meterText.innerText = `${percentageA}% / ${percentageB}%`;
+                meterBar.style.width = percentageA + "%";
+                meterText.innerText = percentageA + "% / " + percentageB + "%";
             }
 
             const heading = document.getElementById("verdict-heading");
