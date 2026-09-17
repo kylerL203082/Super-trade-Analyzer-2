@@ -1,1 +1,215 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Trade Analyzer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <nav class="navbar">
+        <div class="logo">🏈 Super Trade Analyzer</div>
+        <button id="theme-toggle" class="toggle-btn">Toggle Theme</button>
+    </nav>
+
+    <!-- Main Workspace -->
+    <main class="analyzer-container">
+        
+        <!-- Team A (Left Side) -->
+        <div class="team-column">
+            <h2>Team A</h2>
+            <div class="search-container">
+                <input type="text" id="search-a" placeholder="Type player name..." autocomplete="off">
+                <div id="dropdown-a" class="dropdown-list"></div>
+            </div>
+            <div id="team-list-a" class="player-list">
+                <!-- Players dynamically added here -->
+            </div>
+            <div class="total-score" id="total-a">Total Value: 0</div>
+        </div>
+
+        <!-- Team B (Right Side) -->
+        <div class="team-column">
+            <h2>Team B</h2>
+            <div class="search-container">
+                <input type="text" id="search-b" placeholder="Type player name..." autocomplete="off">
+                <div id="dropdown-b" class="dropdown-list"></div>
+            </div>
+            <div id="team-list-b" class="player-list">
+                <!-- Players dynamically added here -->
+            </div>
+            <div class="total-score" id="total-b">Total Value: 0</div>
+        </div>
+
+    </main>
+
+    <!-- Verdict Banner -->
+    <div class="verdict-container">
+        <h1 id="verdict-heading">Add players to analyze</h1>
+    </div>
+
+    <!-- Application Logic -->
+    <script>
+        // Starter Player database with realistic baseline evaluation scores
+        const playerDatabase = [
+            { name: "Josh Allen", pos: "QB", value: 92 },
+            { name: "Patrick Mahomes", pos: "QB", value: 88 },
+            { name: "Lamar Jackson", pos: "QB", value: 94 },
+            { name: "Jalen Hurts", pos: "QB", value: 89 },
+            { name: "Aaron Rodgers", pos: "QB", value: 65 },
+            { name: "Christian McCaffrey", pos: "RB", value: 96 },
+            { name: "Breece Hall", pos: "RB", value: 93 },
+            { name: "Bijan Robinson", pos: "RB", value: 91 },
+            { name: "Saquon Barkley", pos: "RB", value: 92 },
+            { name: "Justin Jefferson", pos: "WR", value: 97 },
+            { name: "CeeDee Lamb", pos: "WR", value: 95 },
+            { name: "Ja'Marr Chase", pos: "WR", value: 94 },
+            { name: "Amon-Ra St. Brown", pos: "WR", value: 93 },
+            { name: "Travis Kelce", pos: "TE", value: 84 },
+            { name: "Sam LaPorta", pos: "TE", value: 86 },
+            { name: "Justin Tucker", pos: "K", value: 45 },
+            { name: "49ers Defense", pos: "DST", value: 55 }
+        ];
+
+        // Roster State tracking arrays
+        let teamA = [];
+        let teamB = [];
+
+        // Application initializations
+        document.addEventListener("DOMContentLoaded", () => {
+            setupSearch("a", teamA);
+            setupSearch("b", teamB);
+            setupThemeToggle();
+            calculateTrade();
+        });
+
+        // Search engine logic mapping
+        function setupSearch(teamId, teamArray) {
+            const input = document.getElementById(`search-${teamId}`);
+            const dropdown = document.getElementById(`dropdown-${teamId}`);
+
+            input.addEventListener("input", () => {
+                const query = input.value.toLowerCase().trim();
+                dropdown.innerHTML = "";
+                
+                if (!query) {
+                    dropdown.style.display = "none";
+                    return;
+                }
+
+                const matches = playerDatabase.filter(p => p.name.toLowerCase().includes(query));
+                
+                if (matches.length === 0) {
+                    dropdown.style.display = "none";
+                    return;
+                }
+
+                dropdown.style.display = "block";
+                matches.forEach(player => {
+                    const item = document.createElement("div");
+                    item.className = "dropdown-item";
+                    item.innerText = `${player.name} (${player.pos}) - Value: ${player.value}`;
+                    item.addEventListener("click", () => {
+                        if (teamArray.length < 8) {
+                            teamArray.push(player);
+                            renderTeams();
+                            calculateTrade();
+                        } else {
+                            alert("Maximum capacity limit reached. Max 8 players per side.");
+                        }
+                        input.value = "";
+                        dropdown.innerHTML = "";
+                        dropdown.style.display = "none";
+                    });
+                    dropdown.appendChild(item);
+                });
+            });
+
+            // Hide dropdown if clicked outside element structure bounds
+            document.addEventListener("click", (e) => {
+                if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.style.display = "none";
+                }
+            });
+        }
+
+        // Structural UI rendering mechanics
+        function renderTeams() {
+            // Render Left Column (Team A)
+            const listA = document.getElementById("team-list-a");
+            listA.innerHTML = "";
+            teamA.forEach((player, index) => {
+                const row = document.createElement("div");
+                row.className = "player-row";
+                row.innerHTML = `
+                    <button class="remove-btn" onclick="removePlayer('a', ${index})">✕</button>
+                    <span class="pos-badge">${player.pos}</span> ${player.name}</span>
+                    <span class="player-score-label">${player.value}</span>
+                `;
+                listA.appendChild(row);
+            });
+
+            // Render Right Column (Team B)
+            const listB = document.getElementById("team-list-b");
+            listB.innerHTML = "";
+            teamB.forEach((player, index) => {
+                const row = document.createElement("div");
+                row.className = "player-row";
+                row.innerHTML = `
+                    <span class="player-score-label">${player.value}</span>
+                    ${player.name} <span class="pos-badge">${player.pos}</span></span>
+                    <button class="remove-btn" onclick="removePlayer('b', ${index})">✕</button>
+                `;
+                listB.appendChild(row);
+            });
+        }
+
+        // Global scoped event handler for index removals
+        window.removePlayer = function(teamId, index) {
+            if (teamId === 'a') {
+                teamA.splice(index, 1);
+            } else {
+                teamB.splice(index, 1);
+            }
+            renderTeams();
+            calculateTrade();
+        };
+
+        // Algorithmic computation evaluations
+        function calculateTrade() {
+            const totalA = teamA.reduce((sum, p) => sum + p.value, 0);
+            const totalB = teamB.reduce((sum, p) => sum + p.value, 0);
+
+            document.getElementById("total-a").innerText = `Total Value: ${totalA}`;
+            document.getElementById("total-b").innerText = `Total Value: ${totalB}`;
+
+            const heading = document.getElementById("verdict-heading");
+
+            if (teamA.length === 0 && teamB.length === 0) {
+                heading.innerText = "Add players to analyze";
+            } else if (totalA === totalB) {
+                heading.innerText = "Even trade";
+            } else if (totalA > totalB) {
+                heading.innerText = "Team A wins the trade";
+            } else {
+                heading.innerText = "Team B wins the trade";
+            }
+        }
+
+        // Local UI styling toggle controls
+        function setupThemeToggle() {
+            const toggleBtn = document.getElementById('theme-toggle');
+            const htmlElement = document.documentElement;
+
+            toggleBtn.addEventListener('click', () => {
+                const currentTheme = htmlElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                htmlElement.setAttribute('data-theme', newTheme);
+            });
+        }
+    </script>
+</body>
+</html>
 
