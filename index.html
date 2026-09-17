@@ -1,1869 +1,6767 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Trade Forge Fantasy</title>
-<link rel="stylesheet" href="styles.css?v=3">
-<style>
-.navbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.league-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.league-control{display:flex;align-items:center;gap:6px;font-size:14px}
-.league-control select{padding:8px 10px;border-radius:8px;border:1px solid rgba(127,127,127,.35);background:inherit;color:inherit}
-.trade-extra{margin-top:12px;text-align:center;white-space:pre-line}
-.trade-controls{margin-top:15px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
-#theme-toggle{margin-left:auto}
-@media(max-width:760px){.league-controls{width:100%;justify-content:center}#theme-toggle{margin-left:0}}
-</style>
-</head>
-<body>
-
-<nav class="navbar">
-  <div class="league-controls">
-
-<div class="league-settings">
-  <div class="league-settings-title">League Settings</div>
-
-  <div class="league-settings-grid">
-    <label class="league-control">
-      <span>Scoring</span>
-      <select id="scoring-select">
-        <option value="ppr">PPR</option>
-        <option value="half">0.5 PPR</option>
-        <option value="standard">No PPR</option>
-      </select>
-    </label>
-
-    <label class="league-control">
-      <span>League</span>
-      <select id="league-select">
-        <option value="redraft">Redraft</option>
-        <option value="keeper">Keeper</option>
-        <option value="dynasty">Dynasty</option>
-      </select>
-    </label>
-
-    <label class="league-control">
-      <span>QB Format</span>
-      <select id="qb-select">
-        <option value="oneqb">1QB</option>
-        <option value="superflex">Superflex</option>
-      </select>
-    </label>
-
-    <label class="league-control">
-      <span>TE Premium</span>
-      <select id="te-premium-select">
-        <option value="off">Off</option>
-        <option value="half">+0.5 PPR</option>
-        <option value="full">+1.0 PPR</option>
-      </select>
-    </label>
-  </div>
-</div>
-    
-  </div>
-
-  <div class="logo">
-    🏈 Super Trade Analyzer
-    <span id="format-badge" class="ppr-badge">PPR • Redraft</span>
-  </div>
-
-  <button id="theme-toggle" class="toggle-btn" type="button">Toggle Theme</button>
-</nav>
-
-<section class="value-board-section">
-  <h3 id="reference-heading">📊 Top Market Values Reference — PPR • Redraft</h3>
-
-  <div class="value-board-grid">
-    <div class="value-card">
-      <h4>Top Running Backs</h4>
-      <div id="top-rb"></div>
-    </div>
-
-    <div class="value-card">
-      <h4>Top Wide Receivers</h4>
-      <div id="top-wr"></div>
-    </div>
-
-    <div class="value-card">
-      <h4>Top Quarterbacks</h4>
-      <div id="top-qb"></div>
-    </div>
-
-    <div class="value-card">
-      <h4>Top Tight Ends</h4>
-      <div id="top-te"></div>
-    </div>
-  </div>
-</section>
-
-<section class="meter-dashboard">
-  <div class="meter-labels">
-    <span class="left-label">⬅ Favors Team A</span>
-    <span id="meter-percentage">50% / 50%</span>
-    <span class="right-label">Favors Team B ➡</span>
-  </div>
-
-  <div class="meter-track">
-    <div id="meter-bar" class="meter-fill" style="width:50%;"></div>
-  </div>
-</section>
-
-<main class="analyzer-container">
-
-  <div class="team-column">
-    <h2>Team A</h2>
-
-    <div class="search-container">
-      <input type="text" id="search-a" placeholder="Type player name..." autocomplete="off">
-      <div id="dropdown-a" class="dropdown-list"></div>
-    </div>
-
-    <div id="team-list-a" class="player-list"></div>
-    <div class="total-score" id="total-a">Base: 0.0 | Adjusted: 0.0</div>
-  </div>
-
-  <div class="team-column">
-    <h2>Team B</h2>
-
-    <div class="search-container">
-      <input type="text" id="search-b" placeholder="Type player name..." autocomplete="off">
-      <div id="dropdown-b" class="dropdown-list"></div>
-    </div>
-
-    <div id="team-list-b" class="player-list"></div>
-    <div class="total-score" id="total-b">Base: 0.0 | Adjusted: 0.0</div>
-  </div>
-
-</main>
-
-<div class="verdict-container">
-
-  <h1 id="verdict-heading">Add players to analyze</h1>
-
-  <div id="fair-box" class="trade-extra"></div>
-
-  <div
-    id="trade-grade-box"
-    class="trade-extra"
-    style="font-size:24px;font-weight:bold;">
-  </div>
-
-  <div id="package-box" class="trade-extra"></div>
-
-  <div class="trade-controls">
-    <button id="clear-trade-button" class="toggle-btn" type="button">Clear Trade</button>
-    <button id="swap-sides-button" class="toggle-btn" type="button">Swap Sides</button>
-  </div>
-
-</div>
-
-<script>
-
-const SUPERSTAR_FACTOR=1.25;
-
-const PACKAGE_WEIGHTS=[
-  1.00,
-  0.95,
-  0.90,
-  0.85,
-  0.80,
-  0.80,
-  0.80,
-  0.80
-];
-
-const playerDatabase=[
-
-{rank:1,name:"Bijan Robinson",pos:"RB",trend:"📈",redraft:99.0,keeper:100.0,dynasty:100.0},
-{rank:2,name:"Jahmyr Gibbs",pos:"RB",trend:"📈",redraft:97.8,keeper:100.0,dynasty:100.0},
-{rank:3,name:"Ja'Marr Chase",pos:"WR",trend:"📈",redraft:96.4,keeper:97.7,dynasty:99.3},
-{rank:4,name:"Puka Nacua",pos:"WR",trend:"📈",redraft:94.1,keeper:96.6,dynasty:99.7},
-{rank:5,name:"Jaxon Smith-Njigba",pos:"WR",trend:"📈",redraft:92.9,keeper:96.2,dynasty:100.0},
-{rank:6,name:"Christian McCaffrey",pos:"RB",trend:"📈",redraft:91.8,keeper:77.3,dynasty:59.7},
-{rank:7,name:"Jonathan Taylor",pos:"RB",trend:"📈",redraft:91.7,keeper:88.4,dynasty:84.4},
-{rank:8,name:"De'Von Achane",pos:"RB",trend:"📈",redraft:90.5,keeper:92.5,dynasty:95.0},
-{rank:9,name:"Amon-Ra St. Brown",pos:"WR",trend:"📈",redraft:89.3,keeper:90.5,dynasty:92.0},
-{rank:10,name:"James Cook III",pos:"RB",trend:"📈",redraft:88.0,keeper:86.0,dynasty:83.6},
-{rank:11,name:"Derrick Henry",pos:"RB",trend:"📈",redraft:86.8,keeper:69.2,dynasty:47.7},
-{rank:12,name:"Justin Jefferson",pos:"WR",trend:"📈",redraft:86.2,keeper:86.2,dynasty:86.2},
-{rank:13,name:"CeeDee Lamb",pos:"WR",trend:"📉",redraft:85.0,keeper:85.0,dynasty:85.0},
-{rank:14,name:"Chase Brown",pos:"RB",trend:"📈",redraft:83.7,keeper:81.8,dynasty:79.5},
-{rank:15,name:"Kenneth Walker III",pos:"RB",trend:"📈",redraft:83.1,keeper:81.2,dynasty:78.9},
-{rank:16,name:"Trey McBride",pos:"TE",trend:"📈",redraft:82.5,keeper:85.5,dynasty:89.1},
-{rank:17,name:"Drake London",pos:"WR",trend:"📈",redraft:81.3,keeper:84.2,dynasty:87.8},
-{rank:18,name:"Brock Bowers",pos:"TE",trend:"📈",redraft:80.1,keeper:84.4,dynasty:89.7},
-{rank:19,name:"Rashee Rice",pos:"WR",trend:"📈",redraft:78.9,keeper:78.2,dynasty:77.3},
-{rank:20,name:"Jeremiyah Love",pos:"RB",trend:"📈",redraft:77.6,keeper:86.3,dynasty:97.0},
-{rank:21,name:"Saquon Barkley",pos:"RB",trend:"📈",redraft:77.0,keeper:66.6,dynasty:53.9},
-{rank:22,name:"Omarion Hampton",pos:"RB",trend:"📈",redraft:75.8,keeper:82.6,dynasty:91.0},
-{rank:23,name:"Ashton Jeanty",pos:"RB",trend:"📈",redraft:75.4,keeper:83.9,dynasty:94.2},
-{rank:24,name:"Javonte Williams",pos:"RB",trend:"📈",redraft:74.2,keeper:70.2,dynasty:65.3},
-{rank:25,name:"Malik Nabers",pos:"WR",trend:"📈",redraft:73.0,keeper:78.9,dynasty:86.1},
-{rank:26,name:"A.J. Brown",pos:"WR",trend:"📈",redraft:71.8,keeper:66.0,dynasty:58.9},
-{rank:27,name:"Chris Olave",pos:"WR",trend:"📈",redraft:71.2,keeper:70.6,dynasty:69.8},
-{rank:28,name:"Josh Allen",pos:"QB",trend:"📈",redraft:70.6,keeper:70.6,dynasty:70.6},
-{rank:29,name:"George Pickens",pos:"WR",trend:"📈",redraft:69.4,keeper:68.8,dynasty:68.0},
-{rank:30,name:"Colston Loveland",pos:"TE",trend:"📈",redraft:67.6,keeper:74.3,dynasty:82.5},
-{rank:31,name:"Kyren Williams",pos:"RB",trend:"📈",redraft:67.5,keeper:65.1,dynasty:62.1},
-{rank:32,name:"Travis Etienne Jr.",pos:"RB",trend:"📈",redraft:66.3,keeper:60.3,dynasty:53.0},
-{rank:33,name:"Emeka Egbuka",pos:"WR",trend:"📈",redraft:65.7,keeper:71.6,dynasty:78.8},
-{rank:34,name:"Garrett Wilson",pos:"WR",trend:"📈",redraft:65.1,keeper:64.5,dynasty:63.8},
-{rank:35,name:"Breece Hall",pos:"RB",trend:"📈",redraft:64.4,keeper:65.0,dynasty:65.7},
-{rank:36,name:"Lamar Jackson",pos:"QB",trend:"📈",redraft:63.8,keeper:63.2,dynasty:62.5},
-{rank:37,name:"Quinshon Judkins",pos:"RB",trend:"📈",redraft:62.6,keeper:66.8,dynasty:72.0},
-{rank:38,name:"D'Andre Swift",pos:"RB",trend:"📈",redraft:62.0,keeper:57.5,dynasty:52.1},
-{rank:39,name:"Nico Collins",pos:"WR",trend:"📈",redraft:61.2,keeper:61.2,dynasty:61.2},
-{rank:40,name:"Jayden Daniels",pos:"QB",trend:"📈",redraft:60.6,keeper:64.7,dynasty:69.7},
-{rank:41,name:"Zay Flowers",pos:"WR",trend:"📈",redraft:59.4,keeper:60.7,dynasty:62.4},
-{rank:42,name:"Tetairoa McMillan",pos:"WR",trend:"📈",redraft:58.8,keeper:64.1,dynasty:70.6},
-{rank:43,name:"DeVonta Smith",pos:"WR",trend:"📈",redraft:58.2,keeper:56.9,dynasty:55.3},
-{rank:44,name:"Jaylen Waddle",pos:"WR",trend:"📈",redraft:57.6,keeper:56.3,dynasty:54.7},
-{rank:45,name:"Cam Skattebo",pos:"RB",trend:"📈",redraft:56.4,keeper:61.0,dynasty:66.6},
-{rank:46,name:"Tyler Warren",pos:"TE",trend:"📈",redraft:55.8,keeper:60.8,dynasty:67.0},
-{rank:47,name:"Bucky Irving",pos:"RB",trend:"📈",redraft:55.2,keeper:58.2,dynasty:61.8},
-{rank:48,name:"Drake Maye",pos:"QB",trend:"📈",redraft:54.6,keeper:58.5,dynasty:63.3},
-{rank:49,name:"Bhayshul Tuten",pos:"RB",trend:"📈",redraft:53.9,keeper:57.5,dynasty:62.0},
-{rank:50,name:"Davante Adams",pos:"WR",trend:"📈",redraft:53.3,keeper:42.5,dynasty:29.3},
-{rank:51,name:"Ladd McConkey",pos:"WR",trend:"📈",redraft:52.7,keeper:56.3,dynasty:60.6},
-{rank:52,name:"Jalen Hurts",pos:"QB",trend:"📈",redraft:52.1,keeper:50.9,dynasty:49.5},
-{rank:53,name:"Harold Fannin Jr.",pos:"TE",trend:"📈",redraft:51.5,keeper:55.7,dynasty:60.8},
-{rank:54,name:"Jadarian Price",pos:"RB",trend:"📈",redraft:50.9,keeper:55.0,dynasty:60.1},
-{rank:55,name:"Josh Jacobs",pos:"RB",trend:"📈",redraft:50.3,keeper:45.3,dynasty:39.2},
-{rank:56,name:"David Montgomery",pos:"RB",trend:"📈",redraft:49.6,keeper:42.9,dynasty:34.7},
-{rank:57,name:"Tee Higgins",pos:"WR",trend:"📈",redraft:49.0,keeper:46.8,dynasty:44.1},
-{rank:58,name:"Kyle Pitts Sr.",pos:"TE",trend:"📈",redraft:48.4,keeper:48.0,dynasty:47.4},
-{rank:59,name:"Justin Herbert",pos:"QB",trend:"📈",redraft:47.8,keeper:46.7,dynasty:45.4},
-{rank:60,name:"Terry McLaurin",pos:"WR",trend:"📈",redraft:47.2,keeper:39.8,dynasty:30.7},
-{rank:61,name:"Carnell Tate",pos:"WR",trend:"📈",redraft:46.6,keeper:51.8,dynasty:58.2},
-{rank:62,name:"Rhamondre Stevenson",pos:"RB",trend:"📈",redraft:46.0,keeper:40.8,dynasty:34.5},
-{rank:63,name:"Tony Pollard",pos:"RB",trend:"📈",redraft:45.3,keeper:38.8,dynasty:30.8},
-{rank:64,name:"George Kittle",pos:"TE",trend:"📈",redraft:44.7,keeper:36.7,dynasty:26.8},
-{rank:65,name:"Chuba Hubbard",pos:"RB",trend:"📈",redraft:44.1,keeper:41.1,dynasty:37.5},
-{rank:66,name:"TreVeyon Henderson",pos:"RB",trend:"📈",redraft:43.5,keeper:47.0,dynasty:51.3},
-{rank:67,name:"Rome Odunze",pos:"WR",trend:"📈",redraft:42.9,keeper:46.4,dynasty:50.6},
-{rank:68,name:"DK Metcalf",pos:"WR",trend:"📈",redraft:42.3,keeper:39.4,dynasty:36.0},
-{rank:69,name:"Kenneth Gainwell",pos:"RB",trend:"📈",redraft:41.7,keeper:36.1,dynasty:29.2},
-{rank:70,name:"Jaxson Dart",pos:"QB",trend:"📈",redraft:41.0,keeper:43.8,dynasty:47.1},
-{rank:71,name:"Jaylen Warren",pos:"RB",trend:"📈",redraft:40.4,keeper:35.9,dynasty:30.3},
-{rank:72,name:"DJ Moore",pos:"WR",trend:"📈",redraft:39.8,keeper:36.2,dynasty:31.8},
-{rank:73,name:"Joe Burrow",pos:"QB",trend:"📈",redraft:39.2,keeper:37.8,dynasty:36.1},
-{rank:74,name:"Marvin Harrison Jr.",pos:"WR",trend:"📈",redraft:38.6,keeper:41.7,dynasty:45.5},
-{rank:75,name:"Trevor Lawrence",pos:"QB",trend:"📈",redraft:38.0,keeper:36.3,dynasty:34.2},
-{rank:76,name:"Christian Watson",pos:"WR",trend:"📈",redraft:37.4,keeper:35.7,dynasty:33.7},
-{rank:77,name:"Luther Burden III",pos:"WR",trend:"📈",redraft:36.7,keeper:40.0,dynasty:44.0},
-{rank:78,name:"Parker Washington",pos:"WR",trend:"📈",redraft:36.1,keeper:36.4,dynasty:36.8},
-{rank:79,name:"Jameson Williams",pos:"WR",trend:"📈",redraft:35.5,keeper:34.7,dynasty:33.7},
-{rank:80,name:"Wan'Dale Robinson",pos:"WR",trend:"📈",redraft:34.9,keeper:33.6,dynasty:32.1},
-{rank:81,name:"Rachaad White",pos:"RB",trend:"📈",redraft:34.3,keeper:30.9,dynasty:26.8},
-{rank:82,name:"Sam LaPorta",pos:"TE",trend:"📈",redraft:33.7,keeper:34.5,dynasty:35.4},
-{rank:83,name:"Aaron Jones Sr.",pos:"RB",trend:"📈",redraft:33.1,keeper:25.7,dynasty:16.6},
-{rank:84,name:"Stefon Diggs",pos:"WR",trend:"📈",redraft:32.4,keeper:24.4,dynasty:14.6},
-{rank:85,name:"Michael Wilson",pos:"WR",trend:"📈",redraft:31.8,keeper:31.1,dynasty:30.2},
-{rank:86,name:"Mike Evans",pos:"WR",trend:"📈",redraft:31.2,keeper:22.1,dynasty:10.9},
-{rank:87,name:"Courtland Sutton",pos:"WR",trend:"📈",redraft:30.6,keeper:25.1,dynasty:18.4},
-{rank:88,name:"Tucker Kraft",pos:"TE",trend:"📈",redraft:30.0,keeper:31.1,dynasty:32.4},
-{rank:89,name:"Dak Prescott",pos:"QB",trend:"📈",redraft:29.4,keeper:26.5,dynasty:22.9},
-{rank:90,name:"Patrick Mahomes",pos:"QB",trend:"📉",redraft:28.8,keeper:27.5,dynasty:25.9},
-{rank:91,name:"Michael Pittman Jr.",pos:"WR",trend:"📈",redraft:28.2,keeper:25.7,dynasty:22.6},
-{rank:92,name:"Jake Ferguson",pos:"TE",trend:"📈",redraft:27.5,keeper:26.9,dynasty:26.1},
-{rank:93,name:"Jakobi Meyers",pos:"WR",trend:"📈",redraft:26.9,keeper:22.7,dynasty:17.5},
-{rank:94,name:"Dallas Goedert",pos:"TE",trend:"📈",redraft:26.3,keeper:20.4,dynasty:13.2},
-{rank:95,name:"MarShawn Lloyd",pos:"RB",trend:"📈",redraft:25.7,keeper:26.9,dynasty:28.3},
-{rank:96,name:"Brock Purdy",pos:"QB",trend:"📈",redraft:25.1,keeper:24.5,dynasty:23.8},
-{rank:97,name:"Matthew Stafford",pos:"QB",trend:"📈",redraft:24.5,keeper:17.3,dynasty:8.6},
-{rank:98,name:"Bo Nix",pos:"QB",trend:"📈",redraft:23.9,keeper:25.0,dynasty:26.3},
-  {rank:99,name:"Travis Kelce",pos:"TE",trend:"📉",redraft:23.2,keeper:15.4,dynasty:5.8},
-{rank:100,name:"Kyle Monangai",pos:"RB",trend:"📈",redraft:22.6,keeper:23.8,dynasty:25.3},
-{rank:101,name:"Jonathon Brooks",pos:"RB",trend:"📈",redraft:22.0,keeper:23.2,dynasty:24.6},
-{rank:102,name:"Chris Godwin Jr.",pos:"WR",trend:"📈",redraft:21.4,keeper:17.5,dynasty:12.8},
-{rank:103,name:"Matthew Golden",pos:"WR",trend:"📈",redraft:20.8,keeper:22.7,dynasty:25.0},
-{rank:104,name:"Alec Pierce",pos:"WR",trend:"📈",redraft:20.2,keeper:18.8,dynasty:17.2},
-{rank:105,name:"Josh Downs",pos:"WR",trend:"📈",redraft:19.6,keeper:20.0,dynasty:20.6},
-{rank:106,name:"Caleb Williams",pos:"QB",trend:"📈",redraft:19.0,keeper:20.0,dynasty:21.3},
-{rank:107,name:"Brian Thomas Jr.",pos:"WR",trend:"📈",redraft:18.3,keeper:19.9,dynasty:22.0},
-{rank:108,name:"De'Zhaun Stribling",pos:"WR",trend:"📈",redraft:17.7,keeper:18.9,dynasty:20.4},
-{rank:109,name:"J.K. Dobbins",pos:"RB",trend:"📈",redraft:17.1,keeper:13.6,dynasty:9.4},
-{rank:110,name:"RJ Harvey",pos:"RB",trend:"📈",redraft:16.5,keeper:17.6,dynasty:19.0},
-{rank:111,name:"Jacory Croskey-Merritt",pos:"RB",trend:"📈",redraft:15.9,keeper:16.8,dynasty:17.8},
-{rank:112,name:"Jordan Love",pos:"QB",trend:"📈",redraft:15.3,keeper:15.2,dynasty:15.0},
-{rank:113,name:"Daniel Jones",pos:"QB",trend:"📈",redraft:14.7,keeper:12.1,dynasty:8.8},
-{rank:114,name:"Blake Corum",pos:"RB",trend:"📈",redraft:14.1,keeper:14.6,dynasty:15.2},
-{rank:115,name:"Romeo Doubs",pos:"WR",trend:"📈",redraft:13.4,keeper:12.8,dynasty:12.1},
-{rank:116,name:"Rico Dowdle",pos:"RB",trend:"📈",redraft:12.8,keeper:11.4,dynasty:9.6},
-{rank:117,name:"Jordan Addison",pos:"WR",trend:"📈",redraft:12.2,keeper:12.3,dynasty:12.4},
-{rank:118,name:"Juwan Johnson",pos:"TE",trend:"📈",redraft:11.6,keeper:9.8,dynasty:7.5},
-{rank:119,name:"Hunter Henry",pos:"TE",trend:"📈",redraft:11.0,keeper:8.3,dynasty:5.0},
-{rank:120,name:"Jalen Coker",pos:"WR",trend:"📈",redraft:10.4,keeper:10.6,dynasty:10.9},
-{rank:121,name:"Dalton Schultz",pos:"TE",trend:"📈",redraft:9.8,keeper:7.8,dynasty:5.4},
-{rank:122,name:"Tyler Shough",pos:"QB",trend:"📈",redraft:9.1,keeper:9.5,dynasty:10.0},
-{rank:123,name:"Tyjae Spears",pos:"RB",trend:"📈",redraft:8.5,keeper:8.1,dynasty:7.7},
-{rank:124,name:"Zach Charbonnet",pos:"RB",trend:"📈",redraft:7.9,keeper:8.0,dynasty:8.1},
-{rank:125,name:"Woody Marks",pos:"RB",trend:"📈",redraft:7.3,keeper:7.7,dynasty:8.2},
-{rank:126,name:"Jordan Mason",pos:"RB",trend:"📈",redraft:6.7,keeper:6.4,dynasty:6.0},
-{rank:127,name:"Isaiah Likely",pos:"TE",trend:"📈",redraft:6.1,keeper:6.2,dynasty:6.4},
-{rank:128,name:"Kyler Murray",pos:"QB",trend:"📈",redraft:5.5,keeper:5.0,dynasty:4.4},
-{rank:129,name:"Khalil Shakir",pos:"WR",trend:"📈",redraft:4.9,keeper:4.9,dynasty:4.9},
-{rank:130,name:"Deebo Samuel",pos:"WR",trend:"📈",redraft:4.3,keeper:3.3,dynasty:2.1},
-{rank:131,name:"Keenan Allen",pos:"WR",trend:"📈",redraft:3.6,keeper:2.4,dynasty:0.9},
-{rank:132,name:"Calvin Ridley",pos:"WR",trend:"📈",redraft:3.0,keeper:2.3,dynasty:1.5},
-{rank:133,name:"Alvin Kamara",pos:"RB",trend:"📈",redraft:2.4,keeper:1.6,dynasty:0.7},
-{rank:134,name:"Quentin Johnston",pos:"WR",trend:"📈",redraft:1.8,keeper:1.8,dynasty:1.7},
-{rank:135,name:"Jayden Reed",pos:"WR",trend:"📈",redraft:1.2,keeper:1.2,dynasty:1.1},
-{rank:136,name:"Xavier Worthy",pos:"WR",trend:"📈",redraft:0.6,keeper:0.6,dynasty:0.7},
-{rank:137,name:"Tank Dell",pos:"WR",trend:"📈",redraft:0.1,keeper:0.1,dynasty:0.1},
-{rank:138,name:"Tyler Allgeier",pos:"RB",trend:"📈",redraft:0.1,keeper:0.1,dynasty:0.1},
-{rank:139,name:"Keaton Mitchell",pos:"RB",trend:"📈",redraft:0.1,keeper:0.1,dynasty:0.1},
-{rank:140,name:"Isiah Pacheco",pos:"RB",trend:"📈",redraft:0.1,keeper:0.1,dynasty:0.1},
-{rank:141,name:"Brandon Aubrey",pos:"K",trend:"📈",redraft:12.4,keeper:9.9,dynasty:6.8},
-{rank:142,name:"Cameron Dicker",pos:"K",trend:"📈",redraft:11.8,keeper:9.4,dynasty:6.5},
-{rank:143,name:"Houston Texans DST",pos:"DST",trend:"📈",redraft:11.2,keeper:8.4,dynasty:5.0},
-{rank:144,name:"Denver Broncos DST",pos:"DST",trend:"📈",redraft:10.6,keeper:8.0,dynasty:4.8},
-{rank:145,name:"Seattle Seahawks DST",pos:"DST",trend:"📈",redraft:10.0,keeper:7.5,dynasty:4.5},
-{rank:146,name:"Los Angeles Rams DST",pos:"DST",trend:"📈",redraft:9.4,keeper:7.1,dynasty:4.2},
-{rank:147,name:"Pittsburgh Steelers DST",pos:"DST",trend:"📈",redraft:8.8,keeper:6.6,dynasty:4.0},
-{rank:148,name:"Ka'imi Fairbairn",pos:"K",trend:"📈",redraft:8.2,keeper:6.5,dynasty:4.5},
-{rank:149,name:"Eddy Pineiro",pos:"K",trend:"📈",redraft:7.6,keeper:6.1,dynasty:4.2},
-{rank:150,name:"Chris Boswell",pos:"K",trend:"📈",redraft:7.0,keeper:5.6,dynasty:3.9},
-{rank:151,name:"Los Angeles Chargers DST",pos:"DST",trend:"📈",redraft:6.4,keeper:4.8,dynasty:2.9},
-{rank:152,name:"New England Patriots DST",pos:"DST",trend:"📈",redraft:5.8,keeper:4.4,dynasty:2.6},
-{rank:153,name:"Minnesota Vikings DST",pos:"DST",trend:"📈",redraft:5.2,keeper:3.9,dynasty:2.3},
-{rank:154,name:"Philadelphia Eagles DST",pos:"DST",trend:"📈",redraft:4.6,keeper:3.5,dynasty:2.1},
-{rank:155,name:"Green Bay Packers DST",pos:"DST",trend:"📈",redraft:4.0,keeper:3.0,dynasty:1.8},
-{rank:156,name:"Harrison Butker",pos:"K",trend:"📈",redraft:3.9,keeper:3.1,dynasty:2.1},
-{rank:157,name:"Jason Myers",pos:"K",trend:"📈",redraft:3.8,keeper:3.0,dynasty:2.1},
-{rank:158,name:"Will Reichard",pos:"K",trend:"📈",redraft:3.2,keeper:2.6,dynasty:1.8},
-{rank:159,name:"Cam Little",pos:"K",trend:"📈",redraft:2.6,keeper:2.1,dynasty:1.4},
-{rank:160,name:"Harrison Mevis",pos:"K",trend:"📈",redraft:2.0,keeper:1.6,dynasty:1.1}
-
-];
-
-const dynastyPickDatabase=[
-
-  {rank:1001,name:"2027 Early 1st",pos:"PICK",trend:"🎯",oneqb:52.0,superflex:58.0},
-  {rank:1002,name:"2027 Mid 1st",pos:"PICK",trend:"🎯",oneqb:44.0,superflex:50.0},
-  {rank:1003,name:"2027 Late 1st",pos:"PICK",trend:"🎯",oneqb:36.0,superflex:42.0},
-  {rank:1004,name:"2027 2nd",pos:"PICK",trend:"🎯",oneqb:22.0,superflex:25.0},
-  {rank:1005,name:"2027 3rd",pos:"PICK",trend:"🎯",oneqb:10.0,superflex:12.0},
-
-  {rank:1006,name:"2028 Early 1st",pos:"PICK",trend:"🎯",oneqb:47.0,superflex:53.0},
-  {rank:1007,name:"2028 Mid 1st",pos:"PICK",trend:"🎯",oneqb:40.0,superflex:46.0},
-  {rank:1008,name:"2028 Late 1st",pos:"PICK",trend:"🎯",oneqb:33.0,superflex:39.0},
-  {rank:1009,name:"2028 2nd",pos:"PICK",trend:"🎯",oneqb:19.0,superflex:22.0},
-  {rank:1010,name:"2028 3rd",pos:"PICK",trend:"🎯",oneqb:8.0,superflex:10.0}
-
-];
-
-function getAssetDatabase(){
-
-  if(leagueMode==="dynasty"){
-    return playerDatabase.concat(dynastyPickDatabase);
-  }
-
-  return playerDatabase;
-}
-
-let teamA=[];
-let teamB=[];
-
-let scoringMode="ppr";
-let leagueMode="redraft";
-let qbMode="oneqb";
-let tePremiumMode="off";
-
-const scoringMultipliers={
-
-  RB:{
-    ppr:1.00,
-    half:0.98,
-    standard:0.95
-  },
-
-  WR:{
-    ppr:1.00,
-    half:0.96,
-    standard:0.91
-  },
-
-  TE:{
-    ppr:1.00,
-    half:0.95,
-    standard:0.89
-  },
-
-  QB:{
-    ppr:1.00,
-    half:1.00,
-    standard:1.00
-  },
-
-  K:{
-    ppr:1.00,
-    half:1.00,
-    standard:1.00
-  },
-
-  DST:{
-    ppr:1.00,
-    half:1.00,
-    standard:1.00
-  }
-
-};
-
-function setupLeagueControls(){
-
-  const scoring=
-    document.getElementById("scoring-select");
-
-  const league=
-    document.getElementById("league-select");
-
-  const qb=
-    document.getElementById("qb-select");
-
-  const tePremium=
-    document.getElementById("te-premium-select");
-
-  function changed(){
-
-    scoringMode=scoring.value;
-    leagueMode=league.value;
-    qbMode=qb.value;
-    tePremiumMode=tePremium.value;
-
-    if(leagueMode!=="dynasty"){
-
-      teamA=teamA.filter(function(asset){
-        return asset.pos!=="PICK";
-      });
-
-      teamB=teamB.filter(function(asset){
-        return asset.pos!=="PICK";
-      });
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta
+    name="description"
+    content="TradeForge Fantasy - fantasy football trade analyzer with Sleeper league sync."
+  >
+
+  <title>TradeForge Fantasy | Super Trade Analyzer</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
     }
 
-    buildReferenceBoard();
-    renderTeams();
-    calculateTrade();
-  }
+    :root {
+      --bg: #f4f7fb;
+      --panel: #ffffff;
+      --panel-2: #eef3f9;
+      --text: #142033;
+      --muted: #66758a;
+      --border: #d9e2ef;
 
-  scoring.addEventListener(
-    "change",
-    changed
-  );
+      --shadow:
+        0 12px 30px rgba(18, 36, 64, 0.10);
 
-  league.addEventListener(
-    "change",
-    changed
-  );
+      --blue: #1976ff;
+      --blue-hover: #075fd7;
 
-  qb.addEventListener(
-    "change",
-    changed
-  );
+      /* User requested white sync text in light theme */
+      --sync-text: #ffffff;
 
-  tePremium.addEventListener(
-    "change",
-    changed
-  );
-}
+      --green: #22a06b;
+      --yellow: #e3a008;
+      --orange: #e87722;
+      --red: #d64545;
 
-function getPlayerValue(player){
+      --input: #ffffff;
 
-  if(player.pos==="PICK"){
+      --chip: #e9f1ff;
+      --chip-text: #174ea6;
 
-    if(qbMode==="superflex"){
-      return player.superflex;
+      --overlay: rgba(9, 16, 28, 0.68);
     }
 
-    return player.oneqb;
-  }
+    html[data-theme="dark"] {
+      --bg: #0c111b;
+      --panel: #151d2a;
+      --panel-2: #101722;
+      --text: #eef4ff;
+      --muted: #9eabc0;
+      --border: #273348;
 
-  let value=
-    player[leagueMode];
+      --shadow:
+        0 14px 34px rgba(0, 0, 0, 0.30);
 
-  const scoringMultiplier=
-    scoringMultipliers[player.pos][scoringMode];
+      --blue: #2583ff;
+      --blue-hover: #4b99ff;
 
-  value=
-    value*scoringMultiplier;
+      /* User requested black sync text in dark theme */
+      --sync-text: #000000;
 
-  if(
-    qbMode==="superflex" &&
-    player.pos==="QB"
-  ){
+      --input: #0f1622;
 
-    let qbMultiplier=1.35;
+      --chip: #172a49;
+      --chip-text: #a9cbff;
 
-    if(leagueMode==="keeper"){
-      qbMultiplier=1.40;
+      --overlay: rgba(0, 0, 0, 0.78);
     }
 
-    if(leagueMode==="dynasty"){
-      qbMultiplier=1.45;
+    body {
+      margin: 0;
+      min-height: 100vh;
+
+      background: var(--bg);
+      color: var(--text);
+
+      font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+      transition:
+        background 0.2s ease,
+        color 0.2s ease;
     }
 
-    value=
-      value*qbMultiplier;
-  }
-
-  if(
-    player.pos==="TE" &&
-    tePremiumMode!=="off"
-  ){
-
-    let teMultiplier=1.00;
-
-    if(tePremiumMode==="half"){
-
-      if(value>=75){
-        teMultiplier=1.10;
-      }
-
-      else if(value>=50){
-        teMultiplier=1.08;
-      }
-
-      else if(value>=25){
-        teMultiplier=1.06;
-      }
-
-      else{
-        teMultiplier=1.04;
-      }
+    button,
+    input,
+    select {
+      font: inherit;
     }
 
-    if(tePremiumMode==="full"){
-
-      if(value>=75){
-        teMultiplier=1.18;
-      }
-
-      else if(value>=50){
-        teMultiplier=1.14;
-      }
-
-      else if(value>=25){
-        teMultiplier=1.10;
-      }
-
-      else{
-        teMultiplier=1.06;
-      }
+    button {
+      cursor: pointer;
     }
 
-    value=
-      value*teMultiplier;
-  }
+    .page-shell {
+      width: min(1440px, calc(100% - 32px));
+      margin: 0 auto;
+      padding-bottom: 42px;
+    }
 
-  return Math.max(
-    0.1,
-    Math.min(
-      100,
-      Math.round(value*10)/10
-    )
-  );
-}
+    /* ======================================================
+       HEADER
+       ====================================================== */
 
-function getModeLabel(){
+    .site-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
 
-  const scoring=
-    scoringMode==="ppr"
-      ?"PPR"
-      :scoringMode==="half"
-      ?"0.5 PPR"
-      :"No PPR";
+      gap: 20px;
 
-  const league=
-    leagueMode==="dynasty"
-      ?"Dynasty"
-      :leagueMode==="keeper"
-      ?"Keeper"
-      :"Redraft";
+      padding:
+        22px 0
+        18px;
 
-  const qbFormat=
-    qbMode==="superflex"
-      ?"Superflex"
-      :"1QB";
+      border-bottom:
+        1px solid var(--border);
+    }
 
-  let label=
-    scoring+
-    " • "+
-    league+
-    " • "+
-    qbFormat;
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
 
-  if(tePremiumMode==="half"){
-    label+=" • TEP +0.5";
-  }
+      min-width: 0;
+    }
 
-  if(tePremiumMode==="full"){
-    label+=" • TEP +1.0";
-  }
+    .brand-mark {
+      width: 54px;
+      height: 54px;
 
-  return label;
-}
+      border-radius: 15px;
 
-function getAdjustedPlayerValue(baseValue){
+      display: grid;
+      place-items: center;
 
-  if(
-    typeof baseValue!=="number" ||
-    baseValue<=0
-  ){
-    return 0;
-  }
-
-  return 100*Math.pow(
-    baseValue/100,
-    SUPERSTAR_FACTOR
-  );
-}
-
-function calculateAdjustedTeamValue(team){
-
-  if(
-    !Array.isArray(team) ||
-    !team.length
-  ){
-    return 0;
-  }
-
-  const adjusted=
-    team
-      .map(function(player){
-
-        return getAdjustedPlayerValue(
-          getPlayerValue(player)
+      background:
+        linear-gradient(
+          145deg,
+          #1976ff,
+          #0b4db1
         );
 
-      })
-      .sort(function(a,b){
+      color: #ffffff;
 
-        return b-a;
+      font-weight: 900;
+      font-size: 21px;
+      letter-spacing: -1px;
+
+      box-shadow:
+        0 8px 20px
+        rgba(25, 118, 255, 0.28);
+
+      flex: 0 0 auto;
+    }
+
+    .brand-copy h1 {
+      margin: 0;
+
+      font-size:
+        clamp(
+          24px,
+          3vw,
+          36px
+        );
+
+      line-height: 1;
+
+      letter-spacing: -1px;
+    }
+
+    .brand-copy p {
+      margin:
+        7px 0
+        0;
+
+      color: var(--muted);
+
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .header-actions {
+      display: flex;
+      flex-direction: column;
+
+      align-items: stretch;
+
+      gap: 8px;
+
+      width: 180px;
+
+      flex:
+        0 0
+        180px;
+    }
+
+    #theme-toggle,
+    #sync-league-button {
+      min-height: 42px;
+
+      border-radius: 10px;
+
+      font-weight: 800;
+
+      border:
+        1px solid
+        var(--border);
+    }
+
+    #theme-toggle {
+      background: var(--panel);
+      color: var(--text);
+    }
+
+    #sync-league-button {
+      background: var(--blue);
+      border-color: var(--blue);
+
+      color: var(--sync-text);
+
+      box-shadow:
+        0 6px 14px
+        rgba(25, 118, 255, 0.24);
+    }
+
+    #sync-league-button:hover {
+      background: var(--blue-hover);
+    }
+
+    /* ======================================================
+       LEAGUE SETTINGS
+       ====================================================== */
+
+    .league-settings {
+      margin:
+        18px auto;
+
+      padding:
+        16px 18px
+        18px;
+
+      background: var(--panel);
+
+      border:
+        1px solid
+        var(--border);
+
+      border-radius: 16px;
+
+      box-shadow: var(--shadow);
+    }
+
+    .settings-topline {
+      display: flex;
+
+      align-items: center;
+      justify-content: space-between;
+
+      gap: 12px;
+
+      margin-bottom: 14px;
+    }
+
+    .league-settings-title {
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    #format-badge {
+      font-size: 12px;
+      font-weight: 800;
+
+      color: var(--blue);
+
+      background: var(--chip);
+
+      border-radius: 999px;
+
+      padding:
+        6px 10px;
+
+      text-align: right;
+    }
+
+    .league-settings-grid {
+      display: grid;
+
+      grid-template-columns:
+        repeat(
+          4,
+          minmax(0, 1fr)
+        );
+
+      gap: 12px;
+    }
+
+    .league-control {
+      display: flex;
+      flex-direction: column;
+
+      gap: 6px;
+    }
+
+    .league-control span {
+      color: var(--muted);
+
+      font-size: 11px;
+      font-weight: 900;
+
+      letter-spacing: 0.7px;
+
+      text-transform: uppercase;
+    }
+
+    .league-control select,
+    .owner-select,
+    .search-box input,
+    .modal input,
+    .modal select {
+      width: 100%;
+
+      min-height: 44px;
+
+      border:
+        1px solid
+        var(--border);
+
+      border-radius: 10px;
+
+      background: var(--input);
+      color: var(--text);
+
+      padding:
+        9px 11px;
+
+      outline: none;
+    }
+
+    .league-control select:focus,
+    .owner-select:focus,
+    .search-box input:focus,
+    .modal input:focus,
+    .modal select:focus {
+      border-color: var(--blue);
+
+      box-shadow:
+        0 0 0 3px
+        rgba(25, 118, 255, 0.12);
+    }
+
+    /* ======================================================
+       SLEEPER SYNC SUMMARY
+       ====================================================== */
+
+    #sleeper-summary {
+      display: none;
+
+      margin:
+        18px 0;
+
+      padding:
+        16px 18px;
+
+      border:
+        1px solid
+        rgba(25, 118, 255, 0.4);
+
+      background:
+        rgba(25, 118, 255, 0.08);
+
+      border-radius: 16px;
+    }
+
+    #sleeper-summary.active {
+      display: block;
+    }
+
+    .sync-summary-top {
+      display: flex;
+
+      justify-content: space-between;
+      align-items: flex-start;
+
+      gap: 14px;
+    }
+
+    .sync-summary-title {
+      font-weight: 900;
+      font-size: 18px;
+    }
+
+    .sync-summary-subtitle {
+      margin-top: 4px;
+
+      color: var(--muted);
+
+      font-size: 13px;
+    }
+
+    .sync-owner-grid {
+      margin-top: 14px;
+
+      display: grid;
+
+      grid-template-columns:
+        1fr 1fr;
+
+      gap: 12px;
+    }
+
+    .owner-box label {
+      display: block;
+
+      margin-bottom: 6px;
+
+      color: var(--muted);
+
+      font-size: 11px;
+      font-weight: 900;
+
+      text-transform: uppercase;
+
+      letter-spacing: 0.6px;
+    }
+
+    .disconnect-button {
+      border:
+        1px solid
+        var(--border);
+
+      background: var(--panel);
+      color: var(--text);
+
+      border-radius: 9px;
+
+      padding:
+        8px 11px;
+
+      font-weight: 800;
+
+      white-space: nowrap;
+    }
+
+    /* ======================================================
+       TOP PLAYERS
+       ====================================================== */
+
+    .reference-board {
+      background: var(--panel);
+
+      border:
+        1px solid
+        var(--border);
+
+      border-radius: 16px;
+
+      box-shadow: var(--shadow);
+
+      padding: 18px;
+
+      margin:
+        18px 0;
+    }
+
+    .section-heading {
+      margin:
+        0 0
+        14px;
+
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .reference-grid {
+      display: grid;
+
+      grid-template-columns:
+        repeat(
+          4,
+          minmax(0, 1fr)
+        );
+
+      gap: 12px;
+    }
+
+    .reference-column {
+      border:
+        1px solid
+        var(--border);
+
+      border-radius: 12px;
+
+      overflow: hidden;
+
+      background: var(--panel-2);
+    }
+
+    .reference-column h3 {
+      margin: 0;
+
+      padding:
+        10px 12px;
+
+      font-size: 13px;
+
+      letter-spacing: 0.6px;
+
+      text-transform: uppercase;
+
+      border-bottom:
+        1px solid
+        var(--border);
+    }
+
+    .top-player-row {
+      display: grid;
+
+      grid-template-columns:
+        24px
+        minmax(0, 1fr)
+        auto;
+
+      align-items: center;
+
+      gap: 7px;
+
+      padding:
+        9px 11px;
+
+      font-size: 12px;
+
+      border-bottom:
+        1px solid
+        var(--border);
+    }
+
+    .top-player-row:last-child {
+      border-bottom: 0;
+    }
+
+    .top-player-rank {
+      color: var(--muted);
+
+      font-weight: 800;
+    }
+
+    .top-player-name {
+      font-weight: 800;
+
+      overflow: hidden;
+
+      text-overflow: ellipsis;
+
+      white-space: nowrap;
+    }
+
+    .top-player-value {
+      color: var(--blue);
+
+      font-weight: 900;
+    }
+
+    /* ======================================================
+       TRADE AREA
+       ====================================================== */
+
+    .trade-layout {
+      display: grid;
+
+      grid-template-columns:
+        minmax(0, 1fr)
+        minmax(300px, 0.72fr)
+        minmax(0, 1fr);
+
+      gap: 16px;
+
+      align-items: start;
+
+      margin-top: 18px;
+    }
+
+    .team-card,
+    .result-card,
+    .analysis-card {
+      background: var(--panel);
+
+      border:
+        1px solid
+        var(--border);
+
+      border-radius: 16px;
+
+      box-shadow: var(--shadow);
+    }
+
+    .team-card {
+      padding: 18px;
+
+      min-height: 490px;
+    }
+
+    .team-title-row {
+      display: flex;
+
+      align-items: center;
+      justify-content: space-between;
+
+      gap: 12px;
+
+      margin-bottom: 14px;
+    }
+
+    .team-title {
+      margin: 0;
+
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    .team-count {
+      color: var(--muted);
+
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    /* ======================================================
+       SEARCH
+       ====================================================== */
+
+    .search-box {
+      position: relative;
+
+      margin-bottom: 12px;
+    }
+
+    .search-results {
+      position: absolute;
+
+      z-index: 30;
+
+      top:
+        calc(100% + 5px);
+
+      left: 0;
+      right: 0;
+
+      max-height: 300px;
+
+      overflow-y: auto;
+
+      border-radius: 10px;
+
+      border:
+        1px solid
+        var(--border);
+
+      background: var(--panel);
+
+      box-shadow: var(--shadow);
+
+      display: none;
+    }
+
+    .search-results.active {
+      display: block;
+    }
+
+    .search-result {
+      width: 100%;
+
+      display: grid;
+
+      grid-template-columns:
+        minmax(0, 1fr)
+        auto;
+
+      gap: 8px;
+
+      text-align: left;
+
+      border: 0;
+
+      border-bottom:
+        1px solid
+        var(--border);
+
+      padding:
+        10px 11px;
+
+      background: transparent;
+
+      color: var(--text);
+    }
+
+    .search-result:hover {
+      background: var(--panel-2);
+    }
+
+    .search-result:last-child {
+      border-bottom: 0;
+    }
+
+    .search-result-name {
+      font-weight: 800;
+    }
+
+    .search-result-meta {
+      display: block;
+
+      margin-top: 2px;
+
+      color: var(--muted);
+
+      font-size: 11px;
+    }
+
+    .search-result-value {
+      color: var(--blue);
+
+      font-weight: 900;
+
+      white-space: nowrap;
+    }
+
+    /* ======================================================
+       SELECTED PLAYERS
+       ====================================================== */
+
+    .empty-state {
+      border:
+        1px dashed
+        var(--border);
+
+      border-radius: 12px;
+
+      color: var(--muted);
+
+      text-align: center;
+
+      padding:
+        28px 12px;
+
+      font-size: 13px;
+    }
+
+    .selected-player {
+      display: grid;
+
+      grid-template-columns:
+        minmax(0, 1fr)
+        auto
+        auto;
+
+      align-items: center;
+
+      gap: 9px;
+
+      padding:
+        11px 0;
+
+      border-bottom:
+        1px solid
+        var(--border);
+    }
+
+    .selected-player:last-child {
+      border-bottom: 0;
+    }
+
+    .selected-player-name {
+      font-weight: 900;
+    }
+
+    .selected-player-meta {
+      color: var(--muted);
+
+      font-size: 11px;
+
+      margin-top: 2px;
+    }
+
+    .selected-player-value {
+      font-weight: 900;
+
+      color: var(--blue);
+    }
+
+    .remove-player {
+      width: 28px;
+      height: 28px;
+
+      border-radius: 8px;
+
+      border:
+        1px solid
+        var(--border);
+
+      background: var(--panel-2);
+
+      color: var(--text);
+
+      font-weight: 900;
+    }
+
+    .team-totals {
+      display: grid;
+
+      grid-template-columns:
+        1fr 1fr;
+
+      gap: 8px;
+
+      margin-top: 16px;
+    }
+
+    .total-box {
+      background: var(--panel-2);
+
+      border:
+        1px solid
+        var(--border);
+
+      border-radius: 10px;
+
+      padding: 10px;
+
+      text-align: center;
+    }
+
+    .total-label {
+      color: var(--muted);
+
+      font-size: 10px;
+
+      text-transform: uppercase;
+
+      letter-spacing: 0.5px;
+
+      font-weight: 900;
+    }
+
+    .total-value {
+      margin-top: 3px;
+
+      font-size: 21px;
+      font-weight: 900;
+    }
+
+    /* ======================================================
+       TRADE RESULT
+       ====================================================== */
+
+    .result-card {
+      padding: 18px;
+
+      position: sticky;
+
+      top: 12px;
+    }
+
+    .meter-labels {
+      display: flex;
+
+      justify-content: space-between;
+
+      gap: 10px;
+
+      color: var(--muted);
+
+      font-size: 11px;
+      font-weight: 900;
+
+      margin-bottom: 7px;
+    }
+
+    .trade-meter {
+      height: 16px;
+
+      border-radius: 999px;
+
+      background:
+        linear-gradient(
+          90deg,
+          #377dff 0%,
+          #68a1ff 35%,
+          #22a06b 50%,
+          #ffb24a 65%,
+          #ff6262 100%
+        );
+
+      position: relative;
+
+      overflow: visible;
+
+      margin-bottom: 23px;
+    }
+
+    #meter-marker {
+      position: absolute;
+
+      left: 50%;
+
+      top: -5px;
+
+      width: 5px;
+      height: 26px;
+
+      border-radius: 4px;
+
+      transform:
+        translateX(-50%);
+
+      background: var(--text);
+
+      box-shadow:
+        0 0 0 2px
+        var(--panel);
+
+      transition:
+        left 0.25s ease;
+    }
+
+    #verdict {
+      margin:
+        8px auto
+        14px;
+
+      padding:
+        20px 16px;
+
+      text-align: center;
+
+      font-size: 26px;
+
+      line-height: 1.15;
+
+      font-weight: 950;
+
+      letter-spacing: 0.3px;
+
+      border:
+        2px solid
+        var(--border);
+
+      border-radius: 14px;
+
+      background: var(--panel-2);
+
+      transition:
+        all 0.2s ease;
+    }
+
+    #verdict small {
+      display: block;
+
+      margin-top: 7px;
+
+      font-size: 12px;
+      font-weight: 800;
+
+      color: var(--muted);
+    }
+
+    #verdict.fair {
+      border-color: var(--green);
+
+      background:
+        rgba(34, 160, 107, 0.13);
+    }
+
+    #verdict.slight {
+      border-color: var(--yellow);
+
+      background:
+        rgba(227, 160, 8, 0.13);
+    }
+
+    #verdict.advantage {
+      border-color: var(--orange);
+
+      background:
+        rgba(232, 119, 34, 0.13);
+    }
+
+    #verdict.major {
+      border-color: var(--red);
+
+      background:
+        rgba(214, 69, 69, 0.13);
+    }
+
+    .grade-box {
+      display: flex;
+
+      justify-content: space-between;
+      align-items: center;
+
+      gap: 12px;
+
+      padding:
+        11px 12px;
+
+      border-radius: 11px;
+
+      background: var(--panel-2);
+
+      border:
+        1px solid
+        var(--border);
+
+      margin-bottom: 12px;
+    }
+
+    .grade-label {
+      color: var(--muted);
+
+      font-size: 11px;
+
+      font-weight: 900;
+
+      text-transform: uppercase;
+    }
+
+    #trade-grade {
+      font-size: 22px;
+
+      font-weight: 950;
+    }
+
+    .action-row {
+      display: grid;
+
+      grid-template-columns:
+        1fr 1fr;
+
+      gap: 8px;
+    }
+
+    .action-button {
+      min-height: 42px;
+
+      border-radius: 10px;
+
+      border:
+        1px solid
+        var(--border);
+
+      background: var(--panel);
+
+      color: var(--text);
+
+      font-weight: 900;
+    }
+
+    .action-button.primary {
+      background: var(--blue);
+
+      border-color: var(--blue);
+
+      color: #ffffff;
+    }
+
+    /* ======================================================
+       SUGGESTIONS
+       ====================================================== */
+
+    .analysis-grid {
+      display: grid;
+
+      grid-template-columns:
+        1fr 1fr;
+
+      gap: 16px;
+
+      margin-top: 16px;
+    }
+
+    .analysis-card {
+      padding: 18px;
+    }
+
+    .analysis-card h3 {
+      margin:
+        0 0
+        12px;
+
+      font-size: 17px;
+    }
+
+    .suggestion {
+      border:
+        1px solid
+        var(--border);
+
+      border-radius: 11px;
+
+      padding:
+        10px 11px;
+
+      margin-top: 8px;
+
+      background: var(--panel-2);
+    }
+
+    .suggestion:first-of-type {
+      margin-top: 0;
+    }
+
+    .suggestion-title {
+      font-weight: 900;
+
+      font-size: 13px;
+    }
+
+    .suggestion-meta {
+      margin-top: 3px;
+
+      color: var(--muted);
+
+      font-size: 11px;
+    }
+
+    .status-note {
+      color: var(--muted);
+
+      font-size: 12px;
+
+      line-height: 1.5;
+    }
+
+    footer {
+      margin-top: 28px;
+
+      padding:
+        20px 4px;
+
+      border-top:
+        1px solid
+        var(--border);
+
+      color: var(--muted);
+
+      text-align: center;
+
+      font-size: 12px;
+    }
+
+    /* ======================================================
+       SLEEPER MODAL
+       ====================================================== */
+
+    .modal-backdrop {
+      position: fixed;
+
+      inset: 0;
+
+      z-index: 1000;
+
+      background: var(--overlay);
+
+      display: none;
+
+      align-items: center;
+      justify-content: center;
+
+      padding: 18px;
+    }
+
+    .modal-backdrop.active {
+      display: flex;
+    }
+
+    .modal {
+      width:
+        min(
+          600px,
+          100%
+        );
+
+      max-height:
+        min(
+          760px,
+          92vh
+        );
+
+      overflow-y: auto;
+
+      background: var(--panel);
+
+      border:
+        1px solid
+        var(--border);
+
+      border-radius: 18px;
+
+      box-shadow:
+        0 24px 70px
+        rgba(0, 0, 0, 0.35);
+
+      padding: 20px;
+    }
+
+    .modal-header {
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: flex-start;
+
+      gap: 14px;
+
+      margin-bottom: 16px;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+
+      font-size: 24px;
+    }
+
+    .modal-header p {
+      margin:
+        5px 0
+        0;
+
+      color: var(--muted);
+
+      font-size: 12px;
+
+      line-height: 1.45;
+    }
+
+    .modal-close {
+      width: 36px;
+      height: 36px;
+
+      border-radius: 9px;
+
+      border:
+        1px solid
+        var(--border);
+
+      background: var(--panel-2);
+
+      color: var(--text);
+
+      font-size: 20px;
+
+      font-weight: 900;
+    }
+
+    .modal-field {
+      margin-top: 12px;
+    }
+
+    .modal-field label {
+      display: block;
+
+      color: var(--muted);
+
+      font-size: 11px;
+
+      font-weight: 900;
+
+      text-transform: uppercase;
+
+      letter-spacing: 0.5px;
+
+      margin-bottom: 6px;
+    }
+
+    .modal-button {
+      width: 100%;
+
+      min-height: 44px;
+
+      margin-top: 12px;
+
+      border: 0;
+
+      border-radius: 10px;
+
+      background: var(--blue);
+
+      color: #ffffff;
+
+      font-weight: 900;
+    }
+
+    .modal-button:disabled {
+      opacity: 0.55;
+
+      cursor: not-allowed;
+    }
+
+    #sync-status {
+      margin-top: 12px;
+
+      min-height: 18px;
+
+      color: var(--muted);
+
+      font-size: 12px;
+
+      line-height: 1.45;
+    }
+
+    #sync-status.error {
+      color: var(--red);
+
+      font-weight: 800;
+    }
+
+    #sync-status.success {
+      color: var(--green);
+
+      font-weight: 800;
+    }
+
+    #league-picker-wrap {
+      display: none;
+    }
+
+    /* ======================================================
+       RESPONSIVE
+       ====================================================== */
+
+    @media (max-width: 1050px) {
+      .trade-layout {
+        grid-template-columns:
+          1fr 1fr;
+      }
+
+      .result-card {
+        grid-column:
+          1 / -1;
+
+        grid-row: 1;
+
+        position: static;
+      }
+
+      .reference-grid {
+        grid-template-columns:
+          repeat(
+            2,
+            1fr
+          );
+      }
+    }
+
+    @media (max-width: 760px) {
+      .page-shell {
+        width:
+          min(
+            100% - 20px,
+            1440px
+          );
+      }
+
+      .site-header {
+        align-items: flex-start;
+      }
+
+      .brand-mark {
+        width: 46px;
+        height: 46px;
+
+        font-size: 18px;
+      }
+
+      .header-actions {
+        width: 150px;
+
+        flex-basis: 150px;
+      }
+
+      .league-settings-grid,
+      .sync-owner-grid,
+      .analysis-grid {
+        grid-template-columns:
+          1fr 1fr;
+      }
+
+      .trade-layout {
+        grid-template-columns:
+          1fr;
+      }
+
+      .result-card {
+        grid-column: auto;
+
+        grid-row: auto;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .site-header {
+        display: grid;
+
+        grid-template-columns:
+          1fr;
+      }
+
+      .header-actions {
+        width: 100%;
+
+        flex-basis: auto;
+
+        display: flex;
+
+        flex-direction: column;
+      }
+
+      .league-settings-grid,
+      .sync-owner-grid,
+      .analysis-grid,
+      .reference-grid {
+        grid-template-columns:
+          1fr;
+      }
+
+      .settings-topline,
+      .sync-summary-top {
+        align-items: stretch;
+
+        flex-direction: column;
+      }
+
+      #format-badge {
+        text-align: left;
+      }
+
+      .team-card {
+        min-height: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="page-shell">
+
+    <header class="site-header">
+
+      <div class="brand">
+
+        <div class="brand-mark">
+          TF
+        </div>
+
+        <div class="brand-copy">
+
+          <h1>
+            TradeForge Fantasy
+          </h1>
+
+          <p>
+            Super Trade Analyzer
+          </p>
+
+        </div>
+
+      </div>
+
+      <div class="header-actions">
+
+        <button
+          id="theme-toggle"
+          type="button"
+        >
+          Toggle Theme
+        </button>
+
+        <button
+          id="sync-league-button"
+          type="button"
+        >
+          Sync Your League
+        </button>
+
+      </div>
+
+    </header>
+
+    <section class="league-settings">
+
+      <div class="settings-topline">
+
+        <div class="league-settings-title">
+          League Settings
+        </div>
+
+        <div id="format-badge">
+          PPR • Redraft • 1QB
+        </div>
+
+      </div>
+
+      <div class="league-settings-grid">
+
+        <label class="league-control">
+
+          <span>
+            Scoring
+          </span>
+
+          <select id="scoring-select">
+
+            <option value="ppr">
+              PPR
+            </option>
+
+            <option value="half">
+              0.5 PPR
+            </option>
+
+            <option value="standard">
+              No PPR
+            </option>
+
+          </select>
+
+        </label>
+
+        <label class="league-control">
+
+          <span>
+            League
+          </span>
+
+          <select id="league-select">
+
+            <option value="redraft">
+              Redraft
+            </option>
+
+            <option value="keeper">
+              Keeper
+            </option>
+
+            <option value="dynasty">
+              Dynasty
+            </option>
+
+          </select>
+
+        </label>
+
+        <label class="league-control">
+
+          <span>
+            QB Format
+          </span>
+
+          <select id="qb-select">
+
+            <option value="oneqb">
+              1QB
+            </option>
+
+            <option value="superflex">
+              Superflex
+            </option>
+
+          </select>
+
+        </label>
+
+        <label class="league-control">
+
+          <span>
+            TE Premium
+          </span>
+
+          <select id="te-premium-select">
+
+            <option value="off">
+              Off
+            </option>
+
+            <option value="half">
+              +0.5 PPR
+            </option>
+
+            <option value="full">
+              +1.0 PPR
+            </option>
+
+          </select>
+
+        </label>
+
+      </div>
+
+    </section>
+
+    <section id="sleeper-summary">
+
+      <div class="sync-summary-top">
+
+        <div>
+
+          <div
+            id="synced-league-name"
+            class="sync-summary-title"
+          >
+            Sleeper League
+          </div>
+
+          <div
+            id="synced-league-detail"
+            class="sync-summary-subtitle"
+          >
+          </div>
+
+        </div>
+
+        <button
+          id="disconnect-sleeper"
+          class="disconnect-button"
+          type="button"
+        >
+          Disconnect
+        </button>
+
+      </div>
+
+      <div class="sync-owner-grid">
+
+        <div class="owner-box">
+
+          <label for="owner-a-select">
+            Team A roster
+          </label>
+
+          <select
+            id="owner-a-select"
+            class="owner-select"
+          >
+          </select>
+
+        </div>
+
+        <div class="owner-box">
+
+          <label for="owner-b-select">
+            Team B roster
+          </label>
+
+          <select
+            id="owner-b-select"
+            class="owner-select"
+          >
+          </select>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <section class="reference-board">
+
+      <h2
+        id="reference-heading"
+        class="section-heading"
+      >
+        Top Players — PPR • Redraft • 1QB
+      </h2>
+
+      <div class="reference-grid">
+
+        <div class="reference-column">
+
+          <h3>
+            Top RB
+          </h3>
+
+          <div id="top-rb">
+          </div>
+
+        </div>
+
+        <div class="reference-column">
+
+          <h3>
+            Top WR
+          </h3>
+
+          <div id="top-wr">
+          </div>
+
+        </div>
+
+        <div class="reference-column">
+
+          <h3>
+            Top QB
+          </h3>
+
+          <div id="top-qb">
+          </div>
+
+        </div>
+
+        <div class="reference-column">
+
+          <h3>
+            Top TE
+          </h3>
+
+          <div id="top-te">
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <main class="trade-layout">
+
+      <section class="team-card">
+
+        <div class="team-title-row">
+
+          <h2 class="team-title">
+            Team A
+          </h2>
+
+          <span
+            id="team-a-count"
+            class="team-count"
+          >
+            0 assets
+          </span>
+
+        </div>
+
+        <div class="search-box">
+
+          <input
+            id="search-a"
+            type="text"
+            autocomplete="off"
+            placeholder="Search player or draft pick"
+          >
+
+          <div
+            id="results-a"
+            class="search-results"
+          >
+          </div>
+
+        </div>
+
+        <div id="team-a-list">
+        </div>
+
+        <div class="team-totals">
+
+          <div class="total-box">
+
+            <div class="total-label">
+              Base Value
+            </div>
+
+            <div
+              id="base-a"
+              class="total-value"
+            >
+              0.0
+            </div>
+
+          </div>
+
+          <div class="total-box">
+
+            <div class="total-label">
+              Adjusted
+            </div>
+
+            <div
+              id="adjusted-a"
+              class="total-value"
+            >
+              0.0
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+      <section class="result-card">
+
+        <div class="meter-labels">
+
+          <span>
+            Team A edge
+          </span>
+
+          <span>
+            Even
+          </span>
+
+          <span>
+            Team B edge
+          </span>
+
+        </div>
+
+        <div class="trade-meter">
+
+          <div id="meter-marker">
+          </div>
+
+        </div>
+
+        <div id="verdict">
+
+          Build a trade
+
+          <small>
+            Add assets to both sides to analyze it.
+          </small>
+
+        </div>
+
+        <div class="grade-box">
+
+          <div>
+
+            <div class="grade-label">
+              Trade Grade
+            </div>
+
+            <div class="status-note">
+              Balance grade
+            </div>
+
+          </div>
+
+          <div id="trade-grade">
+            —
+          </div>
+
+        </div>
+
+        <div class="action-row">
+
+          <button
+            id="swap-trade"
+            class="action-button primary"
+            type="button"
+          >
+            Swap Sides
+          </button>
+
+          <button
+            id="clear-trade"
+            class="action-button"
+            type="button"
+          >
+            Clear Trade
+          </button>
+
+        </div>
+
+      </section>
+
+      <section class="team-card">
+
+        <div class="team-title-row">
+
+          <h2 class="team-title">
+            Team B
+          </h2>
+
+          <span
+            id="team-b-count"
+            class="team-count"
+          >
+            0 assets
+          </span>
+
+        </div>
+
+        <div class="search-box">
+
+          <input
+            id="search-b"
+            type="text"
+            autocomplete="off"
+            placeholder="Search player or draft pick"
+          >
+
+          <div
+            id="results-b"
+            class="search-results"
+          >
+          </div>
+
+        </div>
+
+        <div id="team-b-list">
+        </div>
+
+        <div class="team-totals">
+
+          <div class="total-box">
+
+            <div class="total-label">
+              Base Value
+            </div>
+
+            <div
+              id="base-b"
+              class="total-value"
+            >
+              0.0
+            </div>
+
+          </div>
+
+          <div class="total-box">
+
+            <div class="total-label">
+              Adjusted
+            </div>
+
+            <div
+              id="adjusted-b"
+              class="total-value"
+            >
+              0.0
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+
+    <section class="analysis-grid">
+
+      <article class="analysis-card">
+
+        <h3>
+          What Makes This Fair?
+        </h3>
+
+        <div
+          id="fair-suggestions"
+          class="status-note"
+        >
+          Build a trade to see balancing options.
+        </div>
+
+      </article>
+
+      <article class="analysis-card">
+
+        <h3>
+          Suggested Package
+        </h3>
+
+        <div
+          id="package-suggestions"
+          class="status-note"
+        >
+          Build a trade to see two-player package ideas.
+        </div>
+
+      </article>
+
+    </section>
+
+    <footer>
+      TradeForge Fantasy • Fantasy football trade analysis • Sleeper sync is read-only
+    </footer>
+
+  </div>
+
+  <!-- =====================================================
+       SLEEPER SYNC MODAL
+       ===================================================== -->
+
+  <div
+    id="sync-modal-backdrop"
+    class="modal-backdrop"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="sync-modal-title"
+  >
+
+    <div class="modal">
+
+      <div class="modal-header">
+
+        <div>
+
+          <h2 id="sync-modal-title">
+            Sync Your Sleeper League
+          </h2>
+
+          <p>
+            Enter your Sleeper username. TradeForge will find
+            your current NFL leagues and import league settings
+            and rosters. No Sleeper password is requested.
+          </p>
+
+        </div>
+
+        <button
+          id="sync-modal-close"
+          class="modal-close"
+          type="button"
+          aria-label="Close"
+        >
+          ×
+        </button>
+
+      </div>
+
+      <div class="modal-field">
+
+        <label for="sleeper-username">
+          Sleeper username
+        </label>
+
+        <input
+          id="sleeper-username"
+          type="text"
+          autocomplete="off"
+          placeholder="Example: yourSleeperName"
+        >
+
+      </div>
+
+      <button
+        id="find-sleeper-leagues"
+        class="modal-button"
+        type="button"
+      >
+        Find My Leagues
+      </button>
+
+      <div id="league-picker-wrap">
+
+        <div class="modal-field">
+
+          <label for="sleeper-league-picker">
+            Choose a league
+          </label>
+
+          <select id="sleeper-league-picker">
+          </select>
+
+        </div>
+
+        <button
+          id="connect-selected-league"
+          class="modal-button"
+          type="button"
+        >
+          Sync Selected League
+        </button>
+
+      </div>
+
+      <div id="sync-status">
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    "use strict";
+
+    /* =========================================================
+       TRADEFORGE STATE
+       ========================================================= */
+
+    let teamA = [];
+    let teamB = [];
+
+    let scoringMode = "ppr";
+    let leagueMode = "redraft";
+    let qbMode = "oneqb";
+    let tePremiumMode = "off";
+
+    let sleeperUser = null;
+    let syncedLeague = null;
+    let syncedRosters = [];
+    let syncedUsers = [];
+    let sleeperPlayers = {};
+
+    let syncedRosterA = "";
+    let syncedRosterB = "";
+
+    const SUPERSTAR_FACTOR = 1.25;
+
+    const PACKAGE_WEIGHTS = [
+      1.00,
+      0.95,
+      0.90,
+      0.85,
+      0.80,
+      0.80,
+      0.80,
+      0.80
+    ];
+
+    const scoringMultipliers = {
+
+      RB: {
+        ppr: 1.00,
+        half: 0.98,
+        standard: 0.95
+      },
+
+      WR: {
+        ppr: 1.00,
+        half: 0.96,
+        standard: 0.91
+      },
+
+      TE: {
+        ppr: 1.00,
+        half: 0.95,
+        standard: 0.89
+      },
+
+      QB: {
+        ppr: 1.00,
+        half: 1.00,
+        standard: 1.00
+      },
+
+      K: {
+        ppr: 1.00,
+        half: 1.00,
+        standard: 1.00
+      },
+
+      DST: {
+        ppr: 1.00,
+        half: 1.00,
+        standard: 1.00
+      }
+
+    };
+
+    /* =========================================================
+       TRADEFORGE PLAYER VALUES
+       ========================================================= */
+
+    const playerRows = [
+
+      [1,"Bijan Robinson","RB",99.0,100.0,100.0],
+      [2,"Jahmyr Gibbs","RB",97.8,100.0,100.0],
+      [3,"Ja'Marr Chase","WR",96.4,97.7,99.3],
+      [4,"Puka Nacua","WR",94.1,96.6,99.7],
+      [5,"Jaxon Smith-Njigba","WR",92.9,96.2,100.0],
+
+      [6,"Christian McCaffrey","RB",91.8,77.3,59.7],
+      [7,"Jonathan Taylor","RB",91.7,88.4,84.4],
+      [8,"De'Von Achane","RB",90.5,92.5,95.0],
+      [9,"Amon-Ra St. Brown","WR",89.3,90.5,92.0],
+      [10,"James Cook III","RB",88.0,86.0,83.6],
+
+      [11,"Derrick Henry","RB",86.8,69.2,47.7],
+      [12,"Justin Jefferson","WR",86.2,86.2,86.2],
+      [13,"CeeDee Lamb","WR",85.0,85.0,85.0],
+      [14,"Chase Brown","RB",83.7,81.8,79.5],
+      [15,"Kenneth Walker III","RB",83.1,81.2,78.9],
+
+      [16,"Trey McBride","TE",82.5,85.5,89.1],
+      [17,"Drake London","WR",81.3,84.2,87.8],
+      [18,"Brock Bowers","TE",80.1,84.4,89.7],
+      [19,"Rashee Rice","WR",78.9,78.2,77.3],
+      [20,"Jeremiyah Love","RB",77.6,86.3,97.0],
+
+      [21,"Saquon Barkley","RB",77.0,66.6,53.9],
+      [22,"Omarion Hampton","RB",75.8,82.6,91.0],
+      [23,"Ashton Jeanty","RB",75.4,83.9,94.2],
+      [24,"Javonte Williams","RB",74.2,70.2,65.3],
+      [25,"Malik Nabers","WR",73.0,78.9,86.1],
+
+      [26,"A.J. Brown","WR",71.8,66.0,58.9],
+      [27,"Chris Olave","WR",71.2,70.6,69.8],
+      [28,"Josh Allen","QB",70.6,70.6,70.6],
+      [29,"George Pickens","WR",69.4,68.8,68.0],
+      [30,"Colston Loveland","TE",67.6,74.3,82.5],
+
+      [31,"Kyren Williams","RB",67.5,65.1,62.1],
+      [32,"Travis Etienne Jr.","RB",66.3,60.3,53.0],
+      [33,"Emeka Egbuka","WR",65.7,71.6,78.8],
+      [34,"Garrett Wilson","WR",65.1,64.5,63.8],
+      [35,"Breece Hall","RB",64.4,65.0,65.7],
+
+      [36,"Lamar Jackson","QB",63.8,63.2,62.5],
+      [37,"Quinshon Judkins","RB",62.6,66.8,72.0],
+      [38,"D'Andre Swift","RB",62.0,57.5,52.1],
+      [39,"Nico Collins","WR",61.2,61.2,61.2],
+      [40,"Jayden Daniels","QB",60.6,64.7,69.7],
+
+      [41,"Zay Flowers","WR",59.4,60.7,62.4],
+      [42,"Tetairoa McMillan","WR",58.8,64.1,70.6],
+      [43,"DeVonta Smith","WR",58.2,56.9,55.3],
+      [44,"Jaylen Waddle","WR",57.6,56.3,54.7],
+      [45,"Cam Skattebo","RB",56.4,61.0,66.6],
+
+      [46,"Tyler Warren","TE",55.8,60.8,67.0],
+      [47,"Bucky Irving","RB",55.2,58.2,61.8],
+      [48,"Drake Maye","QB",54.6,58.5,63.3],
+      [49,"Bhayshul Tuten","RB",53.9,57.5,62.0],
+      [50,"Davante Adams","WR",53.3,42.5,29.3],
+
+      [51,"Ladd McConkey","WR",52.7,56.3,60.6],
+      [52,"Jalen Hurts","QB",52.1,50.9,49.5],
+      [53,"Harold Fannin Jr.","TE",51.5,55.7,60.8],
+      [54,"Jadarian Price","RB",50.9,55.0,60.1],
+      [55,"Josh Jacobs","RB",50.3,45.3,39.2],
+
+      [56,"David Montgomery","RB",49.6,42.9,34.7],
+      [57,"Tee Higgins","WR",49.0,46.8,44.1],
+      [58,"Kyle Pitts Sr.","TE",48.4,48.0,47.4],
+      [59,"Justin Herbert","QB",47.8,46.7,45.4],
+      [60,"Terry McLaurin","WR",47.2,39.8,30.7],
+
+      [61,"Carnell Tate","WR",46.6,51.8,58.2],
+      [62,"Rhamondre Stevenson","RB",46.0,40.8,34.5],
+      [63,"Tony Pollard","RB",45.3,38.8,30.8],
+      [64,"George Kittle","TE",44.7,36.7,26.8],
+      [65,"Chuba Hubbard","RB",44.1,41.1,37.5],
+
+      [66,"TreVeyon Henderson","RB",43.5,47.0,51.3],
+      [67,"Rome Odunze","WR",42.9,46.4,50.6],
+      [68,"DK Metcalf","WR",42.3,39.4,36.0],
+      [69,"Kenneth Gainwell","RB",41.7,36.1,29.2],
+      [70,"Jaxson Dart","QB",41.0,43.8,47.1],
+
+      [71,"Jaylen Warren","RB",40.4,35.9,30.3],
+      [72,"DJ Moore","WR",39.8,36.2,31.8],
+      [73,"Joe Burrow","QB",39.2,37.8,36.1],
+      [74,"Marvin Harrison Jr.","WR",38.6,41.7,45.5],
+      [75,"Trevor Lawrence","QB",38.0,36.3,34.2],
+
+      [76,"Christian Watson","WR",37.4,35.7,33.7],
+      [77,"Luther Burden III","WR",36.7,40.0,44.0],
+      [78,"Parker Washington","WR",36.1,36.4,36.8],
+      [79,"Jameson Williams","WR",35.5,34.7,33.7],
+      [80,"Wan'Dale Robinson","WR",34.9,33.6,32.1],
+
+      [81,"Rachaad White","RB",34.3,30.9,26.8],
+      [82,"Sam LaPorta","TE",33.7,34.5,35.4],
+      [83,"Aaron Jones Sr.","RB",33.1,25.7,16.6],
+      [84,"Stefon Diggs","WR",32.4,24.4,14.6],
+      [85,"Michael Wilson","WR",31.8,31.1,30.2],
+
+      [86,"Mike Evans","WR",31.2,22.1,10.9],
+      [87,"Courtland Sutton","WR",30.6,25.1,18.4],
+      [88,"Tucker Kraft","TE",30.0,31.1,32.4],
+      [89,"Dak Prescott","QB",29.4,26.5,22.9],
+      [90,"Patrick Mahomes","QB",28.8,27.5,25.9],
+
+      [91,"Michael Pittman Jr.","WR",28.2,25.7,22.6],
+      [92,"Jake Ferguson","TE",27.5,26.9,26.1],
+      [93,"Jakobi Meyers","WR",26.9,22.7,17.5],
+      [94,"Dallas Goedert","TE",26.3,20.4,13.2],
+      [95,"MarShawn Lloyd","RB",25.7,26.9,28.3],
+
+      [96,"Brock Purdy","QB",25.1,24.5,23.8],
+      [97,"Matthew Stafford","QB",24.5,17.3,8.6],
+      [98,"Bo Nix","QB",23.9,25.0,26.3],
+      [99,"Travis Kelce","TE",23.2,15.4,5.8],
+      [100,"Kyle Monangai","RB",22.6,23.8,25.3],
+
+      [101,"Jonathon Brooks","RB",22.0,23.2,24.6],
+      [102,"Chris Godwin Jr.","WR",21.4,17.5,12.8],
+      [103,"Matthew Golden","WR",20.8,22.7,25.0],
+      [104,"Alec Pierce","WR",20.2,18.8,17.2],
+      [105,"Josh Downs","WR",19.6,20.0,20.6],
+
+      [106,"Caleb Williams","QB",19.0,20.0,21.3],
+      [107,"Brian Thomas Jr.","WR",18.3,19.9,22.0],
+      [108,"De'Zhaun Stribling","WR",17.7,18.9,20.4],
+      [109,"J.K. Dobbins","RB",17.1,13.6,9.4],
+      [110,"RJ Harvey","RB",16.5,17.6,19.0],
+
+      [111,"Jacory Croskey-Merritt","RB",15.9,16.8,17.8],
+      [112,"Jordan Love","QB",15.3,15.2,15.0],
+      [113,"Daniel Jones","QB",14.7,12.1,8.8],
+      [114,"Blake Corum","RB",14.1,14.6,15.2],
+      [115,"Romeo Doubs","WR",13.4,12.8,12.1],
+
+      [116,"Rico Dowdle","RB",12.8,11.4,9.6],
+      [117,"Jordan Addison","WR",12.2,12.3,12.4],
+      [118,"Juwan Johnson","TE",11.6,9.8,7.5],
+      [119,"Hunter Henry","TE",11.0,8.3,5.0],
+      [120,"Jalen Coker","WR",10.4,10.6,10.9],
+
+      [121,"Dalton Schultz","TE",9.8,7.8,5.4],
+      [122,"Tyler Shough","QB",9.1,9.5,10.0],
+      [123,"Tyjae Spears","RB",8.5,8.1,7.7],
+      [124,"Zach Charbonnet","RB",7.9,8.0,8.1],
+      [125,"Woody Marks","RB",7.3,7.7,8.2],
+
+      [126,"Jordan Mason","RB",6.7,6.4,6.0],
+      [127,"Isaiah Likely","TE",6.1,6.2,6.4],
+      [128,"Kyler Murray","QB",5.5,5.0,4.4],
+      [129,"Khalil Shakir","WR",4.9,4.9,4.9],
+      [130,"Deebo Samuel","WR",4.3,3.3,2.1],
+
+      [131,"Keenan Allen","WR",3.6,2.4,0.9],
+      [132,"Calvin Ridley","WR",3.0,2.3,1.5],
+      [133,"Alvin Kamara","RB",2.4,1.6,0.7],
+      [134,"Quentin Johnston","WR",1.8,1.8,1.7],
+      [135,"Jayden Reed","WR",1.2,1.2,1.1],
+
+      [136,"Xavier Worthy","WR",0.6,0.6,0.7],
+      [137,"Tank Dell","WR",0.1,0.1,0.1],
+      [138,"Tyler Allgeier","RB",0.1,0.1,0.1],
+      [139,"Keaton Mitchell","RB",0.1,0.1,0.1],
+      [140,"Isiah Pacheco","RB",0.1,0.1,0.1],
+
+      [141,"Brandon Aubrey","K",12.4,9.9,6.8],
+      [142,"Cameron Dicker","K",11.8,9.4,6.5],
+
+      [143,"Houston Texans DST","DST",11.2,8.4,5.0],
+      [144,"Denver Broncos DST","DST",10.6,8.0,4.8],
+      [145,"Seattle Seahawks DST","DST",10.0,7.5,4.5],
+      [146,"Los Angeles Rams DST","DST",9.4,7.1,4.2],
+      [147,"Pittsburgh Steelers DST","DST",8.8,6.6,4.0],
+
+      [148,"Ka'imi Fairbairn","K",8.2,6.5,4.5],
+      [149,"Eddy Pineiro","K",7.6,6.1,4.2],
+      [150,"Chris Boswell","K",7.0,5.6,3.9],
+
+      [151,"Los Angeles Chargers DST","DST",6.4,4.8,2.9],
+      [152,"New England Patriots DST","DST",5.8,4.4,2.6],
+      [153,"Minnesota Vikings DST","DST",5.2,3.9,2.3],
+      [154,"Philadelphia Eagles DST","DST",4.6,3.5,2.1],
+      [155,"Green Bay Packers DST","DST",4.0,3.0,1.8],
+
+      [156,"Harrison Butker","K",3.9,3.1,2.1],
+      [157,"Jason Myers","K",3.8,3.0,2.1],
+      [158,"Will Reichard","K",3.2,2.6,1.8],
+      [159,"Cam Little","K",2.6,2.1,1.4],
+      [160,"Harrison Mevis","K",2.0,1.6,1.1]
+
+    ];
+
+    const playerDatabase =
+      playerRows.map(function(row) {
+
+        return {
+
+          rank: row[0],
+
+          name: row[1],
+
+          pos: row[2],
+
+          trend: "",
+
+          redraft: row[3],
+
+          keeper: row[4],
+
+          dynasty: row[5]
+
+        };
 
       });
 
-  return adjusted.reduce(
-    function(total,value,index){
+    /* =========================================================
+       DYNASTY DRAFT PICKS
+       ========================================================= */
 
-      const weight=
-        PACKAGE_WEIGHTS[index]!==undefined
-          ?PACKAGE_WEIGHTS[index]
-          :0.80;
+    const dynastyPickDatabase = [
 
-      return total+
-        (value*weight);
+      {
+        rank: 1001,
+        name: "2027 Early 1st",
+        pos: "PICK",
+        trend: "🎯",
+        oneqb: 52.0,
+        superflex: 58.0
+      },
 
-    },
-    0
-  );
-}
-function calculateRawValue(team){
+      {
+        rank: 1002,
+        name: "2027 Mid 1st",
+        pos: "PICK",
+        trend: "🎯",
+        oneqb: 44.0,
+        superflex: 50.0
+      },
 
-  return team.reduce(
-    function(total,player){
+      {
+        rank: 1003,
+        name: "2027 Late 1st",
+        pos: "PICK",
+        trend: "🎯",
+        oneqb: 36.0,
+        superflex: 42.0
+      },
 
-      return total+
-        getPlayerValue(player);
+      {
+        rank: 1004,
+        name: "2027 2nd",
+        pos: "PICK",
+        trend: "🎯",
+        oneqb: 22.0,
+        superflex: 25.0
+      },
 
-    },
-    0
-  );
-}
+      {
+        rank: 1005,
+        name: "2027 3rd",
+        pos: "PICK",
+        trend: "🎯",
+        oneqb: 10.0,
+        superflex: 12.0
+      },
 
-function abbreviateName(name){
+      {
+        rank: 1006,
+        name: "2028 Early 1st",
+        pos: "PICK",
+        trend: "🎯",
+        oneqb: 47.0,
+        superflex: 53.0
+      },
 
-  const parts=
-    name
-      .trim()
-      .split(/\s+/);
+      {
+        rank: 1007,
+        name: "2028 Mid 1st",
+        pos: "PICK",
+        trend: "🎯",
+        oneqb: 40.0,
+        superflex: 46.0
+      },
 
-  if(parts.length===1){
-    return parts[0];
-  }
+      {
+        rank: 1008,
+        name: "2028 Late 1st",
+        pos: "PICK",
+        trend: "🎯",
+        oneqb: 33.0,
+        superflex: 39.0
+      },
 
-  return parts[0].charAt(0)+
-    ". "+
-    parts.slice(1).join(" ");
-}
+      {
+        rank: 1009,
+        name: "2028 2nd",
+        pos: "PICK",
+        trend: "🎯",
+        oneqb: 19.0,
+        superflex: 22.0
+      },
 
-function buildReferenceBoard(){
+      {
+        rank: 1010,
+        name: "2028 3rd",
+        pos: "PICK",
+        trend: "🎯",
+        oneqb: 8.0,
+        superflex: 10.0
+      }
 
-  renderTopPlayers(
-    "RB",
-    "top-rb"
-  );
+    ];
 
-  renderTopPlayers(
-    "WR",
-    "top-wr"
-  );
+    /* =========================================================
+       NFL DEFENSE NAME MAP FOR SLEEPER
+       ========================================================= */
 
-  renderTopPlayers(
-    "QB",
-    "top-qb"
-  );
+    const nflDefenseNames = {
 
-  renderTopPlayers(
-    "TE",
-    "top-te"
-  );
+      ARI: "Arizona Cardinals DST",
 
-  document
-    .getElementById("format-badge")
-    .textContent=
-      getModeLabel();
+      ATL: "Atlanta Falcons DST",
 
-  document
-    .getElementById("reference-heading")
-    .textContent=
-      "📊 Top Market Values Reference — "+
-      getModeLabel();
-}
+      BAL: "Baltimore Ravens DST",
 
-function renderTopPlayers(
-  position,
-  elementId
-){
+      BUF: "Buffalo Bills DST",
 
-  const container=
-    document.getElementById(
-      elementId
-    );
+      CAR: "Carolina Panthers DST",
 
-  const players=
-    playerDatabase
-      .filter(function(player){
+      CHI: "Chicago Bears DST",
 
-        return player.pos===position;
+      CIN: "Cincinnati Bengals DST",
 
-      })
-      .slice()
-      .sort(function(a,b){
+      CLE: "Cleveland Browns DST",
 
-        const diff=
-          getPlayerValue(b)-
-          getPlayerValue(a);
+      DAL: "Dallas Cowboys DST",
 
-        return diff!==0
-          ?diff
-          :a.rank-b.rank;
+      DEN: "Denver Broncos DST",
 
-      })
-      .slice(0,3);
+      DET: "Detroit Lions DST",
 
-  container.innerHTML="";
+      GB: "Green Bay Packers DST",
 
-  players.forEach(
-    function(player,index){
+      HOU: "Houston Texans DST",
 
-      const line=
-        document.createElement("p");
+      IND: "Indianapolis Colts DST",
 
-      line.textContent=
-        (index+1)+
-        ". "+
-        abbreviateName(player.name)+
-        " ("+
-        getPlayerValue(player).toFixed(1)+
-        ")";
+      JAX: "Jacksonville Jaguars DST",
 
-      container.appendChild(line);
+      KC: "Kansas City Chiefs DST",
+
+      LAC: "Los Angeles Chargers DST",
+
+      LAR: "Los Angeles Rams DST",
+
+      LV: "Las Vegas Raiders DST",
+
+      MIA: "Miami Dolphins DST",
+
+      MIN: "Minnesota Vikings DST",
+
+      NE: "New England Patriots DST",
+
+      NO: "New Orleans Saints DST",
+
+      NYG: "New York Giants DST",
+
+      NYJ: "New York Jets DST",
+
+      PHI: "Philadelphia Eagles DST",
+
+      PIT: "Pittsburgh Steelers DST",
+
+      SEA: "Seattle Seahawks DST",
+
+      SF: "San Francisco 49ers DST",
+
+      TB: "Tampa Bay Buccaneers DST",
+
+      TEN: "Tennessee Titans DST",
+
+      WAS: "Washington Commanders DST"
+
+    };
+
+    /* =========================================================
+       ASSET DATABASE
+       ========================================================= */
+
+    function getAssetDatabase() {
+
+      if (leagueMode === "dynasty") {
+
+        return playerDatabase.concat(
+          dynastyPickDatabase
+        );
+
+      }
+
+      return playerDatabase;
+
     }
-  );
-}
 
-function setupSearch(
-  teamId,
-  getTeam
-){
+    /* =========================================================
+       PLAYER VALUE ENGINE
+       ========================================================= */
 
-  const input=
-    document.getElementById(
-      "search-"+teamId
-    );
+    function getPlayerValue(player) {
 
-  const dropdown=
-    document.getElementById(
-      "dropdown-"+teamId
-    );
+      if (player.pos === "PICK") {
 
-  input.addEventListener(
-    "input",
-    function(){
+        if (qbMode === "superflex") {
 
-      const query=
-        input.value
-          .toLowerCase()
-          .trim();
+          return player.superflex;
 
-      dropdown.innerHTML="";
+        }
 
-      if(!query){
+        return player.oneqb;
 
-        dropdown.style.display="none";
-        return;
       }
 
-      const matches=
-        getAssetDatabase()
-          .filter(function(player){
+      let value =
+        player[leagueMode];
 
-            return player.name
-              .toLowerCase()
-              .includes(query);
+      const positionMultipliers =
+        scoringMultipliers[player.pos];
 
-          })
-          .slice()
-          .sort(function(a,b){
+      const scoringMultiplier =
+        positionMultipliers
+          ? positionMultipliers[scoringMode]
+          : 1;
 
-            const diff=
-              getPlayerValue(b)-
-              getPlayerValue(a);
+      value =
+        value *
+        scoringMultiplier;
 
-            return diff!==0
-              ?diff
-              :a.rank-b.rank;
+      /* Superflex QB adjustment */
 
-          });
+      if (
+        qbMode === "superflex" &&
+        player.pos === "QB"
+      ) {
 
-      if(!matches.length){
+        let qbMultiplier =
+          1.35;
 
-        dropdown.style.display="none";
-        return;
+        if (
+          leagueMode === "keeper"
+        ) {
+
+          qbMultiplier =
+            1.40;
+
+        }
+
+        if (
+          leagueMode === "dynasty"
+        ) {
+
+          qbMultiplier =
+            1.45;
+
+        }
+
+        value =
+          value *
+          qbMultiplier;
+
       }
 
-      dropdown.style.display="block";
+      /* Tight End Premium */
 
-      matches.forEach(
-        function(player){
+      if (
+        player.pos === "TE" &&
+        tePremiumMode !== "off"
+      ) {
 
-          const item=
-            document.createElement("div");
+        let teMultiplier =
+          1.00;
 
-          item.className=
-            "dropdown-item";
+        if (
+          tePremiumMode === "half"
+        ) {
 
-          item.textContent=
-            player.name+
-            " ("+
-            player.pos+
-            ") "+
-            player.trend+
-            " - Value: "+
-            getPlayerValue(player).toFixed(1);
+          if (value >= 75) {
 
-          item.addEventListener(
-            "click",
-            function(){
+            teMultiplier =
+              1.10;
 
-              addPlayerToTrade(
-                player,
-                getTeam()
+          }
+
+          else if (value >= 50) {
+
+            teMultiplier =
+              1.08;
+
+          }
+
+          else if (value >= 25) {
+
+            teMultiplier =
+              1.06;
+
+          }
+
+          else {
+
+            teMultiplier =
+              1.04;
+
+          }
+
+        }
+
+        if (
+          tePremiumMode === "full"
+        ) {
+
+          if (value >= 75) {
+
+            teMultiplier =
+              1.18;
+
+          }
+
+          else if (value >= 50) {
+
+            teMultiplier =
+              1.14;
+
+          }
+
+          else if (value >= 25) {
+
+            teMultiplier =
+              1.10;
+
+          }
+
+          else {
+
+            teMultiplier =
+              1.06;
+
+          }
+
+        }
+
+        value =
+          value *
+          teMultiplier;
+
+      }
+
+      return Math.max(
+        0.1,
+        Math.min(
+          100,
+          Math.round(value * 10) / 10
+        )
+      );
+
+    }
+
+    /* =========================================================
+       SUPERSTAR / PACKAGE MATH
+       ========================================================= */
+
+    function getAdjustedPlayerValue(
+      baseValue
+    ) {
+
+      if (
+        baseValue <= 0
+      ) {
+
+        return 0;
+
+      }
+
+      return (
+        100 *
+        Math.pow(
+          baseValue / 100,
+          SUPERSTAR_FACTOR
+        )
+      );
+
+    }
+
+    function calculateAdjustedTeamValue(
+      team
+    ) {
+
+      if (
+        team.length === 0
+      ) {
+
+        return 0;
+
+      }
+
+      const adjustedPlayers =
+        team.map(
+          function(player) {
+
+            return {
+
+              player: player,
+
+              adjustedValue:
+                getAdjustedPlayerValue(
+                  getPlayerValue(player)
+                )
+
+            };
+
+          }
+        );
+
+      adjustedPlayers.sort(
+        function(a, b) {
+
+          return (
+            b.adjustedValue -
+            a.adjustedValue
+          );
+
+        }
+      );
+
+      return adjustedPlayers.reduce(
+        function(
+          total,
+          item,
+          index
+        ) {
+
+          const weight =
+            PACKAGE_WEIGHTS[index] ??
+            0.80;
+
+          return (
+            total +
+            item.adjustedValue *
+            weight
+          );
+
+        },
+        0
+      );
+
+    }
+
+    function calculateBaseTeamValue(
+      team
+    ) {
+
+      return team.reduce(
+        function(
+          total,
+          player
+        ) {
+
+          return (
+            total +
+            getPlayerValue(player)
+          );
+
+        },
+        0
+      );
+
+    }
+
+    /* =========================================================
+       FORMAT LABEL
+       ========================================================= */
+
+    function getModeLabel() {
+
+      const scoring =
+
+        scoringMode === "ppr"
+          ? "PPR"
+
+          : scoringMode === "half"
+          ? "0.5 PPR"
+
+          : "No PPR";
+
+      const league =
+
+        leagueMode === "dynasty"
+          ? "Dynasty"
+
+          : leagueMode === "keeper"
+          ? "Keeper"
+
+          : "Redraft";
+
+      const qbFormat =
+
+        qbMode === "superflex"
+          ? "Superflex"
+
+          : "1QB";
+
+      let label =
+        scoring +
+        " • " +
+        league +
+        " • " +
+        qbFormat;
+
+      if (
+        tePremiumMode === "half"
+      ) {
+
+        label +=
+          " • TEP +0.5";
+
+      }
+
+      if (
+        tePremiumMode === "full"
+      ) {
+
+        label +=
+          " • TEP +1.0";
+
+      }
+
+      return label;
+
+    }
+
+    /* =========================================================
+       TOP PLAYERS BOARD
+       ========================================================= */
+
+    function buildReferenceBoard() {
+
+      renderTopPlayers(
+        "RB",
+        "top-rb"
+      );
+
+      renderTopPlayers(
+        "WR",
+        "top-wr"
+      );
+
+      renderTopPlayers(
+        "QB",
+        "top-qb"
+      );
+
+      renderTopPlayers(
+        "TE",
+        "top-te"
+      );
+
+      const label =
+        getModeLabel();
+
+      document
+        .getElementById(
+          "format-badge"
+        )
+        .textContent =
+          label;
+
+      document
+        .getElementById(
+          "reference-heading"
+        )
+        .textContent =
+          "Top Players — " +
+          label;
+
+    }
+
+    function renderTopPlayers(
+      position,
+      elementId
+    ) {
+
+      const element =
+        document.getElementById(
+          elementId
+        );
+
+      const players =
+        playerDatabase
+
+          .filter(
+            function(player) {
+
+              return (
+                player.pos ===
+                position
               );
 
-              input.value="";
-              dropdown.innerHTML="";
-              dropdown.style.display="none";
+            }
+          )
+
+          .slice()
+
+          .sort(
+            function(a, b) {
+
+              const difference =
+                getPlayerValue(b) -
+                getPlayerValue(a);
+
+              return (
+                difference !== 0
+                  ? difference
+                  : a.rank - b.rank
+              );
+
+            }
+          )
+
+          .slice(
+            0,
+            3
+          );
+
+      element.innerHTML =
+        players
+
+          .map(
+            function(
+              player,
+              index
+            ) {
+
+              return (
+                '<div class="top-player-row">' +
+
+                  '<div class="top-player-rank">' +
+                    "#" +
+                    (index + 1) +
+                  '</div>' +
+
+                  '<div class="top-player-name">' +
+                    escapeHtml(
+                      player.name
+                    ) +
+                  '</div>' +
+
+                  '<div class="top-player-value">' +
+                    getPlayerValue(
+                      player
+                    ).toFixed(1) +
+                  '</div>' +
+
+                '</div>'
+              );
+
+            }
+          )
+
+          .join("");
+
+    }
+
+    /* =========================================================
+       TEAM RENDERING
+       ========================================================= */
+
+    function renderTeams() {
+
+      renderTeam("A");
+
+      renderTeam("B");
+
+    }
+
+    function renderTeam(
+      side
+    ) {
+
+      const team =
+        side === "A"
+          ? teamA
+          : teamB;
+
+      const list =
+        document.getElementById(
+          side === "A"
+            ? "team-a-list"
+            : "team-b-list"
+        );
+
+      const count =
+        document.getElementById(
+          side === "A"
+            ? "team-a-count"
+            : "team-b-count"
+        );
+
+      count.textContent =
+        team.length +
+        (
+          team.length === 1
+            ? " asset"
+            : " assets"
+        );
+
+      if (
+        team.length === 0
+      ) {
+
+        const syncedText =
+
+          syncedLeague &&
+          getSelectedRosterId(side)
+
+            ? "Search this synced Sleeper roster to add trade assets."
+
+            : "Search above to add players or draft picks.";
+
+        list.innerHTML =
+          '<div class="empty-state">' +
+            syncedText +
+          '</div>';
+
+        return;
+
+      }
+
+      list.innerHTML =
+        team.map(
+          function(
+            player,
+            index
+          ) {
+
+            const value =
+              getPlayerValue(
+                player
+              ).toFixed(1);
+
+            const metaParts =
+              [
+                player.pos
+              ];
+
+            if (
+              player.nflTeam
+            ) {
+
+              metaParts.push(
+                player.nflTeam
+              );
+
+            }
+
+            if (
+              player.pos === "PICK"
+            ) {
+
+              metaParts.push(
+                "Dynasty pick"
+              );
+
+            }
+
+            return (
+
+              '<div class="selected-player">' +
+
+                '<div>' +
+
+                  '<div class="selected-player-name">' +
+                    escapeHtml(
+                      player.name
+                    ) +
+                  '</div>' +
+
+                  '<div class="selected-player-meta">' +
+                    escapeHtml(
+                      metaParts.join(
+                        " • "
+                      )
+                    ) +
+                  '</div>' +
+
+                '</div>' +
+
+                '<div class="selected-player-value">' +
+                  value +
+                '</div>' +
+
+                '<button ' +
+                  'class="remove-player" ' +
+                  'type="button" ' +
+                  'data-side="' +
+                  side +
+                  '" ' +
+                  'data-index="' +
+                  index +
+                  '" ' +
+                  'aria-label="Remove ' +
+                  escapeHtml(
+                    player.name
+                  ) +
+                  '">' +
+
+                  "×" +
+
+                '</button>' +
+
+              '</div>'
+
+            );
+
+          }
+        )
+        .join("");
+
+      list
+        .querySelectorAll(
+          ".remove-player"
+        )
+        .forEach(
+          function(button) {
+
+            button.addEventListener(
+              "click",
+              function() {
+
+                const removeSide =
+                  button.dataset.side;
+
+                const removeIndex =
+                  Number(
+                    button.dataset.index
+                  );
+
+                if (
+                  removeSide === "A"
+                ) {
+
+                  teamA.splice(
+                    removeIndex,
+                    1
+                  );
+
+                }
+
+                else {
+
+                  teamB.splice(
+                    removeIndex,
+                    1
+                  );
+
+                }
+
+                renderTeams();
+
+                calculateTrade();
+
+              }
+            );
+
+          }
+        );
+
+    }
+
+    /* =========================================================
+       PLAYER SEARCH
+       ========================================================= */
+
+    function setupSearch(
+      side
+    ) {
+
+      const input =
+        document.getElementById(
+          side === "A"
+            ? "search-a"
+            : "search-b"
+        );
+
+      const results =
+        document.getElementById(
+          side === "A"
+            ? "results-a"
+            : "results-b"
+        );
+
+      input.addEventListener(
+        "input",
+        function() {
+
+          showSearchResults(
+            side,
+            input.value,
+            results
+          );
+
+        }
+      );
+
+      input.addEventListener(
+        "focus",
+        function() {
+
+          if (
+            input.value.trim()
+          ) {
+
+            showSearchResults(
+              side,
+              input.value,
+              results
+            );
+
+          }
+
+        }
+      );
+
+      document.addEventListener(
+        "click",
+        function(event) {
+
+          if (
+            !results.contains(
+              event.target
+            ) &&
+            event.target !== input
+          ) {
+
+            results.classList.remove(
+              "active"
+            );
+
+          }
+
+        }
+      );
+
+    }
+
+    function showSearchResults(
+      side,
+      query,
+      resultsElement
+    ) {
+
+      const cleanQuery =
+        query
+          .trim()
+          .toLowerCase();
+
+      if (
+        !cleanQuery
+      ) {
+
+        resultsElement.innerHTML =
+          "";
+
+        resultsElement
+          .classList
+          .remove(
+            "active"
+          );
+
+        return;
+
+      }
+
+      const currentTeam =
+        side === "A"
+          ? teamA
+          : teamB;
+
+      const usedKeys =
+        new Set(
+          currentTeam.map(
+            assetKey
+          )
+        );
+
+      const matches =
+        getSelectableAssets(side)
+
+          .filter(
+            function(player) {
+
+              return (
+                !usedKeys.has(
+                  assetKey(player)
+                )
+              );
+
+            }
+          )
+
+          .filter(
+            function(player) {
+
+              return (
+
+                player.name
+                  .toLowerCase()
+                  .includes(
+                    cleanQuery
+                  ) ||
+
+                player.pos
+                  .toLowerCase()
+                  .includes(
+                    cleanQuery
+                  )
+
+              );
+
+            }
+          )
+
+          .sort(
+            function(a, b) {
+
+              return (
+                getPlayerValue(b) -
+                getPlayerValue(a)
+              );
+
+            }
+          )
+
+          .slice(
+            0,
+            12
+          );
+
+      if (
+        matches.length === 0
+      ) {
+
+        resultsElement.innerHTML =
+
+          '<div class="search-result" style="cursor:default">' +
+
+            '<div>' +
+
+              '<span class="search-result-name">' +
+                "No matching valued asset" +
+              '</span>' +
+
+              '<span class="search-result-meta">' +
+
+                (
+                  syncedLeague &&
+                  getSelectedRosterId(side)
+
+                    ? "This search is limited to the selected Sleeper roster."
+
+                    : "Try another name."
+                ) +
+
+              '</span>' +
+
+            '</div>' +
+
+          '</div>';
+
+        resultsElement
+          .classList
+          .add(
+            "active"
+          );
+
+        return;
+
+      }
+
+      resultsElement.innerHTML =
+        "";
+
+      matches.forEach(
+        function(player) {
+
+          const button =
+            document.createElement(
+              "button"
+            );
+
+          button.type =
+            "button";
+
+          button.className =
+            "search-result";
+
+          const meta =
+            [
+              player.pos
+            ];
+
+          if (
+            player.nflTeam
+          ) {
+
+            meta.push(
+              player.nflTeam
+            );
+
+          }
+
+          if (
+            player.pos === "PICK"
+          ) {
+
+            meta.push(
+              "Dynasty pick"
+            );
+
+          }
+
+          button.innerHTML =
+
+            '<div>' +
+
+              '<span class="search-result-name">' +
+                escapeHtml(
+                  player.name
+                ) +
+              '</span>' +
+
+              '<span class="search-result-meta">' +
+                escapeHtml(
+                  meta.join(
+                    " • "
+                  )
+                ) +
+              '</span>' +
+
+            '</div>' +
+
+            '<div class="search-result-value">' +
+              getPlayerValue(
+                player
+              ).toFixed(1) +
+            '</div>';
+
+          button.addEventListener(
+            "click",
+            function() {
+
+              addAssetToSide(
+                side,
+                player
+              );
+
+              document
+                .getElementById(
+                  side === "A"
+                    ? "search-a"
+                    : "search-b"
+                )
+                .value =
+                  "";
+
+              resultsElement
+                .classList
+                .remove(
+                  "active"
+                );
+
             }
           );
 
-          dropdown.appendChild(item);
-        }
-      );
-    }
-  );
+          resultsElement
+            .appendChild(
+              button
+            );
 
-  document.addEventListener(
-    "click",
-    function(event){
-
-      if(
-        !input.contains(event.target) &&
-        !dropdown.contains(event.target)
-      ){
-
-        dropdown.style.display="none";
-      }
-    }
-  );
-}
-
-function addPlayerToTrade(
-  player,
-  destinationTeam
-){
-
-  const alreadyAdded=
-    teamA
-      .concat(teamB)
-      .some(function(selected){
-
-        return selected.rank===
-          player.rank;
-
-      });
-
-  if(alreadyAdded){
-
-    alert(
-      player.name+
-      " is already included in this trade."
-    );
-
-    return;
-  }
-
-  if(destinationTeam.length>=8){
-
-    alert(
-      "Maximum capacity reached. Max 8 players per side."
-    );
-
-    return;
-  }
-
-  destinationTeam.push(player);
-
-  renderTeams();
-  calculateTrade();
-}
-
-function renderTeams(){
-
-  renderTeam(
-    "a",
-    teamA
-  );
-
-  renderTeam(
-    "b",
-    teamB
-  );
-}
-
-function renderTeam(
-  teamId,
-  teamArray
-){
-
-  const list=
-    document.getElementById(
-      "team-list-"+teamId
-    );
-
-  list.innerHTML="";
-
-  teamArray.forEach(
-    function(player,index){
-
-      const row=
-        document.createElement("div");
-
-      row.className=
-        "player-row";
-
-      const removeButton=
-        document.createElement("button");
-
-      removeButton.className=
-        "remove-btn";
-
-      removeButton.type=
-        "button";
-
-      removeButton.textContent=
-        "✕";
-
-      removeButton.setAttribute(
-        "aria-label",
-        "Remove "+player.name
-      );
-
-      removeButton.addEventListener(
-        "click",
-        function(){
-
-          removePlayer(
-            teamId,
-            index
-          );
         }
       );
 
-      const position=
-        document.createElement("span");
-
-      position.className=
-        "pos-badge";
-
-      position.textContent=
-        player.pos;
-
-      const playerName=
-        document.createElement("span");
-
-      playerName.className=
-        "player-name";
-
-      playerName.textContent=
-        player.name;
-
-      const trend=
-        document.createElement("span");
-
-      trend.className=
-        "trend-indicator";
-
-      trend.textContent=
-        player.trend;
-
-      const score=
-        document.createElement("span");
-
-      score.className=
-        "player-score-label";
-
-      score.textContent=
-        getPlayerValue(player)
-          .toFixed(1);
-
-      if(teamId==="a"){
-
-        row.appendChild(
-          removeButton
+      resultsElement
+        .classList
+        .add(
+          "active"
         );
 
-        row.appendChild(
-          position
-        );
-
-        row.appendChild(
-          playerName
-        );
-
-        row.appendChild(
-          trend
-        );
-
-        row.appendChild(
-          score
-        );
-      }
-
-      else{
-
-        row.appendChild(
-          score
-        );
-
-        row.appendChild(
-          position
-        );
-
-        row.appendChild(
-          playerName
-        );
-
-        row.appendChild(
-          trend
-        );
-
-        row.appendChild(
-          removeButton
-        );
-      }
-
-      list.appendChild(row);
     }
-  );
-}
 
-function removePlayer(
-  teamId,
-  index
-){
+    function addAssetToSide(
+      side,
+      player
+    ) {
+
+      const target =
+        side === "A"
+          ? teamA
+          : teamB;
+
+      const other =
+        side === "A"
+          ? teamB
+          : teamA;
+
+      const key =
+        assetKey(
+          player
+        );
+
+      if (
+        target.some(
+          function(item) {
+
+            return (
+              assetKey(item) ===
+              key
+            );
+
+          }
+        )
+      ) {
 
-  if(teamId==="a"){
-    teamA.splice(index,1);
-  }
-
-  if(teamId==="b"){
-    teamB.splice(index,1);
-  }
-
-  renderTeams();
-  calculateTrade();
-}
-
-function calculateTrade(){
-
-  const rawA=
-    calculateRawValue(teamA);
-
-  const rawB=
-    calculateRawValue(teamB);
-
-  const adjustedA=
-    calculateAdjustedTeamValue(teamA);
-
-  const adjustedB=
-    calculateAdjustedTeamValue(teamB);
-
-  document
-    .getElementById("total-a")
-    .textContent=
-      "Base: "+
-      rawA.toFixed(1)+
-      " | Adjusted: "+
-      adjustedA.toFixed(1);
-
-  document
-    .getElementById("total-b")
-    .textContent=
-      "Base: "+
-      rawB.toFixed(1)+
-      " | Adjusted: "+
-      adjustedB.toFixed(1);
-
-  updateBalanceMeter(
-    adjustedA,
-    adjustedB
-  );
-
-  updateVerdict(
-    adjustedA,
-    adjustedB
-  );
-
-  updateFairSuggestion();
-
-  updateTradeGrade();
-
-  updateSuggestedPackage();
-}
-
-function updateBalanceMeter(
-  a,
-  b
-){
-
-  const bar=
-    document.getElementById(
-      "meter-bar"
-    );
-
-  const text=
-    document.getElementById(
-      "meter-percentage"
-    );
-
-  const combined=
-    a+b;
-
-  if(combined<=0){
-
-    bar.style.width=
-      "50%";
-
-    text.textContent=
-      "50% / 50%";
-
-    return;
-  }
-
-  const percentA=
-    Math.round(
-      (a/combined)*100
-    );
-
-  const percentB=
-    100-percentA;
-
-  bar.style.width=
-    percentA+"%";
-
-  text.textContent=
-    percentA+
-    "% / "+
-    percentB+
-    "%";
-}
-
-function updateVerdict(
-  a,
-  b
-){
-
-  const heading=
-    document.getElementById(
-      "verdict-heading"
-    );
-
-  if(
-    !teamA.length &&
-    !teamB.length
-  ){
-
-    heading.textContent=
-      "Add players to analyze";
-
-    return;
-  }
-
-  if(
-    !teamA.length ||
-    !teamB.length
-  ){
-
-    heading.textContent=
-      "Add players to both sides";
-
-    return;
-  }
-
-  const average=
-    (a+b)/2;
-
-  if(average<=0){
-
-    heading.textContent=
-      "Unable to analyze trade";
-
-    return;
-  }
-
-  const diff=
-    Math.abs(a-b)/
-    (average/100);
-
-  const winner=
-    a>b
-      ?"Team A"
-      :"Team B";
-
-  if(diff<=5){
-
-    heading.textContent=
-      "Fair Trade";
-  }
-
-  else if(diff<=10){
-
-    heading.textContent=
-      "Slight Advantage: "+
-      winner;
-  }
-
-  else if(diff<=20){
-
-    heading.textContent=
-      "Advantage: "+
-      winner;
-  }
-
-  else{
-
-    heading.textContent=
-      "Major Advantage: "+
-      winner;
-  }
-}
-
-function updateFairSuggestion(){
-
-  const box=
-    document.getElementById(
-      "fair-box"
-    );
-
-  if(
-    !teamA.length ||
-    !teamB.length
-  ){
-
-    box.textContent="";
-    return;
-  }
-
-  const a=
-    calculateAdjustedTeamValue(
-      teamA
-    );
-
-  const b=
-    calculateAdjustedTeamValue(
-      teamB
-    );
-
-  const avg=
-    (a+b)/2;
-
-  const diff=
-    avg
-      ?Math.abs(a-b)/(avg/100)
-      :0;
-
-  if(diff<=5){
-
-    box.textContent=
-      "✅ This trade is already within the fair range.";
-
-    return;
-  }
-
-  const losing=
-    a>b
-      ?teamB
-      :teamA;
-
-  const losingName=
-    a>b
-      ?"Team B"
-      :"Team A";
-
-  const target=
-    a>b
-      ?a
-      :b;
-
-  if(losing.length>=8){
-
-    box.textContent=
-      "⚖️ "+
-      losingName+
-      " is already at the 8-player limit.";
-
-    return;
-  }
-
-  const used=
-    new Set(
-      teamA
-        .concat(teamB)
-        .map(function(player){
-
-          return player.rank;
-
-        })
-    );
-
-  const options=[];
-
-  getAssetDatabase()
-    .forEach(function(player){
-
-      if(used.has(player.rank)){
         return;
+
       }
 
-      const testTeam=
-        losing.concat([player]);
+      if (
+        other.some(
+          function(item) {
 
-      const newValue=
+            return (
+              assetKey(item) ===
+              key
+            );
+
+          }
+        )
+      ) {
+
+        return;
+
+      }
+
+      target.push(
+        {
+          ...player
+        }
+      );
+
+      renderTeams();
+
+      calculateTrade();
+
+    }
+
+    function assetKey(
+      player
+    ) {
+
+      if (
+        player.sleeperId
+      ) {
+
+        return (
+          "sleeper:" +
+          player.sleeperId
+        );
+
+      }
+
+      return (
+        player.pos +
+        ":" +
+        player.name
+      );
+
+    }
+
+    /* =========================================================
+       TRADE CALCULATION
+       ========================================================= */
+
+    function calculateTrade() {
+
+      const baseA =
+        calculateBaseTeamValue(
+          teamA
+        );
+
+      const baseB =
+        calculateBaseTeamValue(
+          teamB
+        );
+
+      const adjustedA =
         calculateAdjustedTeamValue(
-          testTeam
+          teamA
         );
 
-      const resultAvg=
-        (newValue+target)/2;
-
-      const resultDiff=
-        resultAvg
-          ?Math.abs(
-              newValue-target
-            )/(resultAvg/100)
-          :0;
-
-      options.push({
-        player:player,
-        diff:resultDiff
-      });
-    });
-
-  options.sort(
-    function(x,y){
-
-      return x.diff-y.diff;
-
-    }
-  );
-
-  const top=
-    options.slice(0,3);
-
-  let message=
-    "⚖️ Best ways to make this closer for "+
-    losingName+
-    ":\n";
-
-  top.forEach(
-    function(option,index){
-
-      message+=
-        (index+1)+
-        ". Add "+
-        option.player.name+
-        " ("+
-        getPlayerValue(
-          option.player
-        ).toFixed(1)+
-        ") - "+
-        option.diff.toFixed(1)+
-        "% apart";
-
-      if(option.diff<=5){
-
-        message+=
-          " - Fair range";
-      }
-
-      if(
-        index<
-        top.length-1
-      ){
-
-        message+="\n";
-      }
-    }
-  );
-
-  box.textContent=
-    message;
-}
-
-function updateTradeGrade(){
-
-  const box=
-    document.getElementById(
-      "trade-grade-box"
-    );
-
-  if(
-    !teamA.length ||
-    !teamB.length
-  ){
-
-    box.textContent="";
-    return;
-  }
-
-  const a=
-    calculateAdjustedTeamValue(
-      teamA
-    );
-
-  const b=
-    calculateAdjustedTeamValue(
-      teamB
-    );
-
-  const average=
-    (a+b)/2;
-
-  if(!average){
-
-    box.textContent="";
-    return;
-  }
-
-  const diff=
-    Math.abs(a-b)/
-    (average/100);
-
-  let grade="";
-  let description="";
-
-  if(diff<=5){
-
-    grade="A+";
-    description="Excellent Balance";
-  }
-
-  else if(diff<=10){
-
-    grade="A";
-    description="Very Good Balance";
-  }
-
-  else if(diff<=20){
-
-    grade="B";
-    description="Good Trade";
-  }
-
-  else if(diff<=30){
-
-    grade="C";
-    description="Noticeable Advantage";
-  }
-
-  else if(diff<=40){
-
-    grade="D";
-    description="Lopsided Trade";
-  }
-
-  else{
-
-    grade="F";
-    description="Very Lopsided Trade";
-  }
-
-  box.textContent=
-    "Trade Grade: "+
-    grade+
-    " — "+
-    description;
-}
-
-function findBestTwoPlayerPackages(
-  targetTeam,
-  targetValue,
-  used
-){
-
-  const available=
-    getAssetDatabase()
-      .filter(function(player){
-
-        return !used.has(
-          player.rank
-        );
-
-      });
-
-  const packages=[];
-
-  for(
-    let i=0;
-    i<available.length;
-    i++
-  ){
-
-    for(
-      let j=i+1;
-      j<available.length;
-      j++
-    ){
-
-      const p1=
-        available[i];
-
-      const p2=
-        available[j];
-
-      const testTeam=
-        targetTeam.concat([
-          p1,
-          p2
-        ]);
-
-      const value=
+      const adjustedB =
         calculateAdjustedTeamValue(
-          testTeam
+          teamB
         );
 
-      const average=
-        (value+targetValue)/2;
+      document
+        .getElementById(
+          "base-a"
+        )
+        .textContent =
+          baseA.toFixed(1);
 
-      const diff=
-        average
-          ?Math.abs(
-              value-targetValue
-            )/(average/100)
-          :0;
+      document
+        .getElementById(
+          "base-b"
+        )
+        .textContent =
+          baseB.toFixed(1);
 
-      packages.push({
-        p1:p1,
-        p2:p2,
-        diff:diff
-      });
-    }
-  }
+      document
+        .getElementById(
+          "adjusted-a"
+        )
+        .textContent =
+          adjustedA.toFixed(1);
 
-  packages.sort(
-    function(a,b){
+      document
+        .getElementById(
+          "adjusted-b"
+        )
+        .textContent =
+          adjustedB.toFixed(1);
 
-      return a.diff-b.diff;
-
-    }
-  );
-
-  return packages.slice(
-    0,
-    3
-  );
-}
-
-function updateSuggestedPackage(){
-
-  const box=
-    document.getElementById(
-      "package-box"
-    );
-
-  if(
-    !teamA.length &&
-    !teamB.length
-  ){
-
-    box.textContent="";
-    return;
-  }
-
-  const used=
-    new Set(
-      teamA
-        .concat(teamB)
-        .map(function(player){
-
-          return player.rank;
-
-        })
-    );
-
-  let targetTeam=[];
-  let targetValue=0;
-  let packageTeamName="";
-
-  if(
-    teamA.length &&
-    !teamB.length
-  ){
-
-    targetTeam=[];
-
-    targetValue=
-      calculateAdjustedTeamValue(
-        teamA
+      updateMeter(
+        adjustedA,
+        adjustedB
       );
 
-    packageTeamName=
-      "Team B";
-  }
-
-  else if(
-    teamB.length &&
-    !teamA.length
-  ){
-
-    targetTeam=[];
-
-    targetValue=
-      calculateAdjustedTeamValue(
-        teamB
+      updateVerdict(
+        adjustedA,
+        adjustedB
       );
 
-    packageTeamName=
-      "Team A";
-  }
-
-  else{
-
-    const a=
-      calculateAdjustedTeamValue(
-        teamA
+      updateTradeGrade(
+        adjustedA,
+        adjustedB
       );
 
-    const b=
-      calculateAdjustedTeamValue(
-        teamB
+      updateFairSuggestions(
+        adjustedA,
+        adjustedB
       );
 
-    const average=
-      (a+b)/2;
+      updatePackageSuggestions(
+        adjustedA,
+        adjustedB
+      );
 
-    const diff=
-      average
-        ?Math.abs(a-b)/(average/100)
-        :0;
-
-    if(diff<=5){
-
-      box.textContent="";
-      return;
     }
 
-    targetTeam=
-      a>b
-        ?teamB
-        :teamA;
+    function getDifferencePercent(
+      valueA,
+      valueB
+    ) {
 
-    targetValue=
-      a>b
-        ?a
-        :b;
-
-    packageTeamName=
-      a>b
-        ?"Team B"
-        :"Team A";
-
-    if(targetTeam.length>=7){
-
-      box.textContent="";
-      return;
-    }
-  }
-
-  const best=
-    findBestTwoPlayerPackages(
-      targetTeam,
-      targetValue,
-      used
-    );
-
-  if(!best.length){
-
-    box.textContent="";
-    return;
-  }
-
-  let message=
-    "📦 Suggested 2-Player Packages for "+
-    packageTeamName+
-    ":\n";
-
-  best.forEach(
-    function(option,index){
-
-      message+=
-        (index+1)+
-        ". "+
-        option.p1.name+
-        " + "+
-        option.p2.name+
-        " — "+
-        option.diff.toFixed(1)+
-        "% apart";
-
-      if(option.diff<=5){
-
-        message+=
-          " — Fair range";
-      }
-
-      if(
-        index<
-        best.length-1
-      ){
-
-        message+="\n";
-      }
-    }
-  );
-
-  box.textContent=
-    message;
-}
-
-function setupThemeToggle(){
-
-  const button=
-    document.getElementById(
-      "theme-toggle"
-    );
-
-  const html=
-    document.documentElement;
-
-  button.addEventListener(
-    "click",
-    function(){
-
-      const current=
-        html.getAttribute(
-          "data-theme"
+      const difference =
+        Math.abs(
+          valueA -
+          valueB
         );
 
-      html.setAttribute(
-        "data-theme",
-        current==="dark"
-          ?"light"
-          :"dark"
+      const average =
+        (
+          valueA +
+          valueB
+        ) / 2;
+
+      return (
+        average > 0
+
+          ? (
+              difference /
+              average
+            ) * 100
+
+          : 0
       );
+
     }
-  );
-}
 
-function setupTradeButtons(){
+    /* =========================================================
+       TRADE METER
+       ========================================================= */
 
-  document
-    .getElementById(
-      "clear-trade-button"
-    )
-    .addEventListener(
-      "click",
-      function(){
+    function updateMeter(
+      adjustedA,
+      adjustedB
+    ) {
 
-        teamA.length=0;
-        teamB.length=0;
+      const marker =
+        document.getElementById(
+          "meter-marker"
+        );
+
+      if (
+        adjustedA === 0 &&
+        adjustedB === 0
+      ) {
+
+        marker.style.left =
+          "50%";
+
+        return;
+
+      }
+
+      const total =
+        adjustedA +
+        adjustedB;
+
+      const teamBShare =
+        total > 0
+          ? adjustedB / total
+          : 0.5;
+
+      const position =
+        Math.max(
+          5,
+          Math.min(
+            95,
+            teamBShare * 100
+          )
+        );
+
+      marker.style.left =
+        position + "%";
+
+    }
+
+    /* =========================================================
+       VERDICT
+       ========================================================= */
+
+    function updateVerdict(
+      adjustedA,
+      adjustedB
+    ) {
+
+      const verdict =
+        document.getElementById(
+          "verdict"
+        );
+
+      verdict.className =
+        "";
+
+      if (
+        teamA.length === 0 ||
+        teamB.length === 0
+      ) {
+
+        verdict.innerHTML =
+
+          "Build a trade" +
+
+          "<small>" +
+            "Add assets to both sides to analyze it." +
+          "</small>";
+
+        return;
+
+      }
+
+      const differencePercent =
+        getDifferencePercent(
+          adjustedA,
+          adjustedB
+        );
+
+      let headline =
+        "";
+
+      let className =
+        "";
+
+      if (
+        differencePercent <= 5
+      ) {
+
+        headline =
+          "FAIR TRADE";
+
+        className =
+          "fair";
+
+      }
+
+      else if (
+        differencePercent <= 10
+      ) {
+
+        headline =
+          "SLIGHT ADVANTAGE";
+
+        className =
+          "slight";
+
+      }
+
+      else if (
+        differencePercent <= 20
+      ) {
+
+        headline =
+          "ADVANTAGE";
+
+        className =
+          "advantage";
+
+      }
+
+      else {
+
+        headline =
+          "MAJOR ADVANTAGE";
+
+        className =
+          "major";
+
+      }
+
+      let detail =
+        differencePercent
+          .toFixed(1) +
+        "% adjusted-value difference";
+
+      if (
+        differencePercent > 5
+      ) {
+
+        detail =
+
+          (
+            adjustedA >
+            adjustedB
+
+              ? "Team A"
+              : "Team B"
+          ) +
+
+          " package carries more adjusted value • " +
+
+          detail;
+
+      }
+
+      verdict.className =
+        className;
+
+      verdict.innerHTML =
+
+        escapeHtml(
+          headline
+        ) +
+
+        "<small>" +
+
+          escapeHtml(
+            detail
+          ) +
+
+        "</small>";
+
+    }
+
+    /* =========================================================
+       TRADE GRADE
+       ========================================================= */
+
+    function updateTradeGrade(
+      adjustedA,
+      adjustedB
+    ) {
+
+      const gradeElement =
+        document.getElementById(
+          "trade-grade"
+        );
+
+      if (
+        teamA.length === 0 ||
+        teamB.length === 0
+      ) {
+
+        gradeElement.textContent =
+          "—";
+
+        return;
+
+      }
+
+      const differencePercent =
+        getDifferencePercent(
+          adjustedA,
+          adjustedB
+        );
+
+      if (
+        differencePercent <= 5
+      ) {
+
+        gradeElement.textContent =
+          "A+";
+
+      }
+
+      else if (
+        differencePercent <= 10
+      ) {
+
+        gradeElement.textContent =
+          "A";
+
+      }
+
+      else if (
+        differencePercent <= 20
+      ) {
+
+        gradeElement.textContent =
+          "B";
+
+      }
+
+      else if (
+        differencePercent <= 30
+      ) {
+
+        gradeElement.textContent =
+          "C";
+
+      }
+
+      else if (
+        differencePercent <= 40
+      ) {
+
+        gradeElement.textContent =
+          "D";
+
+      }
+
+      else {
+
+        gradeElement.textContent =
+          "F";
+
+      }
+
+    }
+
+    /* =========================================================
+       WHAT MAKES THIS FAIR
+       ========================================================= */
+
+    function updateFairSuggestions(
+      adjustedA,
+      adjustedB
+    ) {
+
+      const container =
+        document.getElementById(
+          "fair-suggestions"
+        );
+
+      if (
+        teamA.length === 0 ||
+        teamB.length === 0
+      ) {
+
+        container.className =
+          "status-note";
+
+        container.textContent =
+          "Build a trade to see balancing options.";
+
+        return;
+
+      }
+
+      const currentDifference =
+        getDifferencePercent(
+          adjustedA,
+          adjustedB
+        );
+
+      if (
+        currentDifference <= 5
+      ) {
+
+        container.className =
+          "status-note";
+
+        container.textContent =
+          "This trade is already inside the fair-trade range.";
+
+        return;
+
+      }
+
+      const losingSide =
+        adjustedA < adjustedB
+          ? "A"
+          : "B";
+
+      const losingTeam =
+        losingSide === "A"
+          ? teamA
+          : teamB;
+
+      const winningValue =
+        losingSide === "A"
+          ? adjustedB
+          : adjustedA;
+
+      const pool =
+        getSuggestionPoolForSide(
+          losingSide
+        );
+
+      const used =
+        new Set(
+          teamA
+            .concat(teamB)
+            .map(assetKey)
+        );
+
+      const options =
+        pool
+
+          .filter(
+            function(player) {
+
+              return (
+                !used.has(
+                  assetKey(player)
+                )
+              );
+
+            }
+          )
+
+          .map(
+            function(player) {
+
+              const candidateTeam =
+                losingTeam.concat(
+                  [
+                    {
+                      ...player
+                    }
+                  ]
+                );
+
+              const candidateValue =
+                calculateAdjustedTeamValue(
+                  candidateTeam
+                );
+
+              const difference =
+                Math.abs(
+                  candidateValue -
+                  winningValue
+                );
+
+              return {
+
+                player: player,
+
+                difference:
+                  difference,
+
+                percent:
+                  getDifferencePercent(
+                    candidateValue,
+                    winningValue
+                  )
+
+              };
+
+            }
+          )
+
+          .sort(
+            function(a, b) {
+
+              return (
+                a.difference -
+                b.difference
+              );
+
+            }
+          )
+
+          .slice(
+            0,
+            3
+          );
+
+      if (
+        options.length === 0
+      ) {
+
+        container.className =
+          "status-note";
+
+        container.textContent =
+          "No unused valued assets are available for a balancing suggestion.";
+
+        return;
+
+      }
+
+      container.className =
+        "";
+
+      container.innerHTML =
+        options
+
+          .map(
+            function(
+              option,
+              index
+            ) {
+
+              const titles =
+                [
+                  "Closest Match",
+                  "Alternative",
+                  "Another Option"
+                ];
+
+              return (
+
+                '<div class="suggestion">' +
+
+                  '<div class="suggestion-title">' +
+
+                    titles[index] +
+
+                    ": Add " +
+
+                    escapeHtml(
+                      option.player.name
+                    ) +
+
+                    " to Team " +
+
+                    losingSide +
+
+                  "</div>" +
+
+                  '<div class="suggestion-meta">' +
+
+                    escapeHtml(
+                      option.player.pos
+                    ) +
+
+                    " • Value " +
+
+                    getPlayerValue(
+                      option.player
+                    ).toFixed(1) +
+
+                    " • New difference " +
+
+                    option.percent
+                      .toFixed(1) +
+
+                    "%" +
+
+                  "</div>" +
+
+                "</div>"
+
+              );
+
+            }
+          )
+
+          .join("");
+
+    }
+
+    /* =========================================================
+       TWO-PLAYER PACKAGE BUILDER
+       ========================================================= */
+
+    function updatePackageSuggestions(
+      adjustedA,
+      adjustedB
+    ) {
+
+      const container =
+        document.getElementById(
+          "package-suggestions"
+        );
+
+      if (
+        teamA.length === 0 ||
+        teamB.length === 0
+      ) {
+
+        container.className =
+          "status-note";
+
+        container.textContent =
+          "Build a trade to see two-player package ideas.";
+
+        return;
+
+      }
+
+      if (
+        getDifferencePercent(
+          adjustedA,
+          adjustedB
+        ) <= 5
+      ) {
+
+        container.className =
+          "status-note";
+
+        container.textContent =
+          "No package is needed — the current trade is already balanced.";
+
+        return;
+
+      }
+
+      const losingSide =
+        adjustedA < adjustedB
+          ? "A"
+          : "B";
+
+      const losingTeam =
+        losingSide === "A"
+          ? teamA
+          : teamB;
+
+      const targetValue =
+        losingSide === "A"
+          ? adjustedB
+          : adjustedA;
+
+      const used =
+        new Set(
+          teamA
+            .concat(teamB)
+            .map(assetKey)
+        );
+
+      const available =
+        getSuggestionPoolForSide(
+          losingSide
+        )
+
+          .filter(
+            function(player) {
+
+              return (
+                !used.has(
+                  assetKey(player)
+                )
+              );
+
+            }
+          )
+
+          .slice()
+
+          .sort(
+            function(a, b) {
+
+              return (
+                getPlayerValue(b) -
+                getPlayerValue(a)
+              );
+
+            }
+          )
+
+          .slice(
+            0,
+            80
+          );
+
+      const packages =
+        [];
+
+      for (
+        let i = 0;
+        i < available.length;
+        i++
+      ) {
+
+        for (
+          let j = i + 1;
+          j < available.length;
+          j++
+        ) {
+
+          const candidateTeam =
+            losingTeam.concat(
+              [
+                {
+                  ...available[i]
+                },
+
+                {
+                  ...available[j]
+                }
+              ]
+            );
+
+          const candidateValue =
+            calculateAdjustedTeamValue(
+              candidateTeam
+            );
+
+          packages.push(
+            {
+
+              first:
+                available[i],
+
+              second:
+                available[j],
+
+              difference:
+                Math.abs(
+                  candidateValue -
+                  targetValue
+                ),
+
+              percent:
+                getDifferencePercent(
+                  candidateValue,
+                  targetValue
+                )
+
+            }
+          );
+
+        }
+
+      }
+
+      packages.sort(
+        function(a, b) {
+
+          return (
+            a.difference -
+            b.difference
+          );
+
+        }
+      );
+
+      const best =
+        packages.slice(
+          0,
+          3
+        );
+
+      if (
+        best.length === 0
+      ) {
+
+        container.className =
+          "status-note";
+
+        container.textContent =
+          "Not enough unused valued assets are available for a two-player package.";
+
+        return;
+
+      }
+
+      container.className =
+        "";
+
+      container.innerHTML =
+        best
+
+          .map(
+            function(
+              pkg,
+              index
+            ) {
+
+              const titles =
+                [
+                  "Best Package",
+                  "Package 2",
+                  "Package 3"
+                ];
+
+              return (
+
+                '<div class="suggestion">' +
+
+                  '<div class="suggestion-title">' +
+
+                    titles[index] +
+
+                    ": " +
+
+                    escapeHtml(
+                      pkg.first.name
+                    ) +
+
+                    " + " +
+
+                    escapeHtml(
+                      pkg.second.name
+                    ) +
+
+                    " to Team " +
+
+                    losingSide +
+
+                  "</div>" +
+
+                  '<div class="suggestion-meta">' +
+
+                    "New difference " +
+
+                    pkg.percent
+                      .toFixed(1) +
+
+                    "%" +
+
+                  "</div>" +
+
+                "</div>"
+
+              );
+
+            }
+          )
+
+          .join("");
+
+    }
+
+    function getSuggestionPoolForSide(
+      side
+    ) {
+
+      const rosterId =
+        getSelectedRosterId(
+          side
+        );
+
+      if (
+        syncedLeague &&
+        rosterId
+      ) {
+
+        const rosterAssets =
+          buildRosterAssets(
+            rosterId
+          );
+
+        if (
+          leagueMode === "dynasty"
+        ) {
+
+          return rosterAssets.concat(
+            dynastyPickDatabase
+          );
+
+        }
+
+        return rosterAssets;
+
+      }
+
+      return getAssetDatabase();
+
+    }
+
+    /* =========================================================
+       LEAGUE SETTINGS CONTROLS
+       ========================================================= */
+
+    function setupLeagueControls() {
+
+      const scoring =
+        document.getElementById(
+          "scoring-select"
+        );
+
+      const league =
+        document.getElementById(
+          "league-select"
+        );
+
+      const qb =
+        document.getElementById(
+          "qb-select"
+        );
+
+      const tePremium =
+        document.getElementById(
+          "te-premium-select"
+        );
+
+      function changed() {
+
+        scoringMode =
+          scoring.value;
+
+        leagueMode =
+          league.value;
+
+        qbMode =
+          qb.value;
+
+        tePremiumMode =
+          tePremium.value;
+
+        if (
+          leagueMode !==
+          "dynasty"
+        ) {
+
+          teamA =
+            teamA.filter(
+              function(asset) {
+
+                return (
+                  asset.pos !==
+                  "PICK"
+                );
+
+              }
+            );
+
+          teamB =
+            teamB.filter(
+              function(asset) {
+
+                return (
+                  asset.pos !==
+                  "PICK"
+                );
+
+              }
+            );
+
+        }
+
+        buildReferenceBoard();
 
         renderTeams();
+
         calculateTrade();
+
       }
+
+      scoring.addEventListener(
+        "change",
+        changed
+      );
+
+      league.addEventListener(
+        "change",
+        changed
+      );
+
+      qb.addEventListener(
+        "change",
+        changed
+      );
+
+      tePremium.addEventListener(
+        "change",
+        changed
+      );
+
+    }
+
+    function setControlsFromState() {
+
+      document
+        .getElementById(
+          "scoring-select"
+        )
+        .value =
+          scoringMode;
+
+      document
+        .getElementById(
+          "league-select"
+        )
+        .value =
+          leagueMode;
+
+      document
+        .getElementById(
+          "qb-select"
+        )
+        .value =
+          qbMode;
+
+      document
+        .getElementById(
+          "te-premium-select"
+        )
+        .value =
+          tePremiumMode;
+
+      buildReferenceBoard();
+
+      renderTeams();
+
+      calculateTrade();
+
+    }
+
+    /* =========================================================
+       THEME TOGGLE
+       ========================================================= */
+
+    function setupThemeToggle() {
+
+      const button =
+        document.getElementById(
+          "theme-toggle"
+        );
+
+      const htmlElement =
+        document.documentElement;
+
+      const savedTheme =
+        localStorage.getItem(
+          "tradeforge-theme"
+        );
+
+      if (
+        savedTheme === "light" ||
+        savedTheme === "dark"
+      ) {
+
+        htmlElement
+          .setAttribute(
+            "data-theme",
+            savedTheme
+          );
+
+      }
+
+      updateThemeButton();
+
+      button.addEventListener(
+        "click",
+        function() {
+
+          const current =
+            htmlElement.getAttribute(
+              "data-theme"
+            );
+
+          const next =
+            current === "dark"
+              ? "light"
+              : "dark";
+
+          htmlElement.setAttribute(
+            "data-theme",
+            next
+          );
+
+          localStorage.setItem(
+            "tradeforge-theme",
+            next
+          );
+
+          updateThemeButton();
+
+        }
+      );
+
+      function updateThemeButton() {
+
+        const current =
+          htmlElement.getAttribute(
+            "data-theme"
+          );
+
+        button.textContent =
+          current === "dark"
+
+            ? "☀ Light Theme"
+
+            : "☾ Dark Theme";
+
+      }
+
+    }
+
+    /* =========================================================
+       CLEAR / SWAP
+       ========================================================= */
+
+    function setupTradeButtons() {
+
+      document
+        .getElementById(
+          "clear-trade"
+        )
+        .addEventListener(
+          "click",
+          function() {
+
+            teamA.length =
+              0;
+
+            teamB.length =
+              0;
+
+            renderTeams();
+
+            calculateTrade();
+
+          }
+        );
+
+      document
+        .getElementById(
+          "swap-trade"
+        )
+        .addEventListener(
+          "click",
+          function() {
+
+            const oldTeamA =
+              teamA;
+
+            teamA =
+              teamB;
+
+            teamB =
+              oldTeamA;
+
+            if (
+              syncedLeague
+            ) {
+
+              const oldRosterA =
+                syncedRosterA;
+
+              syncedRosterA =
+                syncedRosterB;
+
+              syncedRosterB =
+                oldRosterA;
+
+              document
+                .getElementById(
+                  "owner-a-select"
+                )
+                .value =
+                  syncedRosterA;
+
+              document
+                .getElementById(
+                  "owner-b-select"
+                )
+                .value =
+                  syncedRosterB;
+
+            }
+
+            renderTeams();
+
+            calculateTrade();
+
+          }
+        );
+
+    }
+
+    /* =========================================================
+       SLEEPER SETUP
+       ========================================================= */
+
+    function setupSleeperSync() {
+
+      const openButton =
+        document.getElementById(
+          "sync-league-button"
+        );
+
+      const backdrop =
+        document.getElementById(
+          "sync-modal-backdrop"
+        );
+
+      const closeButton =
+        document.getElementById(
+          "sync-modal-close"
+        );
+
+      const findButton =
+        document.getElementById(
+          "find-sleeper-leagues"
+        );
+
+      const connectButton =
+        document.getElementById(
+          "connect-selected-league"
+        );
+
+      const usernameInput =
+        document.getElementById(
+          "sleeper-username"
+        );
+
+      const disconnectButton =
+        document.getElementById(
+          "disconnect-sleeper"
+        );
+
+      openButton.addEventListener(
+        "click",
+        function() {
+
+          openSyncModal();
+
+        }
+      );
+
+      closeButton.addEventListener(
+        "click",
+        function() {
+
+          closeSyncModal();
+
+        }
+      );
+
+      backdrop.addEventListener(
+        "click",
+        function(event) {
+
+          if (
+            event.target === backdrop
+          ) {
+
+            closeSyncModal();
+
+          }
+
+        }
+      );
+
+      document.addEventListener(
+        "keydown",
+        function(event) {
+
+          if (
+            event.key ===
+            "Escape" &&
+            backdrop
+              .classList
+              .contains(
+                "active"
+              )
+          ) {
+
+            closeSyncModal();
+
+          }
+
+        }
+      );
+
+      findButton.addEventListener(
+        "click",
+        findSleeperLeagues
+      );
+
+      usernameInput.addEventListener(
+        "keydown",
+        function(event) {
+
+          if (
+            event.key ===
+            "Enter"
+          ) {
+
+            findSleeperLeagues();
+
+          }
+
+        }
+      );
+
+      connectButton.addEventListener(
+        "click",
+        connectSelectedSleeperLeague
+      );
+
+      disconnectButton.addEventListener(
+        "click",
+        disconnectSleeper
+      );
+
+      document
+        .getElementById(
+          "owner-a-select"
+        )
+        .addEventListener(
+          "change",
+          function(event) {
+
+            syncedRosterA =
+              event.target.value;
+
+            teamA =
+              [];
+
+            renderTeams();
+
+            calculateTrade();
+
+            updateSyncedSummaryDetail();
+
+          }
+        );
+
+      document
+        .getElementById(
+          "owner-b-select"
+        )
+        .addEventListener(
+          "change",
+          function(event) {
+
+            syncedRosterB =
+              event.target.value;
+
+            teamB =
+              [];
+
+            renderTeams();
+
+            calculateTrade();
+
+            updateSyncedSummaryDetail();
+
+          }
+        );
+
+    }
+
+    /* =========================================================
+       SLEEPER MODAL
+       ========================================================= */
+
+    function openSyncModal() {
+
+      const backdrop =
+        document.getElementById(
+          "sync-modal-backdrop"
+        );
+
+      backdrop
+        .classList
+        .add(
+          "active"
+        );
+
+      setSyncStatus(
+        "",
+        ""
+      );
+
+      if (
+        sleeperUser &&
+        sleeperUser.username
+      ) {
+
+        document
+          .getElementById(
+            "sleeper-username"
+          )
+          .value =
+            sleeperUser.username;
+
+      }
+
+      setTimeout(
+        function() {
+
+          document
+            .getElementById(
+              "sleeper-username"
+            )
+            .focus();
+
+        },
+        0
+      );
+
+    }
+
+    function closeSyncModal() {
+
+      document
+        .getElementById(
+          "sync-modal-backdrop"
+        )
+        .classList
+        .remove(
+          "active"
+        );
+
+    }
+
+    /* =========================================================
+       FIND SLEEPER USER / LEAGUES
+       ========================================================= */
+
+    async function findSleeperLeagues() {
+
+      const username =
+        document
+          .getElementById(
+            "sleeper-username"
+          )
+          .value
+          .trim();
+
+      const button =
+        document.getElementById(
+          "find-sleeper-leagues"
+        );
+
+      const pickerWrap =
+        document.getElementById(
+          "league-picker-wrap"
+        );
+
+      const picker =
+        document.getElementById(
+          "sleeper-league-picker"
+        );
+
+      if (
+        !username
+      ) {
+
+        setSyncStatus(
+          "Enter your Sleeper username first.",
+          "error"
+        );
+
+        return;
+
+      }
+
+      button.disabled =
+        true;
+
+      pickerWrap.style.display =
+        "none";
+
+      setSyncStatus(
+        "Finding your Sleeper account and current NFL leagues…",
+        ""
+      );
+
+      try {
+
+        const user =
+          await fetchJson(
+
+            "https://api.sleeper.app/v1/user/" +
+
+            encodeURIComponent(
+              username
+            )
+
+          );
+
+        if (
+          !user ||
+          !user.user_id
+        ) {
+
+          throw new Error(
+            "Sleeper username not found."
+          );
+
+        }
+
+        const nflState =
+          await fetchJson(
+            "https://api.sleeper.app/v1/state/nfl"
+          );
+
+        const currentSeason =
+          nflState.league_season ||
+          nflState.season;
+
+        if (
+          !currentSeason
+        ) {
+
+          throw new Error(
+            "Sleeper did not return the current NFL season."
+          );
+
+        }
+
+        const leagues =
+          await fetchJson(
+
+            "https://api.sleeper.app/v1/user/" +
+
+            encodeURIComponent(
+              user.user_id
+            ) +
+
+            "/leagues/nfl/" +
+
+            encodeURIComponent(
+              currentSeason
+            )
+
+          );
+
+        sleeperUser =
+          user;
+
+        if (
+          !Array.isArray(
+            leagues
+          ) ||
+          leagues.length === 0
+        ) {
+
+          throw new Error(
+
+            "No Sleeper NFL leagues were found for " +
+
+            currentSeason +
+
+            "."
+
+          );
+
+        }
+
+        picker.innerHTML =
+          leagues
+
+            .slice()
+
+            .sort(
+              function(a, b) {
+
+                return String(
+                  a.name || ""
+                )
+                  .localeCompare(
+                    String(
+                      b.name || ""
+                    )
+                  );
+
+              }
+            )
+
+            .map(
+              function(league) {
+
+                return (
+
+                  '<option value="' +
+
+                  escapeHtml(
+                    league.league_id
+                  ) +
+
+                  '">' +
+
+                  escapeHtml(
+                    league.name ||
+                    "Unnamed League"
+                  ) +
+
+                  " • " +
+
+                  escapeHtml(
+                    String(
+                      league.total_rosters ||
+                      "?"
+                    )
+                  ) +
+
+                  " teams" +
+
+                  "</option>"
+
+                );
+
+              }
+            )
+
+            .join("");
+
+        pickerWrap.style.display =
+          "block";
+
+        setSyncStatus(
+
+          "Found " +
+
+          leagues.length +
+
+          (
+            leagues.length === 1
+              ? " league"
+              : " leagues"
+          ) +
+
+          " for " +
+
+          currentSeason +
+
+          ". Choose one below.",
+
+          "success"
+
+        );
+
+      }
+
+      catch(error) {
+
+        setSyncStatus(
+
+          error.message ||
+          "Unable to find Sleeper leagues.",
+
+          "error"
+
+        );
+
+      }
+
+      finally {
+
+        button.disabled =
+          false;
+
+      }
+
+    }
+
+    /* =========================================================
+       CONNECT SELECTED LEAGUE
+       ========================================================= */
+
+    async function connectSelectedSleeperLeague() {
+
+      const picker =
+        document.getElementById(
+          "sleeper-league-picker"
+        );
+
+      const connectButton =
+        document.getElementById(
+          "connect-selected-league"
+        );
+
+      const leagueId =
+        picker.value;
+
+      if (
+        !leagueId
+      ) {
+
+        setSyncStatus(
+          "Choose a Sleeper league first.",
+          "error"
+        );
+
+        return;
+
+      }
+
+      connectButton.disabled =
+        true;
+
+      setSyncStatus(
+        "Syncing league settings, users, rosters, and player IDs…",
+        ""
+      );
+
+      try {
+
+        const responses =
+          await Promise.all(
+            [
+
+              fetchJson(
+
+                "https://api.sleeper.app/v1/league/" +
+
+                encodeURIComponent(
+                  leagueId
+                )
+
+              ),
+
+              fetchJson(
+
+                "https://api.sleeper.app/v1/league/" +
+
+                encodeURIComponent(
+                  leagueId
+                ) +
+
+                "/rosters"
+
+              ),
+
+              fetchJson(
+
+                "https://api.sleeper.app/v1/league/" +
+
+                encodeURIComponent(
+                  leagueId
+                ) +
+
+                "/users"
+
+              ),
+
+              loadSleeperPlayerMap()
+
+            ]
+          );
+
+        const league =
+          responses[0];
+
+        const rosters =
+          responses[1];
+
+        const users =
+          responses[2];
+
+        const playerMap =
+          responses[3];
+
+        if (
+          !league ||
+          !league.league_id
+        ) {
+
+          throw new Error(
+            "Sleeper returned an invalid league response."
+          );
+
+        }
+
+        if (
+          !Array.isArray(
+            rosters
+          ) ||
+          rosters.length === 0
+        ) {
+
+          throw new Error(
+            "No rosters were returned for this league."
+          );
+
+        }
+
+        syncedLeague =
+          league;
+
+        syncedRosters =
+          rosters;
+
+        syncedUsers =
+          Array.isArray(
+            users
+          )
+            ? users
+            : [];
+
+        sleeperPlayers =
+          playerMap ||
+          {};
+
+        applySleeperLeagueSettings(
+          league
+        );
+
+        populateOwnerSelectors();
+
+        teamA =
+          [];
+
+        teamB =
+          [];
+
+        document
+          .getElementById(
+            "sleeper-summary"
+          )
+          .classList
+          .add(
+            "active"
+          );
+
+        document
+          .getElementById(
+            "synced-league-name"
+          )
+          .textContent =
+
+            league.name ||
+            "Sleeper League";
+
+        updateSyncedSummaryDetail();
+
+        setControlsFromState();
+
+        updateSyncButtonState();
+
+        setSyncStatus(
+          "Sleeper league synced successfully.",
+          "success"
+        );
+
+        setTimeout(
+          function() {
+
+            closeSyncModal();
+
+          },
+          350
+        );
+
+      }
+
+      catch(error) {
+
+        setSyncStatus(
+
+          error.message ||
+          "Unable to sync this Sleeper league.",
+
+          "error"
+
+        );
+
+      }
+
+      finally {
+
+        connectButton.disabled =
+          false;
+
+      }
+
+    }
+
+    /* =========================================================
+       READ SLEEPER LEAGUE SETTINGS
+       ========================================================= */
+
+    function applySleeperLeagueSettings(
+      league
+    ) {
+
+      const scoring =
+        league.scoring_settings ||
+        {};
+
+      const rosterPositions =
+        Array.isArray(
+          league.roster_positions
+        )
+
+          ? league.roster_positions
+
+          : [];
+
+      const settings =
+        league.settings ||
+        {};
+
+      /* PPR */
+
+      const receptionPoints =
+        Number(
+          scoring.rec ||
+          0
+        );
+
+      if (
+        receptionPoints >=
+        0.75
+      ) {
+
+        scoringMode =
+          "ppr";
+
+      }
+
+      else if (
+        receptionPoints >=
+        0.25
+      ) {
+
+        scoringMode =
+          "half";
+
+      }
+
+      else {
+
+        scoringMode =
+          "standard";
+
+      }
+
+      /* Superflex */
+
+      qbMode =
+        rosterPositions.includes(
+          "SUPER_FLEX"
+        )
+
+          ? "superflex"
+
+          : "oneqb";
+
+      /* TE Premium */
+
+      const teBonus =
+        Number(
+          scoring.bonus_rec_te ||
+          0
+        );
+
+      if (
+        teBonus >= 0.75
+      ) {
+
+        tePremiumMode =
+          "full";
+
+      }
+
+      else if (
+        teBonus >= 0.25
+      ) {
+
+        tePremiumMode =
+          "half";
+
+      }
+
+      else {
+
+        tePremiumMode =
+          "off";
+
+      }
+
+      /* League Type */
+
+      const leagueType =
+        Number(
+          settings.type
+        );
+
+      if (
+        leagueType === 2
+      ) {
+
+        leagueMode =
+          "dynasty";
+
+      }
+
+      else if (
+        leagueType === 1
+      ) {
+
+        leagueMode =
+          "keeper";
+
+      }
+
+      else if (
+        leagueType === 0
+      ) {
+
+        leagueMode =
+          "redraft";
+
+      }
+
+      else if (
+        Number(
+          settings.taxi_slots ||
+          0
+        ) > 0
+      ) {
+
+        leagueMode =
+          "dynasty";
+
+      }
+
+    }
+
+    /* =========================================================
+       SLEEPER PLAYER MAP
+       ========================================================= */
+
+    async function loadSleeperPlayerMap() {
+
+      const cacheKey =
+        "tradeforge-sleeper-player-map-v1";
+
+      const cacheDateKey =
+        "tradeforge-sleeper-player-map-date-v1";
+
+      const today =
+        new Date()
+          .toISOString()
+          .slice(
+            0,
+            10
+          );
+
+      try {
+
+        const cachedDate =
+          localStorage.getItem(
+            cacheDateKey
+          );
+
+        const cached =
+          localStorage.getItem(
+            cacheKey
+          );
+
+        if (
+          cachedDate === today &&
+          cached
+        ) {
+
+          return JSON.parse(
+            cached
+          );
+
+        }
+
+      }
+
+      catch(error) {
+
+        /*
+          Cache errors do not stop
+          the Sleeper sync.
+        */
+
+      }
+
+      const rawMap =
+        await fetchJson(
+          "https://api.sleeper.app/v1/players/nfl?active=true"
+        );
+
+      const slimMap =
+        {};
+
+      Object
+        .keys(
+          rawMap ||
+          {}
+        )
+        .forEach(
+          function(playerId) {
+
+            const player =
+              rawMap[playerId] ||
+              {};
+
+            const fullName =
+
+              player.full_name ||
+
+              [
+                player.first_name,
+                player.last_name
+              ]
+                .filter(Boolean)
+                .join(" ");
+
+            slimMap[playerId] =
+              {
+
+                full_name:
+                  fullName ||
+                  "",
+
+                position:
+                  player.position ||
+                  "",
+
+                team:
+                  player.team ||
+                  ""
+
+              };
+
+          }
+        );
+
+      try {
+
+        localStorage.setItem(
+
+          cacheKey,
+
+          JSON.stringify(
+            slimMap
+          )
+
+        );
+
+        localStorage.setItem(
+
+          cacheDateKey,
+
+          today
+
+        );
+
+      }
+
+      catch(error) {
+
+        /*
+          If browser storage is full,
+          the current in-memory player
+          data still works.
+        */
+
+      }
+
+      return slimMap;
+
+    }
+
+    /* =========================================================
+       SLEEPER TEAM SELECTORS
+       ========================================================= */
+
+    function populateOwnerSelectors() {
+
+      const selectA =
+        document.getElementById(
+          "owner-a-select"
+        );
+
+      const selectB =
+        document.getElementById(
+          "owner-b-select"
+        );
+
+      const options =
+        syncedRosters
+
+          .slice()
+
+          .sort(
+            function(a, b) {
+
+              return (
+                Number(
+                  a.roster_id
+                ) -
+                Number(
+                  b.roster_id
+                )
+              );
+
+            }
+          )
+
+          .map(
+            function(roster) {
+
+              return {
+
+                rosterId:
+                  String(
+                    roster.roster_id
+                  ),
+
+                label:
+                  getRosterLabel(
+                    roster
+                  ),
+
+                ownerId:
+                  roster.owner_id
+
+                    ? String(
+                        roster.owner_id
+                      )
+
+                    : ""
+
+              };
+
+            }
+          );
+
+      const optionHtml =
+        options
+
+          .map(
+            function(option) {
+
+              return (
+
+                '<option value="' +
+
+                escapeHtml(
+                  option.rosterId
+                ) +
+
+                '">' +
+
+                escapeHtml(
+                  option.label
+                ) +
+
+                "</option>"
+
+              );
+
+            }
+          )
+
+          .join("");
+
+      selectA.innerHTML =
+        optionHtml;
+
+      selectB.innerHTML =
+        optionHtml;
+
+      /* Automatically make the Sleeper user's roster Team A */
+
+      const myRoster =
+        options.find(
+          function(option) {
+
+            return (
+
+              sleeperUser &&
+
+              option.ownerId ===
+              String(
+                sleeperUser.user_id
+              )
+
+            );
+
+          }
+        );
+
+      syncedRosterA =
+
+        myRoster
+
+          ? myRoster.rosterId
+
+          : (
+              options[0]
+                ? options[0].rosterId
+                : ""
+            );
+
+      /* Pick another roster for Team B */
+
+      const opponent =
+        options.find(
+          function(option) {
+
+            return (
+              option.rosterId !==
+              syncedRosterA
+            );
+
+          }
+        );
+
+      syncedRosterB =
+
+        opponent
+
+          ? opponent.rosterId
+
+          : syncedRosterA;
+
+      selectA.value =
+        syncedRosterA;
+
+      selectB.value =
+        syncedRosterB;
+
+    }
+
+    function getRosterLabel(
+      roster
+    ) {
+
+      const owner =
+        syncedUsers.find(
+          function(user) {
+
+            return (
+
+              String(
+                user.user_id
+              ) ===
+
+              String(
+                roster.owner_id
+              )
+
+            );
+
+          }
+        );
+
+      const teamName =
+
+        owner &&
+        owner.metadata &&
+        owner.metadata.team_name
+
+          ? owner.metadata.team_name
+
+          : owner &&
+            owner.display_name
+
+          ? owner.display_name
+
+          : owner &&
+            owner.username
+
+          ? owner.username
+
+          : "Roster " +
+            roster.roster_id;
+
+      const wins =
+
+        roster.settings &&
+
+        Number.isFinite(
+          Number(
+            roster.settings.wins
+          )
+        )
+
+          ? Number(
+              roster.settings.wins
+            )
+
+          : null;
+
+      const losses =
+
+        roster.settings &&
+
+        Number.isFinite(
+          Number(
+            roster.settings.losses
+          )
+        )
+
+          ? Number(
+              roster.settings.losses
+            )
+
+          : null;
+
+      if (
+        wins !== null &&
+        losses !== null
+      ) {
+
+        return (
+
+          teamName +
+
+          " (" +
+
+          wins +
+
+          "-" +
+
+          losses +
+
+          ")"
+
+        );
+
+      }
+
+      return teamName;
+
+    }
+
+    /* =========================================================
+       SYNC SUMMARY
+       ========================================================= */
+
+    function updateSyncedSummaryDetail() {
+
+      if (
+        !syncedLeague
+      ) {
+
+        return;
+
+      }
+
+      const allRostered =
+        new Set();
+
+      syncedRosters.forEach(
+        function(roster) {
+
+          (
+            roster.players ||
+            []
+          )
+            .forEach(
+              function(playerId) {
+
+                allRostered.add(
+                  String(
+                    playerId
+                  )
+                );
+
+              }
+            );
+
+        }
+      );
+
+      let matched =
+        0;
+
+      allRostered.forEach(
+        function(playerId) {
+
+          if (
+            matchSleeperIdToTradeForge(
+              playerId
+            )
+          ) {
+
+            matched +=
+              1;
+
+          }
+
+        }
+      );
+
+      document
+        .getElementById(
+          "synced-league-detail"
+        )
+        .textContent =
+
+          getModeLabel() +
+
+          " • " +
+
+          matched +
+
+          "/" +
+
+          allRostered.size +
+
+          " rostered assets currently match TradeForge values";
+
+    }
+
+    /* =========================================================
+       BUILD A TRADEFORGE ROSTER FROM SLEEPER IDS
+       ========================================================= */
+
+    function getSelectedRosterId(
+      side
+    ) {
+
+      return (
+        side === "A"
+
+          ? syncedRosterA
+
+          : syncedRosterB
+      );
+
+    }
+
+    function buildRosterAssets(
+      rosterId
+    ) {
+
+      const roster =
+        syncedRosters.find(
+          function(item) {
+
+            return (
+
+              String(
+                item.roster_id
+              ) ===
+
+              String(
+                rosterId
+              )
+
+            );
+
+          }
+        );
+
+      if (
+        !roster
+      ) {
+
+        return [];
+
+      }
+
+      const assets =
+        [];
+
+      const seen =
+        new Set();
+
+      (
+        roster.players ||
+        []
+      )
+        .forEach(
+          function(playerId) {
+
+            const matched =
+              matchSleeperIdToTradeForge(
+                String(
+                  playerId
+                )
+              );
+
+            if (
+              matched &&
+              !seen.has(
+                assetKey(
+                  matched
+                )
+              )
+            ) {
+
+              seen.add(
+                assetKey(
+                  matched
+                )
+              );
+
+              assets.push(
+                matched
+              );
+
+            }
+
+          }
+        );
+
+      return assets.sort(
+        function(a, b) {
+
+          return (
+            getPlayerValue(b) -
+            getPlayerValue(a)
+          );
+
+        }
+      );
+
+    }
+
+    /* =========================================================
+       MATCH SLEEPER PLAYERS TO TRADEFORGE VALUES
+       ========================================================= */
+
+    function matchSleeperIdToTradeForge(
+      playerId
+    ) {
+
+      /* Team defense */
+
+      if (
+        nflDefenseNames[playerId]
+      ) {
+
+        const defenseName =
+          nflDefenseNames[playerId];
+
+        const defense =
+          playerDatabase.find(
+            function(player) {
+
+              return (
+
+                normalizeName(
+                  player.name
+                ) ===
+
+                normalizeName(
+                  defenseName
+                )
+
+              );
+
+            }
+          );
+
+        if (
+          !defense
+        ) {
+
+          return null;
+
+        }
+
+        return {
+
+          ...defense,
+
+          sleeperId:
+            playerId,
+
+          nflTeam:
+            playerId
+
+        };
+
+      }
+
+      /* Normal player */
+
+      const sleeperPlayer =
+        sleeperPlayers[playerId];
+
+      if (
+        !sleeperPlayer ||
+        !sleeperPlayer.full_name
+      ) {
+
+        return null;
+
+      }
+
+      const normalizedSleeperName =
+        normalizeName(
+          sleeperPlayer.full_name
+        );
+
+      const tradeForgePlayer =
+        playerDatabase.find(
+          function(player) {
+
+            return (
+
+              normalizeName(
+                player.name
+              ) ===
+
+              normalizedSleeperName
+
+            );
+
+          }
+        );
+
+      if (
+        !tradeForgePlayer
+      ) {
+
+        return null;
+
+      }
+
+      return {
+
+        ...tradeForgePlayer,
+
+        sleeperId:
+          playerId,
+
+        nflTeam:
+          sleeperPlayer.team ||
+          ""
+
+      };
+
+    }
+
+    /* =========================================================
+       SEARCH DATABASE WHEN SLEEPER IS CONNECTED
+       ========================================================= */
+
+    function getSelectableAssets(
+      side
+    ) {
+
+      const rosterId =
+        getSelectedRosterId(
+          side
+        );
+
+      if (
+        syncedLeague &&
+        rosterId
+      ) {
+
+        const rosterAssets =
+          buildRosterAssets(
+            rosterId
+          );
+
+        /*
+          Dynasty pick ownership is not
+          automatically classified as
+          Early/Mid/Late yet, so picks
+          remain manually selectable.
+        */
+
+        if (
+          leagueMode === "dynasty"
+        ) {
+
+          return rosterAssets.concat(
+            dynastyPickDatabase
+          );
+
+        }
+
+        return rosterAssets;
+
+      }
+
+      return getAssetDatabase();
+
+    }
+
+    /* =========================================================
+       DISCONNECT SLEEPER
+       ========================================================= */
+
+    function disconnectSleeper() {
+
+      sleeperUser =
+        null;
+
+      syncedLeague =
+        null;
+
+      syncedRosters =
+        [];
+
+      syncedUsers =
+        [];
+
+      sleeperPlayers =
+        {};
+
+      syncedRosterA =
+        "";
+
+      syncedRosterB =
+        "";
+
+      teamA =
+        [];
+
+      teamB =
+        [];
+
+      document
+        .getElementById(
+          "sleeper-summary"
+        )
+        .classList
+        .remove(
+          "active"
+        );
+
+      document
+        .getElementById(
+          "league-picker-wrap"
+        )
+        .style
+        .display =
+          "none";
+
+      updateSyncButtonState();
+
+      renderTeams();
+
+      calculateTrade();
+
+    }
+
+    function updateSyncButtonState() {
+
+      const button =
+        document.getElementById(
+          "sync-league-button"
+        );
+
+      if (
+        syncedLeague
+      ) {
+
+        button.textContent =
+          "Sleeper Synced ✓";
+
+      }
+
+      else {
+
+        button.textContent =
+          "Sync Your League";
+
+      }
+
+    }
+
+    /* =========================================================
+       SLEEPER STATUS MESSAGES
+       ========================================================= */
+
+    function setSyncStatus(
+      message,
+      type
+    ) {
+
+      const element =
+        document.getElementById(
+          "sync-status"
+        );
+
+      element.textContent =
+        message ||
+        "";
+
+      element.className =
+        type ||
+        "";
+
+    }
+
+    /* =========================================================
+       SAFE SLEEPER FETCH
+       ========================================================= */
+
+    async function fetchJson(
+      url
+    ) {
+
+      const response =
+        await fetch(
+          url,
+          {
+
+            method: "GET",
+
+            headers: {
+
+              "Accept":
+                "application/json"
+
+            }
+
+          }
+        );
+
+      if (
+        !response.ok
+      ) {
+
+        if (
+          response.status === 404
+        ) {
+
+          throw new Error(
+            "Sleeper could not find that account or league."
+          );
+
+        }
+
+        if (
+          response.status === 429
+        ) {
+
+          throw new Error(
+            "Sleeper is receiving too many requests. Try again shortly."
+          );
+
+        }
+
+        throw new Error(
+
+          "Sleeper request failed (" +
+
+          response.status +
+
+          ")."
+
+        );
+
+      }
+
+      return response.json();
+
+    }
+
+    /* =========================================================
+       NAME NORMALIZATION
+       Helps match:
+       A.J. Brown
+       AJ Brown
+       Marvin Harrison Jr.
+       Marvin Harrison
+       etc.
+       ========================================================= */
+
+    function normalizeName(
+      name
+    ) {
+
+      return String(
+        name ||
+        ""
+      )
+
+        .toLowerCase()
+
+        .replace(
+          /[.'’\-]/g,
+          ""
+        )
+
+        .replace(
+          /\b(jr|sr|ii|iii|iv)\b/g,
+          ""
+        )
+
+        .replace(
+          /[^a-z0-9]/g,
+          ""
+        );
+
+    }
+
+    /* =========================================================
+       HTML SAFETY
+       ========================================================= */
+
+    function escapeHtml(
+      value
+    ) {
+
+      return String(
+        value
+      )
+
+        .replace(
+          /&/g,
+          "&amp;"
+        )
+
+        .replace(
+          /</g,
+          "&lt;"
+        )
+
+        .replace(
+          />/g,
+          "&gt;"
+        )
+
+        .replace(
+          /"/g,
+          "&quot;"
+        )
+
+        .replace(
+          /'/g,
+          "&#039;"
+        );
+
+    }
+
+    /* =========================================================
+       STARTUP
+       ========================================================= */
+
+    function initialize() {
+
+      setupThemeToggle();
+
+      setupLeagueControls();
+
+      setupTradeButtons();
+
+      setupSearch("A");
+
+      setupSearch("B");
+
+      setupSleeperSync();
+
+      buildReferenceBoard();
+
+      renderTeams();
+
+      calculateTrade();
+
+      updateSyncButtonState();
+
+    }
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      initialize
     );
 
-  document
-    .getElementById(
-      "swap-sides-button"
-    )
-    .addEventListener(
-      "click",
-      function(){
-
-        const oldTeamA=
-          teamA;
-
-        teamA=
-          teamB;
-
-        teamB=
-          oldTeamA;
-
-        renderTeams();
-        calculateTrade();
-      }
-    );
-}
-
-document.addEventListener(
-  "DOMContentLoaded",
-  function(){
-
-    setupSearch(
-      "a",
-      function(){
-        return teamA;
-      }
-    );
-
-    setupSearch(
-      "b",
-      function(){
-        return teamB;
-      }
-    );
-
-    setupThemeToggle();
-
-    setupLeagueControls();
-
-    setupTradeButtons();
-
-    buildReferenceBoard();
-
-    renderTeams();
-
-    calculateTrade();
-  }
-);
-
-</script>
+  </script>
 
 </body>
 </html>
