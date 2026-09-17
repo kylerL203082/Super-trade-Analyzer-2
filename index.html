@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Super Trade Analyzer</title>
-<link rel="stylesheet" href="styles.css?v=2">
+    <link rel="stylesheet" href="styles.css?v=2">
 </head>
 <body>
 
@@ -18,10 +18,10 @@
     <section class="value-board-section">
         <h3>📊 Top Market Values Reference (Custom PPR Rankings)</h3>
         <div class="value-board-grid">
-            <div class="value-card"><h4>Top Running Backs</h4><p>1. B. Robinson (99.0)</p><p>2. J. Gibbs (97.8)</p><p>3. C. McCaffrey (96.6)</p></div>
-            <div class="value-card"><h4>Top Wide Receivers</h4><p>4. J. Chase (95.4)</p><p>5. P. Nacua (94.1)</p><p>6. J. Smith-Njigba (92.9)</p></div>
+            <div class="value-card"><h4>Top Running Backs</h4><p>1. B. Robinson (99.0)</p><p>2. J. Gibbs (97.8)</p><p>7. J. Taylor (91.7)</p></div>
+            <div class="value-card"><h4>Top Wide Receivers</h4><p>3. J. Chase (96.4)</p><p>4. P. Nacua (94.1)</p><p>5. J. Smith-Njigba (92.9)</p></div>
             <div class="value-card"><h4>Top Quarterbacks</h4><p>28. J. Allen (70.6)</p><p>36. L. Jackson (63.8)</p><p>40. J. Daniels (60.6)</p></div>
-            <div class="value-card"><h4>Top Specialists</h4><p>16. B. Bowers (TE1 - 82.5)</p><p>141. B. Aubrey (K1 - 12.4)</p><p>143. Texans (DST1 - 11.2)</p></div>
+            <div class="value-card"><h4>Top Tight Ends</h4><p>16. T. McBride (82.5)</p><p>18. B. Bowers (80.1)</p><p>35. C. Loveland (64.4)</p></div>
         </div>
     </section>
 
@@ -78,10 +78,10 @@
         const playerDatabase = [
             { name: "Bijan Robinson", pos: "RB", value: 99.0, trend: "📈" },
             { name: "Jahmyr Gibbs", pos: "RB", value: 97.8, trend: "📈" },
-            { name: "Christian McCaffrey", pos: "RB", value: 96.6, trend: "📈" },
-            { name: "Ja'Marr Chase", pos: "WR", value: 95.4, trend: "📈" },
+            { name: "Ja'Marr Chase", pos: "WR", value: 96.4, trend: "📈" },
             { name: "Puka Nacua", pos: "WR", value: 94.1, trend: "📈" },
             { name: "Jaxon Smith-Njigba", pos: "WR", value: 92.9, trend: "📈" },
+            { name: "Christian McCaffrey", pos: "RB", value: 91.8, trend: "📈" },
             { name: "Jonathan Taylor", pos: "RB", value: 91.7, trend: "📈" },
             { name: "De'Von Achane", pos: "RB", value: 90.5, trend: "📈" },
             { name: "Amon-Ra St. Brown", pos: "WR", value: 89.3, trend: "📈" },
@@ -91,9 +91,9 @@
             { name: "CeeDee Lamb", pos: "WR", value: 85.0, trend: "📉" },
             { name: "Chase Brown", pos: "RB", value: 83.7, trend: "📈" },
             { name: "Kenneth Walker III", pos: "RB", value: 83.1, trend: "📈" },
-            { name: "Brock Bowers", pos: "TE", value: 82.5, trend: "📈" },
+            { name: "Trey Mcbride", pos: "TE", value: 82.5, trend: "📈" },
             { name: "Drake London", pos: "WR", value: 81.3, trend: "📈" },
-            { name: "Trey McBride", pos: "TE", value: 80.1, trend: "📈" },
+            { name: "Brock Bowers", pos: "TE", value: 80.1, trend: "📈" },
             { name: "Rashee Rice", pos: "WR", value: 78.9, trend: "📈" },
             { name: "Jeremiyah Love", pos: "RB", value: 77.6, trend: "📈" },
             { name: "Saquon Barkley", pos: "RB", value: 77.0, trend: "📈" },
@@ -146,17 +146,7 @@
             { name: "DK Metcalf", pos: "WR", value: 42.3, trend: "📈" },
             { name: "Kenneth Gainwell", pos: "RB", value: 41.7, trend: "📈" },
             { name: "Jaxson Dart", pos: "QB", value: 41.0, trend: "📈" },
-            { name: "Jaylen Warren", pos: "RB", value: 40.4, trend: "📈" },
-            { name: "DJ Moore", pos: "WR", value: 39.8, trend: "📈" },
-            { name: "Joe Burrow", pos: "QB", value: 39.2, trend: "📈" },
-            { name: "Marvin Harrison Jr.", pos: "WR", value: 38.6, trend: "📈" },
-            { name: "Trevor Lawrence", pos: "QB", value: 38.0, trend: "📈" },
-            { name: "Christian Watson", pos: "WR", value: 37.4, trend: "📈" },
-            { name: "Luther Burden III", pos: "WR", value: 36.7, trend: "📈" },
-            { name: "Parker Washington", pos: "WR", value: 36.1, trend: "📈" },
-            { name: "Jameson Williams", pos: "WR", value: 35.5, trend: "📈" },
-            { name: "Wan'Dale Robinson", pos: "WR", value: 34.9, trend: "📈" },
-            { name: "Rachaad White", pos: "RB", value: 34.3, trend: "📈" },
+            { name: "Jaylen             { name: "Rachaad White", pos: "RB", value: 34.3, trend: "📈" },
             { name: "Sam LaPorta", pos: "TE", value: 33.7, trend: "📈" },
             { name: "Aaron Jones Sr.", pos: "RB", value: 33.1, trend: "📈" },
             { name: "Stefon Diggs", pos: "WR", value: 32.4, trend: "📈" },
@@ -236,6 +226,16 @@
             { name: "Will Reichard", pos: "K", value: 2.2, trend: "📈" },
             { name: "Cam Little", pos: "K", value: 1.6, trend: "📈" },
             { name: "Harrison Mevis", pos: "K", value: 1.0, trend: "📈" }
+Warren", pos: "RB", value: 40.4, trend: "📈" },
+            { name: "DJ Moore", pos: "WR", value: 39.8, trend: "📈" },
+            { name: "Joe Burrow", pos: "QB", value: 39.2, trend: "📈" },
+            { name: "Marvin Harrison Jr.", pos: "WR", value: 38.6, trend: "📈" },
+            { name: "Trevor Lawrence", pos: "QB", value: 38.0, trend: "📈" },
+            { name: "Christian Watson", pos: "WR", value: 37.4, trend: "📈" },
+            { name: "Luther Burden III", pos: "WR", value: 36.7, trend: "📈" },
+            { name: "Parker Washington", pos: "WR", value: 36.1, trend: "📈" },
+            { name: "Jameson Williams", pos: "WR", value: 35.5, trend: "📈" },
+            { name: "Wan'Dale Robinson", pos: "WR", value: 34.9, trend: "📈" },
         ];
 
         let teamA = [];
