@@ -1682,8 +1682,82 @@ updateFairSuggestion();
 
 });
     
+const tradeGradeBox=document.createElement("div");
 
+tradeGradeBox.style.marginTop="12px";
+tradeGradeBox.style.fontSize="24px";
+tradeGradeBox.style.fontWeight="bold";
+tradeGradeBox.style.textAlign="center";
+
+document.querySelector(".verdict-container").appendChild(tradeGradeBox);
+
+function updateTradeGrade(){
+
+  if(!teamA.length||!teamB.length){
+    tradeGradeBox.textContent="";
+    return;
+  }
+
+  const a=calculateAdjustedTeamValue(teamA);
+  const b=calculateAdjustedTeamValue(teamB);
+
+  const average=(a+b)/2;
+
+  if(!average){
+    tradeGradeBox.textContent="";
+    return;
+  }
+
+  const difference=Math.abs(a-b)/(average/100);
+
+  let grade="";
+  let description="";
+
+  if(difference<=5){
+    grade="A+";
+    description="Excellent Balance";
+  }
+
+  else if(difference<=10){
+    grade="A";
+    description="Very Good Balance";
+  }
+
+  else if(difference<=20){
+    grade="B";
+    description="Good Trade";
+  }
+
+  else if(difference<=30){
+    grade="C";
+    description="Noticeable Advantage";
+  }
+
+  else if(difference<=40){
+    grade="D";
+    description="Lopsided Trade";
+  }
+
+  else{
+    grade="F";
+    description="Very Lopsided Trade";
+  }
+
+  tradeGradeBox.textContent=
+    "Trade Grade: "+
+    grade+
+    " — "+
+    description;
+
+}
+
+document.addEventListener("click",function(){
+  setTimeout(updateTradeGrade,0);
+});
+
+updateTradeGrade();
     
+
 </script>
 </body>
 </html>
