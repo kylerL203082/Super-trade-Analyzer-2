@@ -241,11 +241,58 @@ Warren", pos: "RB", value: 40.4, trend: "📈" },
         let teamA = [];
         let teamB = [];
 
-        document.addEventListener("DOMContentLoaded", () => {
-            setupSearch("a", teamA);
-            setupSearch("b", teamB);
-            setupThemeToggle();
-            calculateTrade();
+            // Re-engineered Independent Dual Search Script Engine
+        function setupSearch(teamId, teamArray) {
+            const input = document.getElementById('search-' + teamId);
+            const dropdown = document.getElementById('dropdown-' + teamId);
+
+            input.addEventListener('input', () => {
+                const query = input.value.toLowerCase().trim();
+                dropdown.innerHTML = '';
+                
+                if (!query) {
+                    dropdown.style.display = 'none';
+                    return;
+                }
+
+                // Filters through your complete 160 records seamlessly
+                const matches = playerDatabase.filter(p => p.name.toLowerCase().includes(query));
+                
+                if (matches.length === 0) {
+                    dropdown.style.display = 'none';
+                    return;
+                }
+
+                dropdown.style.display = 'block';
+                matches.forEach(player => {
+                    const item = document.createElement('div');
+                    item.className = 'dropdown-item';
+                    item.innerText = player.name + ' (' + player.pos + ') ' + player.trend + ' - Value: ' + player.value.toFixed(1);
+                    
+                    item.addEventListener('click', () => {
+                        if (teamArray.length < 8) {
+                            teamArray.push(player);
+                            renderTeams();
+                            calculateTrade();
+                        } else {
+                            alert('Maximum capacity limit reached. Max 8 players per side.');
+                        }
+                        input.value = '';
+                        dropdown.innerHTML = '';
+                        dropdown.style.display = 'none';
+                    });
+                    dropdown.appendChild(item);
+                });
+            });
+
+            // Hide the active suggestion list if user clicks away
+            document.addEventListener('click', (e) => {
+                if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.style.display = 'none';
+                }
+            });
+        }
+
         });
 
         function setupSearch(teamId, teamArray) {
