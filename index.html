@@ -321,6 +321,16 @@ function setupLeagueControls(){
     leagueMode=league.value;
     qbMode=qb.value;
 
+    if(leagueMode!=="dynasty"){
+      teamA=teamA.filter(function(asset){
+        return asset.pos!=="PICK";
+      });
+
+      teamB=teamB.filter(function(asset){
+        return asset.pos!=="PICK";
+      });
+    }
+
     buildReferenceBoard();
     renderTeams();
     calculateTrade();
@@ -330,16 +340,8 @@ function setupLeagueControls(){
   league.addEventListener("change",changed);
   qb.addEventListener("change",changed);
 }
-function getAdjustedPlayerValue(baseValue){
-  if(typeof baseValue!=="number"||baseValue<=0) return 0;
-  return 100*Math.pow(baseValue/100,SUPERSTAR_FACTOR);
-}
 
-function calculateAdjustedTeamValue(team){
-  if(!Array.isArray(team)||!team.length) return 0;
-
-  const adjusted=team.map(function(player){
-  function getPlayerValue(player){
+function getPlayerValue(player){
 
   if(player.pos==="PICK"){
 
@@ -380,13 +382,70 @@ function calculateAdjustedTeamValue(team){
     )
   );
 }
+
+function getModeLabel(){
+
+  const scoring=
+    scoringMode==="ppr"
+      ?"PPR"
+      :scoringMode==="half"
+      ?"0.5 PPR"
+      :"No PPR";
+
+  const league=
+    leagueMode==="dynasty"
+      ?"Dynasty"
+      :leagueMode==="keeper"
+      ?"Keeper"
+      :"Redraft";
+
+  const qbFormat=
+    qbMode==="superflex"
+      ?"Superflex"
+      :"1QB";
+
+  return scoring+" • "+league+" • "+qbFormat;
+}
   
-  
-  }).sort(function(a,b){return b-a;});
+  function getAdjustedPlayerValue(baseValue){
+
+  if(typeof baseValue!=="number"||baseValue<=0){
+    return 0;
+  }
+
+  return 100*Math.pow(
+    baseValue/100,
+    SUPERSTAR_FACTOR
+  );
+}
+
+function calculateAdjustedTeamValue(team){
+
+  if(!Array.isArray(team)||!team.length){
+    return 0;
+  }
+
+  const adjusted=team.map(function(player){
+
+    return getAdjustedPlayerValue(
+      getPlayerValue(player)
+    );
+
+  }).sort(function(a,b){
+
+    return b-a;
+
+  });
 
   return adjusted.reduce(function(total,value,index){
-    const weight=PACKAGE_WEIGHTS[index]!==undefined?PACKAGE_WEIGHTS[index]:0.80;
+
+    const weight=
+      PACKAGE_WEIGHTS[index]!==undefined
+        ? PACKAGE_WEIGHTS[index]
+        : 0.80;
+
     return total+(value*weight);
+
   },0);
 }
 
@@ -445,7 +504,7 @@ function setupSearch(teamId,getTeam){
       return;
     }
 
-    const matches=playerDatabase
+    const matches=getAssetDatabase()
       .filter(function(player){return player.name.toLowerCase().includes(query);})
       .slice()
       .sort(function(a,b){
@@ -658,7 +717,7 @@ function updateFairSuggestion(){
   const used=new Set(teamA.concat(teamB).map(function(p){return p.rank;}));
   const options=[];
 
-  playerDatabase.forEach(function(player){
+    getAssetDatabase().forEach(function(player){
     if(used.has(player.rank)) return;
 
     const testTeam=losing.concat([player]);
@@ -716,7 +775,7 @@ function updateTradeGrade(){
 }
 
 function findBestTwoPlayerPackages(targetTeam,targetValue,used){
-  const available=playerDatabase.filter(function(player){
+const available=getAssetDatabase().filter(function(player){
     return !used.has(player.rank);
   });
 
@@ -813,21 +872,6 @@ function setupThemeToggle(){
   });
 }
 
-function setupLeagueControls(){
-  const scoring=document.getElementById("scoring-select");
-  const league=document.getElementById("league-select");
-
-  function changed(){
-    scoringMode=scoring.value;
-    leagueMode=league.value;
-    buildReferenceBoard();
-    renderTeams();
-    calculateTrade();
-  }
-
-  scoring.addEventListener("change",changed);
-  league.addEventListener("change",changed);
-}
 
 function setupTradeButtons(){
   document.getElementById("clear-trade-button").addEventListener("click",function(){
