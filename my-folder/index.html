@@ -441,9 +441,8 @@ let sleeperPlayers={};
 let rosterA="";
 let rosterB="";
 
-let sleeperTrendMarket={};
-let sleeperIdByName={};
-
+let sleeperTrendMarket={},sleeperIdByName={};
+let tradeForgeFeedMeta=null;
 const SUPERSTAR_FACTOR=1.25;
 
 const PACKAGE_WEIGHTS=[
@@ -2109,7 +2108,6 @@ liveInputs:tfHasAnyEngineData(p)
 function updateEngineStatus(){
 
 const live=
-
 playerDatabase
 .filter(
 tfHasAnyEngineData
@@ -2123,7 +2121,7 @@ live
 
 ?
 
-`Live Engine • ${live} players`
+`TradeForge Live • ${live} auto-updated players`
 
 :
 
@@ -2131,9 +2129,169 @@ live
 
 
 if(
+tradeForgeFeedMeta?.week
+){
+
+text+=
+` • Week ${tradeForgeFeedMeta.week}`;
+
+}
+
+
+if(
 tradeForgeFeedMeta?.generatedAt
 ){
 
+const d=
+
+new Date(
+tradeForgeFeedMeta.generatedAt
+);
+
+
+if(
+!Number.isNaN(
+d.getTime()
+)
+){
+
+text+=
+` • Updated ${d.toLocaleString()}`;
+
+}
+
+}
+
+
+$("engine-status")
+.textContent=
+text;
+
+}
+
+
+async function loadTradeForgeFeed(){
+
+try{
+
+const response=
+
+await fetch(
+
+`./tradeforge-data.json?v=${Date.now()}`,
+
+{
+cache:"no-store"
+}
+
+);
+
+
+if(!response.ok){
+
+throw new Error(
+`Feed HTTP ${response.status}`
+);
+
+}
+
+
+const feed=
+
+await response.json();
+
+
+tradeForgeFeedMeta=
+feed.meta
+||
+null;
+
+
+let applied=0;
+
+
+playerDatabase
+.forEach(
+player=>{
+
+const live=
+
+feed.players
+?.[
+norm(
+player.name
+)
+];
+
+
+if(
+live?.engine
+){
+
+player.engine=
+live.engine;
+
+
+player.liveData=
+live;
+
+
+applied++;
+
+}
+
+}
+);
+
+
+console.log(
+`TradeForge nflverse feed applied to ${applied} players.`
+);
+
+
+renderBoard();
+
+render();
+
+
+if(
+syncedLeague
+&&
+!(
+$("league-page")
+.classList
+.contains(
+"page-hidden"
+)
+)
+){
+
+buildLeaguePage();
+
+}
+
+}
+
+catch(error){
+
+console.warn(
+
+"TradeForge live feed unavailable; baseline values remain active.",
+
+error
+
+);
+
+
+tradeForgeFeedMeta=
+null;
+
+
+updateEngineStatus();
+
+}
+
+}
 const updated=
 new Date(
 tradeForgeFeedMeta.generatedAt
