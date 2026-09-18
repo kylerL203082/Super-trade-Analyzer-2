@@ -17,13 +17,12 @@ header{display:flex;justify-content:space-between;align-items:center;border-bott
 .brand{display:flex;align-items:center;gap:12px}
 .logo{background:var(--blue);color:#fff;font-weight:900;font-size:20px;padding:15px;border-radius:13px}
 h1{margin:0;font-size:30px}
-.sub{color:var(--muted);font-size:13px;margin-top:4px}
+.sub,.roster-meta,.not-valued{color:var(--muted);font-size:12px}
 .header-buttons{display:flex;flex-direction:column;gap:7px;width:360px}
-.header-buttons button{padding:10px;border-radius:9px;font-weight:800}
-.sync-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px}
-#theme-toggle{background:var(--card);color:var(--text);border:1px solid var(--border)}
-#sync-button{background:var(--blue);color:var(--sync);border:0}
-#league-view-button{background:var(--card);color:var(--text);border:1px solid var(--border)}
+.sync-actions,.actions,.sync-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.header-buttons button,.actions button,.close{padding:10px;border-radius:9px;font-weight:800}
+#theme-toggle,#league-view-button,.close,.actions button{background:var(--card);color:var(--text);border:1px solid var(--border)}
+#sync-button,.primary{background:var(--blue);color:var(--sync);border:0}
 #league-view-button:disabled{opacity:.45;cursor:not-allowed}
 .card,.team,.result-card{background:var(--card);border:1px solid var(--border);border-radius:15px;padding:16px;margin-top:16px}
 .settings{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
@@ -33,28 +32,27 @@ select,input{width:100%;padding:10px;border-radius:8px;border:1px solid var(--bo
 .settings-title{display:flex;justify-content:space-between;margin-bottom:12px;font-weight:900}
 #mode-label{color:var(--blue);font-size:12px}
 .top-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.top-box,.suggestion,.total,.grade{background:var(--card2);border-radius:9px}
-.top-box{border:1px solid var(--border);padding:10px}
-.top-box h3{margin:0 0 8px;font-size:13px}
+.top-box,.suggestion,.total,.grade,.roster-card{background:var(--card2);border-radius:10px}
+.top-box,.roster-card{border:1px solid var(--border);padding:12px}
+.top-box h3{margin:0 0 8px}
 .top-row{display:flex;justify-content:space-between;font-size:12px;padding:5px 0}
 .trade-grid{display:grid;grid-template-columns:1fr 320px 1fr;gap:15px;margin-top:16px}
-.team{margin-top:0}
-.team h2{margin-top:0}
+.team,.result-card{margin-top:0}
 .search-wrap{position:relative}
 .results{display:none;position:absolute;left:0;right:0;top:46px;background:var(--card);border:1px solid var(--border);border-radius:9px;z-index:20;max-height:320px;overflow:auto}
 .results.show{display:block}
-.result-item{padding:9px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;justify-content:space-between;gap:10px}
+.result-item{padding:9px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;gap:10px}
 .result-item:hover{background:var(--card2)}
-.player{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
+.player,.roster-player{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
+.roster-player{grid-template-columns:1fr auto}
 .player small,.roster-player small{display:block;color:var(--muted);margin-top:3px}
 .remove{border:1px solid var(--border);background:var(--card2);color:var(--text);border-radius:6px}
 .totals{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:15px}
 .total{padding:10px;text-align:center}
 .total small{display:block;color:var(--muted)}
 .total strong{font-size:20px}
-.result-card{margin-top:0}
 .meter{height:15px;background:linear-gradient(90deg,#3380ff,#26a269,#ff9b3d,#ef5350);border-radius:20px;position:relative;margin:15px 0 24px}
-#marker{position:absolute;width:5px;height:25px;background:var(--text);top:-5px;left:50%;border-radius:3px;transition:.2s}
+#marker{position:absolute;width:5px;height:25px;background:var(--text);top:-5px;left:50%;border-radius:3px}
 #verdict{padding:18px;text-align:center;font-size:25px;font-weight:900;border:2px solid var(--border);border-radius:12px;background:var(--card2)}
 #verdict small{display:block;font-size:11px;color:var(--muted);margin-top:6px}
 #verdict.fair{border-color:#22a06b}
@@ -62,38 +60,33 @@ select,input{width:100%;padding:10px;border-radius:8px;border:1px solid var(--bo
 #verdict.adv{border-color:#e87722}
 #verdict.major{border-color:#d64545}
 .grade{display:flex;justify-content:space-between;padding:12px;margin-top:10px}
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
-.actions button,.close{padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--card2);color:var(--text);font-weight:800}
 .analysis{display:grid;grid-template-columns:1fr 1fr;gap:15px}
 .suggestion{border:1px solid var(--border);padding:9px;margin-top:7px;font-size:12px}
 #sleeper-bar{display:none;border-color:var(--blue)}
-.sync-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-.primary{background:var(--blue);color:#fff;border:0;width:100%;margin-top:10px;padding:10px;border-radius:8px;font-weight:800}
+.primary{width:100%;margin-top:10px;padding:10px;border-radius:8px;font-weight:800}
 .modal-bg{display:none;position:fixed;inset:0;background:#000b;z-index:100;align-items:center;justify-content:center;padding:15px}
 .modal-bg.show{display:flex}
 .modal{width:min(550px,100%);background:var(--card);padding:20px;border-radius:15px}
-.modal-head{display:flex;justify-content:space-between;gap:10px}
-.modal h2{margin-top:0}
+.modal-head,.league-toolbar,.roster-title{display:flex;justify-content:space-between;gap:12px;align-items:center}
 #league-wrap{display:none;margin-top:12px}
-#status{font-size:12px;color:var(--muted);margin-top:10px}
+#status{margin-top:10px}
 .page-hidden{display:none!important}
-.league-toolbar{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:16px}
-.league-toolbar h2{margin:0}
 .league-view-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.roster-card{background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:16px}
-.roster-title{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.roster-title{align-items:flex-start;padding-bottom:12px;border-bottom:1px solid var(--border)}
 .roster-title h3{margin:4px 0 0}
-.roster-meta{color:var(--muted);font-size:12px}
-.roster-list{margin-top:8px}
-.roster-player{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid var(--border)}
-.roster-player:last-child{border-bottom:0}
-.roster-value{font-weight:900}
-.not-valued{font-size:10px;color:var(--muted)}
-@media(max-width:900px){.trade-grid{grid-template-columns:1fr}.top-grid,.settings{grid-template-columns:1fr 1fr}}
+.not-valued{font-size:10px}
+
+@media(max-width:900px){
+.trade-grid{grid-template-columns:1fr}
+.top-grid,.settings{grid-template-columns:1fr 1fr}
+}
+
 @media(max-width:550px){
- header{display:block}.header-buttons{width:100%;margin-top:15px}.sync-actions{grid-template-columns:1fr 1fr}
- .top-grid,.settings,.analysis,.sync-grid,.league-view-grid{grid-template-columns:1fr}
- .league-toolbar{display:block}.league-toolbar button{width:100%;margin-top:12px}
+header{display:block}
+.header-buttons{width:100%;margin-top:15px}
+.top-grid,.settings,.analysis,.sync-grid,.league-view-grid{grid-template-columns:1fr}
+.league-toolbar{display:block}
+.league-toolbar button{width:100%;margin-top:12px}
 }
 </style>
 </head>
@@ -102,242 +95,301 @@ select,input{width:100%;padding:10px;border-radius:8px;border:1px solid var(--bo
 <div class="wrap">
 
 <header>
-  <div class="brand">
-    <div class="logo">TF</div>
-    <div>
-      <h1>TradeForge Fantasy</h1>
-      <div class="sub">Super Trade Analyzer</div>
-    </div>
-  </div>
+<div class="brand">
+<div class="logo">TF</div>
+<div>
+<h1>TradeForge Fantasy</h1>
+<div class="sub">Super Trade Analyzer</div>
+</div>
+</div>
 
-  <div class="header-buttons">
-    <button id="theme-toggle">☀ Light Theme</button>
-    <div class="sync-actions">
-      <button id="sync-button">Sync Your League</button>
-      <button id="league-view-button" disabled>League View</button>
-    </div>
-  </div>
+<div class="header-buttons">
+<button id="theme-toggle">☀ Light Theme</button>
+<div class="sync-actions">
+<button id="sync-button">Sync Your League</button>
+<button id="league-view-button" disabled>League View</button>
+</div>
+</div>
 </header>
 
 <main id="analyzer-page">
 
 <section class="card">
-  <div class="settings-title">
-    <span>League Settings</span>
-    <span id="mode-label"></span>
-  </div>
+<div class="settings-title">
+<span>League Settings</span>
+<span id="mode-label"></span>
+</div>
 
-  <div class="settings">
-    <label class="setting"><span>SCORING</span>
-      <select id="scoring">
-        <option value="ppr">PPR</option>
-        <option value="half">0.5 PPR</option>
-        <option value="standard">No PPR</option>
-      </select>
-    </label>
+<div class="settings">
 
-    <label class="setting"><span>LEAGUE</span>
-      <select id="league">
-        <option value="redraft">Redraft</option>
-        <option value="keeper">Keeper</option>
-        <option value="dynasty">Dynasty</option>
-      </select>
-    </label>
+<label class="setting">
+<span>SCORING</span>
+<select id="scoring">
+<option value="ppr">PPR</option>
+<option value="half">0.5 PPR</option>
+<option value="standard">No PPR</option>
+</select>
+</label>
 
-    <label class="setting"><span>QB FORMAT</span>
-      <select id="qb">
-        <option value="oneqb">1QB</option>
-        <option value="superflex">Superflex</option>
-      </select>
-    </label>
+<label class="setting">
+<span>LEAGUE</span>
+<select id="league">
+<option value="redraft">Redraft</option>
+<option value="keeper">Keeper</option>
+<option value="dynasty">Dynasty</option>
+</select>
+</label>
 
-    <label class="setting"><span>TE PREMIUM</span>
-      <select id="tep">
-        <option value="off">Off</option>
-        <option value="half">+0.5 PPR</option>
-        <option value="full">+1.0 PPR</option>
-      </select>
-    </label>
-  </div>
+<label class="setting">
+<span>QB FORMAT</span>
+<select id="qb">
+<option value="oneqb">1QB</option>
+<option value="superflex">Superflex</option>
+</select>
+</label>
+
+<label class="setting">
+<span>TE PREMIUM</span>
+<select id="tep">
+<option value="off">Off</option>
+<option value="half">+0.5 PPR</option>
+<option value="full">+1.0 PPR</option>
+</select>
+</label>
+
+</div>
 </section>
 
 <section id="sleeper-bar" class="card">
-  <strong id="sleeper-name">Sleeper League</strong>
-  <div id="sleeper-info" class="sub"></div>
+<strong id="sleeper-name">Sleeper League</strong>
+<div id="sleeper-info" class="sub"></div>
 
-  <div class="sync-grid">
-    <label class="setting"><span>TEAM A ROSTER</span><select id="roster-a"></select></label>
-    <label class="setting"><span>TEAM B ROSTER</span><select id="roster-b"></select></label>
-  </div>
+<div class="sync-grid">
+<label class="setting">
+<span>TEAM A ROSTER</span>
+<select id="roster-a"></select>
+</label>
 
-  <button id="disconnect" class="close" style="margin-top:10px">Disconnect Sleeper</button>
+<label class="setting">
+<span>TEAM B ROSTER</span>
+<select id="roster-b"></select>
+</label>
+</div>
+
+<button id="disconnect" class="close" style="margin-top:10px">Disconnect Sleeper</button>
 </section>
 
 <section class="card">
-  <h3 style="margin-top:0">Top Players</h3>
-  <div class="top-grid">
-    <div class="top-box"><h3>RB</h3><div id="top-rb"></div></div>
-    <div class="top-box"><h3>WR</h3><div id="top-wr"></div></div>
-    <div class="top-box"><h3>QB</h3><div id="top-qb"></div></div>
-    <div class="top-box"><h3>TE</h3><div id="top-te"></div></div>
-  </div>
+<h3 style="margin-top:0">Top Players</h3>
+
+<div class="top-grid">
+<div class="top-box"><h3>RB</h3><div id="top-rb"></div></div>
+<div class="top-box"><h3>WR</h3><div id="top-wr"></div></div>
+<div class="top-box"><h3>QB</h3><div id="top-qb"></div></div>
+<div class="top-box"><h3>TE</h3><div id="top-te"></div></div>
+</div>
 </section>
 
 <div class="trade-grid">
 
 <section class="team">
-  <h2>Team A</h2>
-  <div class="search-wrap">
-    <input id="search-a" placeholder="Search player or pick" autocomplete="off">
-    <div id="results-a" class="results"></div>
-  </div>
-  <div id="team-a"></div>
-  <div class="totals">
-    <div class="total"><small>Base</small><strong id="base-a">0.0</strong></div>
-    <div class="total"><small>Adjusted</small><strong id="adj-a">0.0</strong></div>
-  </div>
+<h2>Team A</h2>
+
+<div class="search-wrap">
+<input id="search-a" placeholder="Search player or pick" autocomplete="off">
+<div id="results-a" class="results"></div>
+</div>
+
+<div id="team-a"></div>
+
+<div class="totals">
+<div class="total"><small>Base</small><strong id="base-a">0.0</strong></div>
+<div class="total"><small>Adjusted</small><strong id="adj-a">0.0</strong></div>
+</div>
 </section>
 
 <section class="result-card">
-  <div class="meter"><div id="marker"></div></div>
 
-  <div id="verdict">
-    Build a Trade
-    <small>Add players to both sides.</small>
-  </div>
+<div class="meter">
+<div id="marker"></div>
+</div>
 
-  <div class="grade">
-    <span>Trade Grade</span>
-    <strong id="grade">—</strong>
-  </div>
+<div id="verdict">
+Build a Trade
+<small>Add players to both sides.</small>
+</div>
 
-  <div class="actions">
-    <button id="swap">Swap Sides</button>
-    <button id="clear">Clear Trade</button>
-  </div>
+<div class="grade">
+<span>Trade Grade</span>
+<strong id="grade">—</strong>
+</div>
+
+<div class="actions">
+<button id="swap">Swap Sides</button>
+<button id="clear">Clear Trade</button>
+</div>
+
 </section>
 
 <section class="team">
-  <h2>Team B</h2>
-  <div class="search-wrap">
-    <input id="search-b" placeholder="Search player or pick" autocomplete="off">
-    <div id="results-b" class="results"></div>
-  </div>
-  <div id="team-b"></div>
-  <div class="totals">
-    <div class="total"><small>Base</small><strong id="base-b">0.0</strong></div>
-    <div class="total"><small>Adjusted</small><strong id="adj-b">0.0</strong></div>
-  </div>
+<h2>Team B</h2>
+
+<div class="search-wrap">
+<input id="search-b" placeholder="Search player or pick" autocomplete="off">
+<div id="results-b" class="results"></div>
+</div>
+
+<div id="team-b"></div>
+
+<div class="totals">
+<div class="total"><small>Base</small><strong id="base-b">0.0</strong></div>
+<div class="total"><small>Adjusted</small><strong id="adj-b">0.0</strong></div>
+</div>
 </section>
 
 </div>
 
 <div class="analysis">
-  <section class="card">
-    <h3>What Makes This Fair?</h3>
-    <div id="fair">Build a trade to see suggestions.</div>
-  </section>
 
-  <section class="card">
-    <h3>Suggested Package</h3>
-    <div id="packages">Build a trade to see packages.</div>
-  </section>
+<section class="card">
+<h3>What Makes This Fair?</h3>
+<div id="fair">Build a trade to see suggestions.</div>
+</section>
+
+<section class="card">
+<h3>Suggested Package</h3>
+<div id="packages">Build a trade to see packages.</div>
+</section>
+
 </div>
-
 </main>
 
 <main id="league-page" class="page-hidden">
 
 <section class="card">
 
-  <div class="league-toolbar">
-    <div>
-      <h2>League View</h2>
-      <div id="league-page-name" class="sub"></div>
-    </div>
-    <button id="back-to-analyzer" class="close">← Back to Trade Analyzer</button>
-  </div>
+<div class="league-toolbar">
+<div>
+<h2 style="margin:0">League View</h2>
+<div id="league-page-name" class="sub"></div>
+</div>
 
-  <div class="league-view-grid">
+<button id="back-to-analyzer" class="close">← Back to Trade Analyzer</button>
+</div>
 
-    <section class="roster-card">
-      <div class="roster-title">
-        <div>
-          <div class="roster-meta">YOUR TEAM</div>
-          <h3 id="my-team-name">Your Team</h3>
-        </div>
-        <div id="my-team-meta" class="roster-meta"></div>
-      </div>
-      <div id="my-team-roster" class="roster-list"></div>
-    </section>
+<div class="league-view-grid">
 
-    <section class="roster-card">
-      <label class="setting">
-        <span>COMPARE WITH TEAM</span>
-        <select id="opponent-select"></select>
-      </label>
+<section class="roster-card">
 
-      <div class="roster-title" style="margin-top:15px">
-        <div>
-          <div class="roster-meta">OTHER TEAM</div>
-          <h3 id="opponent-team-name">Team</h3>
-        </div>
-        <div id="opponent-team-meta" class="roster-meta"></div>
-      </div>
+<div class="roster-title">
+<div>
+<div class="roster-meta">YOUR TEAM</div>
+<h3 id="my-team-name">Your Team</h3>
+</div>
 
-      <div id="opponent-team-roster" class="roster-list"></div>
-    </section>
+<div id="my-team-meta" class="roster-meta"></div>
+</div>
 
-  </div>
-
+<div id="my-team-roster"></div>
 </section>
 
+<section class="roster-card">
+
+<label class="setting">
+<span>COMPARE WITH TEAM</span>
+<select id="opponent-select"></select>
+</label>
+
+<div class="roster-title" style="margin-top:15px">
+<div>
+<div class="roster-meta">OTHER TEAM</div>
+<h3 id="opponent-team-name">Team</h3>
+</div>
+
+<div id="opponent-team-meta" class="roster-meta"></div>
+</div>
+
+<div id="opponent-team-roster"></div>
+</section>
+
+</div>
+</section>
 </main>
 
 </div>
 
 <div id="modal" class="modal-bg">
-  <div class="modal">
 
-    <div class="modal-head">
-      <div>
-        <h2>Sync Your Sleeper League</h2>
-        <div class="sub">Enter your Sleeper username. No password is needed.</div>
-      </div>
-      <button id="modal-close" class="close">×</button>
-    </div>
+<div class="modal">
 
-    <input id="username" placeholder="Sleeper username" autocomplete="off">
-    <button id="find-leagues" class="primary">Find My Leagues</button>
+<div class="modal-head">
+<div>
+<h2 style="margin-top:0">Sync Your Sleeper League</h2>
+<div class="sub">Enter your Sleeper username. No password is needed.</div>
+</div>
 
-    <div id="league-wrap">
-      <select id="league-picker"></select>
-      <button id="connect-league" class="primary">Sync Selected League</button>
-    </div>
+<button id="modal-close" class="close">×</button>
+</div>
 
-    <div id="status" aria-live="polite"></div>
+<input id="username" placeholder="Sleeper username" autocomplete="off">
 
-  </div>
+<button id="find-leagues" class="primary">
+Find My Leagues
+</button>
+
+<div id="league-wrap">
+<select id="league-picker"></select>
+<button id="connect-league" class="primary">
+Sync Selected League
+</button>
+</div>
+
+<div id="status" class="sub" aria-live="polite"></div>
+
+</div>
 </div>
 
 <script>
-let teamA=[],teamB=[],scoringMode="ppr",leagueMode="redraft",qbMode="oneqb",tePremiumMode="off";
-let sleeperUser=null,syncedLeague=null,syncedRosters=[],syncedUsers=[],sleeperPlayers={},rosterA="",rosterB="";
+
+let teamA=[];
+let teamB=[];
+let scoringMode="ppr";
+let leagueMode="redraft";
+let qbMode="oneqb";
+let tePremiumMode="off";
+
+let sleeperUser=null;
+let syncedLeague=null;
+let syncedRosters=[];
+let syncedUsers=[];
+let sleeperPlayers={};
+let rosterA="";
+let rosterB="";
 
 const SUPERSTAR_FACTOR=1.25;
-const PACKAGE_WEIGHTS=[1,.95,.90,.85,.80,.80,.80,.80];
+
+const PACKAGE_WEIGHTS=[
+1,
+.95,
+.90,
+.85,
+.80,
+.80,
+.80,
+.80
+];
 
 const multipliers={
-  RB:{ppr:1,half:.98,standard:.95},
-  WR:{ppr:1,half:.96,standard:.91},
-  TE:{ppr:1,half:.95,standard:.89},
-  QB:{ppr:1,half:1,standard:1},
-  K:{ppr:1,half:1,standard:1},
-  DST:{ppr:1,half:1,standard:1}
+RB:{ppr:1,half:.98,standard:.95},
+WR:{ppr:1,half:.96,standard:.91},
+TE:{ppr:1,half:.95,standard:.89},
+QB:{ppr:1,half:1,standard:1},
+K:{ppr:1,half:1,standard:1},
+DST:{ppr:1,half:1,standard:1}
 };
 
-/* PLAYER DATABASE — KEEP ONE PLAYER PER LINE */
-const playerDatabase = [
+/* PLAYER DATABASE — ONE PLAYER PER LINE */
+
 const playerDatabase = [
   { rank: 1, pos: "RB", name: "Jahmyr Gibbs", redraft: 100.0, keeper: 100.0, dynasty: 100.0 },
   { rank: 2, pos: "RB", name: "Bijan Robinson", redraft: 96.7, keeper: 97.9, dynasty: 100.0 },
@@ -686,367 +738,1693 @@ const playerDatabase = [
 ];
 
 const picks=[
-  ["2027 Early 1st",52,58],["2027 Mid 1st",44,50],["2027 Late 1st",36,42],["2027 2nd",22,25],["2027 3rd",10,12],
-  ["2028 Early 1st",47,53],["2028 Mid 1st",40,46],["2028 Late 1st",33,39],["2028 2nd",19,22],["2028 3rd",8,10]
-].map((x,i)=>({rank:1001+i,name:x[0],pos:"PICK",oneqb:x[1],superflex:x[2]}));
+["2027 Early 1st",52,58],
+["2027 Mid 1st",44,50],
+["2027 Late 1st",36,42],
+["2027 2nd",22,25],
+["2027 3rd",10,12],
+["2028 Early 1st",47,53],
+["2028 Mid 1st",40,46],
+["2028 Late 1st",33,39],
+["2028 2nd",19,22],
+["2028 3rd",8,10]
+].map((x,i)=>({
+rank:1001+i,
+name:x[0],
+pos:"PICK",
+oneqb:x[1],
+superflex:x[2]
+}));
 
 const dst={
-  HOU:"Houston Texans DST",DEN:"Denver Broncos DST",SEA:"Seattle Seahawks DST",LAR:"Los Angeles Rams DST",
-  PIT:"Pittsburgh Steelers DST",LAC:"Los Angeles Chargers DST",NE:"New England Patriots DST",
-  MIN:"Minnesota Vikings DST",PHI:"Philadelphia Eagles DST",GB:"Green Bay Packers DST",
-  BAL:"Baltimore Ravens DST",JAC:"Jacksonville Jaguars DST",KC:"Kansas City Chiefs DST"
+HOU:"Houston Texans DST",
+DEN:"Denver Broncos DST",
+SEA:"Seattle Seahawks DST",
+LAR:"Los Angeles Rams DST",
+PIT:"Pittsburgh Steelers DST",
+LAC:"Los Angeles Chargers DST",
+NE:"New England Patriots DST",
+MIN:"Minnesota Vikings DST",
+PHI:"Philadelphia Eagles DST",
+GB:"Green Bay Packers DST",
+BAL:"Baltimore Ravens DST",
+JAC:"Jacksonville Jaguars DST",
+KC:"Kansas City Chiefs DST"
 };
 
 const $=id=>document.getElementById(id);
-const assets=()=>leagueMode==="dynasty"?playerDatabase.concat(picks):playerDatabase;
+
+const esc=s=>
+String(s??"")
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+
+const norm=s=>
+String(s||"")
+.toLowerCase()
+.replace(/[.'’\-]/g,"")
+.replace(/\b(jr|sr|ii|iii|iv)\b/g,"")
+.replace(/[^a-z0-9]/g,"");
+
 const key=p=>p.sleeperId||p.pos+"|"+p.name;
-const norm=s=>String(s||"").toLowerCase().replace(/[.'’\-]/g,"").replace(/\b(jr|sr|ii|iii|iv)\b/g,"").replace(/[^a-z0-9]/g,"");
-const esc=s=>String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+
+const assets=()=>
+leagueMode==="dynasty"
+?playerDatabase.concat(picks)
+:playerDatabase;
 
 function value(p){
-  if(p.pos==="PICK")return qbMode==="superflex"?p.superflex:p.oneqb;
-  let v=p[leagueMode]*(multipliers[p.pos]?.[scoringMode]||1);
-  if(qbMode==="superflex"&&p.pos==="QB")v*=leagueMode==="dynasty"?1.45:leagueMode==="keeper"?1.40:1.35;
-  if(p.pos==="TE"&&tePremiumMode==="half")v*=v>=75?1.10:v>=50?1.08:v>=25?1.06:1.04;
-  if(p.pos==="TE"&&tePremiumMode==="full")v*=v>=75?1.18:v>=50?1.14:v>=25?1.10:1.06;
-  return Math.max(.1,Math.min(100,Math.round(v*10)/10));
+
+if(p.pos==="PICK"){
+return qbMode==="superflex"
+?p.superflex
+:p.oneqb;
 }
 
-function adjustedPlayer(v){return v<=0?0:100*Math.pow(v/100,SUPERSTAR_FACTOR)}
-function adjusted(team){return team.map(p=>adjustedPlayer(value(p))).sort((a,b)=>b-a).reduce((t,v,i)=>t+v*(PACKAGE_WEIGHTS[i]??.8),0)}
-function base(team){return team.reduce((t,p)=>t+value(p),0)}
-function diff(a,b){const avg=(a+b)/2;return avg?Math.abs(a-b)/avg*100:0}
+let v=
+Number(p[leagueMode])*
+(multipliers[p.pos]?.[scoringMode]||1);
+
+if(
+qbMode==="superflex" &&
+p.pos==="QB"
+){
+v*=leagueMode==="dynasty"
+?1.45
+:leagueMode==="keeper"
+?1.40
+:1.35;
+}
+
+if(
+p.pos==="TE" &&
+tePremiumMode==="half"
+){
+v*=v>=75
+?1.10
+:v>=50
+?1.08
+:v>=25
+?1.06
+:1.04;
+}
+
+if(
+p.pos==="TE" &&
+tePremiumMode==="full"
+){
+v*=v>=75
+?1.18
+:v>=50
+?1.14
+:v>=25
+?1.10
+:1.06;
+}
+
+return Number.isFinite(v)
+?Math.max(.1,Math.min(100,Math.round(v*10)/10))
+:0;
+}
+
+function adjustedPlayer(v){
+
+return v<=0
+?0
+:100*Math.pow(v/100,SUPERSTAR_FACTOR);
+
+}
+
+function adjusted(team){
+
+return team
+.map(p=>adjustedPlayer(value(p)))
+.sort((a,b)=>b-a)
+.reduce(
+(t,v,i)=>
+t+v*(PACKAGE_WEIGHTS[i]??.8),
+0
+);
+
+}
+
+function base(team){
+
+return team.reduce(
+(t,p)=>t+value(p),
+0
+);
+
+}
+
+function diff(a,b){
+
+const avg=(a+b)/2;
+
+return avg
+?Math.abs(a-b)/avg*100
+:0;
+
+}
 
 function modeLabel(){
-  const s=scoringMode==="ppr"?"PPR":scoringMode==="half"?"0.5 PPR":"No PPR";
-  const l=leagueMode[0].toUpperCase()+leagueMode.slice(1);
-  const q=qbMode==="superflex"?"Superflex":"1QB";
-  const t=tePremiumMode==="half"?" • TEP +0.5":tePremiumMode==="full"?" • TEP +1.0":"";
-  return `${s} • ${l} • ${q}${t}`;
+
+const s=
+scoringMode==="ppr"
+?"PPR"
+:scoringMode==="half"
+?"0.5 PPR"
+:"No PPR";
+
+const l=
+leagueMode[0].toUpperCase()+
+leagueMode.slice(1);
+
+const q=
+qbMode==="superflex"
+?"Superflex"
+:"1QB";
+
+const t=
+tePremiumMode==="half"
+?" • TEP +0.5"
+:tePremiumMode==="full"
+?" • TEP +1.0"
+:"";
+
+return `${s} • ${l} • ${q}${t}`;
+
 }
 
+/* TOP 3 — FIXED */
+
 function renderTop(pos,id){
-  const top=playerDatabase.filter(p=>p.pos===pos).sort((a,b)=>value(b)-value(a)).slice(0,3);
-  $(id).innerHTML=top.map((p,i)=>`<div class="top-row"><span>#${i+1} ${esc(p.name)}</span><strong>${value(p).toFixed(1)}</strong></div>`).join("");
+
+const top=
+playerDatabase
+.filter(
+p=>
+p.pos===pos &&
+Number.isFinite(value(p))
+)
+.sort(
+(a,b)=>
+value(b)-value(a) ||
+a.rank-b.rank
+)
+.slice(0,3);
+
+$(id).innerHTML=
+top.length
+?top.map(
+(p,i)=>`
+<div class="top-row">
+<span>#${i+1} ${esc(p.name)}</span>
+<strong>${value(p).toFixed(1)}</strong>
+</div>`
+).join("")
+:'<div class="sub">No ranked players</div>';
+
 }
 
 function renderBoard(){
-  $("mode-label").textContent=modeLabel();
-  renderTop("RB","top-rb");renderTop("WR","top-wr");renderTop("QB","top-qb");renderTop("TE","top-te");
+
+$("mode-label").textContent=
+modeLabel();
+
+renderTop("RB","top-rb");
+renderTop("WR","top-wr");
+renderTop("QB","top-qb");
+renderTop("TE","top-te");
+
 }
 
 function renderTeam(side){
-  const team=side==="A"?teamA:teamB,box=$(side==="A"?"team-a":"team-b");
-  if(!team.length){box.innerHTML='<div class="sub" style="padding:20px 0">Search above to add players.</div>';return}
-  box.innerHTML=team.map((p,i)=>`<div class="player"><div><strong>${esc(p.name)}</strong><small>${esc(p.pos)}${p.nflTeam?" • "+esc(p.nflTeam):""}</small></div><strong>${value(p).toFixed(1)}</strong><button class="remove" onclick="removePlayer('${side}',${i})">×</button></div>`).join("");
+
+const team=
+side==="A"
+?teamA
+:teamB;
+
+const box=
+$(side==="A"
+?"team-a"
+:"team-b");
+
+box.innerHTML=
+team.length
+?team.map(
+(p,i)=>`
+<div class="player">
+
+<div>
+<strong>${esc(p.name)}</strong>
+<small>
+${esc(p.pos)}
+${p.nflTeam
+?" • "+esc(p.nflTeam)
+:""}
+</small>
+</div>
+
+<strong>
+${value(p).toFixed(1)}
+</strong>
+
+<button
+class="remove"
+onclick="removePlayer('${side}',${i})"
+>
+×
+</button>
+
+</div>`
+).join("")
+:'<div class="sub" style="padding:20px 0">Search above to add players.</div>';
+
 }
 
-function removePlayer(side,i){(side==="A"?teamA:teamB).splice(i,1);render()}
-function render(){renderTeam("A");renderTeam("B");calculate()}
+function removePlayer(side,i){
+
+(side==="A"
+?teamA
+:teamB)
+.splice(i,1);
+
+render();
+
+}
+
+function render(){
+
+renderTeam("A");
+renderTeam("B");
+calculate();
+
+}
 
 function calculate(){
-  const ba=base(teamA),bb=base(teamB),aa=adjusted(teamA),ab=adjusted(teamB),d=diff(aa,ab);
-  $("base-a").textContent=ba.toFixed(1);$("base-b").textContent=bb.toFixed(1);
-  $("adj-a").textContent=aa.toFixed(1);$("adj-b").textContent=ab.toFixed(1);
-  $("marker").style.left=(aa+ab?Math.max(5,Math.min(95,ab/(aa+ab)*100)):50)+"%";
 
-  const v=$("verdict");v.className="";
-  if(!teamA.length||!teamB.length){
-    v.innerHTML="Build a Trade<small>Add players to both sides.</small>";
-    $("grade").textContent="—";$("fair").textContent="Build a trade to see suggestions.";$("packages").textContent="Build a trade to see packages.";return;
-  }
+const ba=base(teamA);
+const bb=base(teamB);
 
-  let title,cls;
-  if(d<=5){title="FAIR TRADE";cls="fair"}
-  else if(d<=10){title="SLIGHT ADVANTAGE";cls="slight"}
-  else if(d<=20){title="ADVANTAGE";cls="adv"}
-  else{title="MAJOR ADVANTAGE";cls="major"}
+const aa=adjusted(teamA);
+const ab=adjusted(teamB);
 
-  v.className=cls;
-  v.innerHTML=`${title}<small>${d.toFixed(1)}% difference${d>5?" • "+(aa>ab?"Team A":"Team B")+" has more adjusted value":""}</small>`;
-  $("grade").textContent=d<=5?"A+":d<=10?"A":d<=20?"B":d<=30?"C":d<=40?"D":"F";
-  suggestions(aa,ab);packages(aa,ab);
+const d=diff(aa,ab);
+
+$("base-a").textContent=
+ba.toFixed(1);
+
+$("base-b").textContent=
+bb.toFixed(1);
+
+$("adj-a").textContent=
+aa.toFixed(1);
+
+$("adj-b").textContent=
+ab.toFixed(1);
+
+$("marker").style.left=
+(
+aa+ab
+?Math.max(
+5,
+Math.min(
+95,
+ab/(aa+ab)*100
+)
+)
+:50
+)+"%";
+
+const v=$("verdict");
+
+v.className="";
+
+if(
+!teamA.length ||
+!teamB.length
+){
+
+v.innerHTML=
+"Build a Trade<small>Add players to both sides.</small>";
+
+$("grade").textContent="—";
+
+$("fair").textContent=
+"Build a trade to see suggestions.";
+
+$("packages").textContent=
+"Build a trade to see packages.";
+
+return;
+
 }
 
-function selectedRoster(side){return side==="A"?rosterA:rosterB}
+let title;
+let cls;
+
+if(d<=5){
+title="FAIR TRADE";
+cls="fair";
+}
+else if(d<=10){
+title="SLIGHT ADVANTAGE";
+cls="slight";
+}
+else if(d<=20){
+title="ADVANTAGE";
+cls="adv";
+}
+else{
+title="MAJOR ADVANTAGE";
+cls="major";
+}
+
+v.className=cls;
+
+v.innerHTML=
+`${title}<small>${d.toFixed(1)}% difference${
+d>5
+?" • "+(
+aa>ab
+?"Team A"
+:"Team B"
+)+" has more adjusted value"
+:""
+}</small>`;
+
+$("grade").textContent=
+d<=5
+?"A+"
+:d<=10
+?"A"
+:d<=20
+?"B"
+:d<=30
+?"C"
+:d<=40
+?"D"
+:"F";
+
+suggestions(aa,ab);
+packages(aa,ab);
+
+}
+
+function selectedRoster(side){
+
+return side==="A"
+?rosterA
+:rosterB;
+
+}
 
 function rosterAssets(id){
-  const r=syncedRosters.find(x=>String(x.roster_id)===String(id));
-  if(!r)return[];
-  return (r.players||[]).map(pid=>matchSleeper(String(pid))).filter(Boolean).sort((a,b)=>value(b)-value(a));
+
+const r=
+syncedRosters.find(
+x=>
+String(x.roster_id)===
+String(id)
+);
+
+return r
+?(r.players||[])
+.map(
+pid=>
+matchSleeper(
+String(pid)
+)
+)
+.filter(Boolean)
+.sort(
+(a,b)=>
+value(b)-value(a)
+)
+:[];
+
 }
 
 function pool(side){
-  if(syncedLeague&&selectedRoster(side)){
-    const r=rosterAssets(selectedRoster(side));
-    return leagueMode==="dynasty"?r.concat(picks):r;
-  }
-  return assets();
+
+if(
+syncedLeague &&
+selectedRoster(side)
+){
+
+const r=
+rosterAssets(
+selectedRoster(side)
+);
+
+return leagueMode==="dynasty"
+?r.concat(picks)
+:r;
+
+}
+
+return assets();
+
 }
 
 function suggestions(aa,ab){
-  const box=$("fair"),d=diff(aa,ab);
-  if(d<=5){box.textContent="This trade is already inside the fair range.";return}
-  const side=aa<ab?"A":"B",losing=side==="A"?teamA:teamB,target=side==="A"?ab:aa;
-  const used=new Set(teamA.concat(teamB).map(key));
-  const opts=pool(side).filter(p=>!used.has(key(p))).map(p=>{const n=adjusted(losing.concat(p));return{p,d:Math.abs(n-target),pct:diff(n,target)}}).sort((a,b)=>a.d-b.d).slice(0,3);
-  box.innerHTML=opts.length?opts.map((o,i)=>`<div class="suggestion"><strong>${["Closest Match","Alternative","Another Option"][i]}:</strong> Add ${esc(o.p.name)} to Team ${side}<br>${esc(o.p.pos)} • Value ${value(o.p).toFixed(1)} • New difference ${o.pct.toFixed(1)}%</div>`).join(""):"No matching single-player adjustment found.";
+
+const box=$("fair");
+const d=diff(aa,ab);
+
+if(d<=5){
+
+box.textContent=
+"This trade is already inside the fair range.";
+
+return;
+
+}
+
+const side=
+aa<ab
+?"A"
+:"B";
+
+const losing=
+side==="A"
+?teamA
+:teamB;
+
+const target=
+side==="A"
+?ab
+:aa;
+
+const used=
+new Set(
+teamA.concat(teamB).map(key)
+);
+
+const opts=
+pool(side)
+.filter(
+p=>
+!used.has(key(p))
+)
+.map(
+p=>{
+
+const n=
+adjusted(
+losing.concat(p)
+);
+
+return{
+p,
+d:Math.abs(n-target),
+pct:diff(n,target)
+};
+
+}
+)
+.sort(
+(a,b)=>
+a.d-b.d
+)
+.slice(0,3);
+
+box.innerHTML=
+opts.length
+?opts.map(
+(o,i)=>`
+<div class="suggestion">
+
+<strong>
+${[
+"Closest Match",
+"Alternative",
+"Another Option"
+][i]}:
+</strong>
+
+Add ${esc(o.p.name)}
+to Team ${side}
+
+<br>
+
+${esc(o.p.pos)}
+• Value ${value(o.p).toFixed(1)}
+• New difference ${o.pct.toFixed(1)}%
+
+</div>`
+).join("")
+:"No matching single-player adjustment found.";
+
 }
 
 function packages(aa,ab){
-  const box=$("packages"),d=diff(aa,ab);
-  if(d<=5){box.textContent="No package needed — trade is already balanced.";return}
-  const side=aa<ab?"A":"B",losing=side==="A"?teamA:teamB,target=side==="A"?ab:aa;
-  const used=new Set(teamA.concat(teamB).map(key));
-  const available=pool(side).filter(p=>!used.has(key(p))).sort((a,b)=>value(b)-value(a)).slice(0,50),list=[];
-  for(let i=0;i<available.length;i++)for(let j=i+1;j<available.length;j++){const n=adjusted(losing.concat(available[i],available[j]));list.push({a:available[i],b:available[j],d:Math.abs(n-target),pct:diff(n,target)})}
-  list.sort((a,b)=>a.d-b.d);
-  box.innerHTML=list.length?list.slice(0,3).map((x,i)=>`<div class="suggestion"><strong>${i?"Package "+(i+1):"Best Package"}:</strong> ${esc(x.a.name)} + ${esc(x.b.name)} to Team ${side}<br>New difference ${x.pct.toFixed(1)}%</div>`).join(""):"No two-player package found.";
+
+const box=$("packages");
+const d=diff(aa,ab);
+
+if(d<=5){
+
+box.textContent=
+"No package needed — trade is already balanced.";
+
+return;
+
+}
+
+const side=
+aa<ab
+?"A"
+:"B";
+
+const losing=
+side==="A"
+?teamA
+:teamB;
+
+const target=
+side==="A"
+?ab
+:aa;
+
+const used=
+new Set(
+teamA.concat(teamB).map(key)
+);
+
+const available=
+pool(side)
+.filter(
+p=>
+!used.has(key(p))
+)
+.sort(
+(a,b)=>
+value(b)-value(a)
+)
+.slice(0,50);
+
+const list=[];
+
+for(
+let i=0;
+i<available.length;
+i++
+){
+
+for(
+let j=i+1;
+j<available.length;
+j++
+){
+
+const n=
+adjusted(
+losing.concat(
+available[i],
+available[j]
+)
+);
+
+list.push({
+a:available[i],
+b:available[j],
+d:Math.abs(n-target),
+pct:diff(n,target)
+});
+
+}
+
+}
+
+list.sort(
+(a,b)=>
+a.d-b.d
+);
+
+box.innerHTML=
+list.length
+?list
+.slice(0,3)
+.map(
+(x,i)=>`
+<div class="suggestion">
+
+<strong>
+${i
+?"Package "+(i+1)
+:"Best Package"}:
+</strong>
+
+${esc(x.a.name)}
++
+${esc(x.b.name)}
+to Team ${side}
+
+<br>
+
+New difference
+${x.pct.toFixed(1)}%
+
+</div>`
+)
+.join("")
+:"No two-player package found.";
+
 }
 
 function setupSearch(side){
-  const input=$(side==="A"?"search-a":"search-b"),results=$(side==="A"?"results-a":"results-b");
-  input.oninput=()=>{
-    const q=input.value.trim().toLowerCase();
-    if(!q){results.classList.remove("show");return}
-    const used=new Set(teamA.concat(teamB).map(key));
-    const found=pool(side).filter(p=>!used.has(key(p))&&(p.name.toLowerCase().includes(q)||p.pos.toLowerCase().includes(q))).sort((a,b)=>value(b)-value(a)).slice(0,15);
-    results.innerHTML=found.length?found.map((p,i)=>`<div class="result-item" data-i="${i}"><span>${esc(p.name)} <small class="sub">${esc(p.pos)}</small></span><strong>${value(p).toFixed(1)}</strong></div>`).join(""):'<div class="result-item"><span>No matching players found</span></div>';
-    results.classList.add("show");
-    results.querySelectorAll("[data-i]").forEach((el,i)=>el.onclick=()=>{(side==="A"?teamA:teamB).push({...found[i]});input.value="";results.classList.remove("show");render()});
-  };
+
+const input=
+$(side==="A"
+?"search-a"
+:"search-b");
+
+const results=
+$(side==="A"
+?"results-a"
+:"results-b");
+
+input.oninput=()=>{
+
+const q=
+input.value
+.trim()
+.toLowerCase();
+
+if(!q){
+
+results.classList.remove(
+"show"
+);
+
+return;
+
+}
+
+const used=
+new Set(
+teamA
+.concat(teamB)
+.map(key)
+);
+
+const found=
+pool(side)
+.filter(
+p=>
+!used.has(key(p)) &&
+(
+p.name
+.toLowerCase()
+.includes(q)
+||
+p.pos
+.toLowerCase()
+.includes(q)
+)
+)
+.sort(
+(a,b)=>
+value(b)-value(a)
+)
+.slice(0,15);
+
+results.innerHTML=
+found.length
+?found.map(
+(p,i)=>`
+<div
+class="result-item"
+data-i="${i}"
+>
+
+<span>
+${esc(p.name)}
+<small class="sub">
+${esc(p.pos)}
+</small>
+</span>
+
+<strong>
+${value(p).toFixed(1)}
+</strong>
+
+</div>`
+).join("")
+:'<div class="result-item"><span>No matching players found</span></div>';
+
+results.classList.add(
+"show"
+);
+
+results
+.querySelectorAll(
+"[data-i]"
+)
+.forEach(
+(el,i)=>
+el.onclick=()=>{
+
+(
+side==="A"
+?teamA
+:teamB
+)
+.push({
+...found[i]
+});
+
+input.value="";
+
+results.classList.remove(
+"show"
+);
+
+render();
+
+}
+);
+
+};
+
 }
 
 function applyControls(){
-  scoringMode=$("scoring").value;leagueMode=$("league").value;qbMode=$("qb").value;tePremiumMode=$("tep").value;
-  if(leagueMode!=="dynasty"){teamA=teamA.filter(x=>x.pos!=="PICK");teamB=teamB.filter(x=>x.pos!=="PICK")}
-  renderBoard();render();
-  if(syncedLeague&&!$("league-page").classList.contains("page-hidden"))buildLeaguePage();
+
+scoringMode=
+$("scoring").value;
+
+leagueMode=
+$("league").value;
+
+qbMode=
+$("qb").value;
+
+tePremiumMode=
+$("tep").value;
+
+if(
+leagueMode!=="dynasty"
+){
+
+teamA=
+teamA.filter(
+x=>
+x.pos!=="PICK"
+);
+
+teamB=
+teamB.filter(
+x=>
+x.pos!=="PICK"
+);
+
 }
 
-["scoring","league","qb","tep"].forEach(id=>$(id).onchange=applyControls);
+renderBoard();
+render();
+
+if(
+syncedLeague &&
+!$("league-page")
+.classList
+.contains("page-hidden")
+){
+
+buildLeaguePage();
+
+}
+
+}
+
+[
+"scoring",
+"league",
+"qb",
+"tep"
+].forEach(
+id=>
+$(id).onchange=
+applyControls
+);
 
 $("swap").onclick=()=>{
-  [teamA,teamB]=[teamB,teamA];[rosterA,rosterB]=[rosterB,rosterA];
-  if(syncedLeague){$("roster-a").value=rosterA;$("roster-b").value=rosterB}
-  render();
+
+[
+teamA,
+teamB
+]=[
+teamB,
+teamA
+];
+
+[
+rosterA,
+rosterB
+]=[
+rosterB,
+rosterA
+];
+
+if(syncedLeague){
+
+$("roster-a").value=
+rosterA;
+
+$("roster-b").value=
+rosterB;
+
+}
+
+render();
+
 };
 
-$("clear").onclick=()=>{teamA=[];teamB=[];render()};
+$("clear").onclick=()=>{
+
+teamA=[];
+teamB=[];
+
+render();
+
+};
 
 $("theme-toggle").onclick=()=>{
-  const html=document.documentElement,next=html.dataset.theme==="dark"?"light":"dark";
-  html.dataset.theme=next;
-  $("theme-toggle").textContent=next==="dark"?"☀ Light Theme":"☾ Dark Theme";
+
+const h=
+document.documentElement;
+
+const n=
+h.dataset.theme==="dark"
+?"light"
+:"dark";
+
+h.dataset.theme=n;
+
+$("theme-toggle").textContent=
+n==="dark"
+?"☀ Light Theme"
+:"☾ Dark Theme";
+
 };
 
-setupSearch("A");setupSearch("B");
+setupSearch("A");
+setupSearch("B");
 
 /* LEAGUE VIEW */
+
 function getMyRosterId(){
-  const mine=syncedRosters.find(r=>String(r.owner_id)===String(sleeperUser?.user_id));
-  return mine?String(mine.roster_id):String(rosterA||"");
+
+const mine=
+syncedRosters.find(
+r=>
+String(r.owner_id)===
+String(
+sleeperUser?.user_id
+)
+);
+
+return mine
+?String(mine.roster_id)
+:String(rosterA||"");
+
 }
 
 function getSleeperRosterPlayer(id){
-  id=String(id);
-  const matched=matchSleeper(id);
-  if(matched)return{name:matched.name,pos:matched.pos,team:matched.nflTeam||"",tradePlayer:matched};
-  const sp=sleeperPlayers[id];
-  if(!sp)return null;
-  return{
-    name:sp.full_name||[sp.first_name,sp.last_name].filter(Boolean).join(" ")||"Unknown Player",
-    pos:sp.position||"",team:sp.team||"",tradePlayer:null
-  };
+
+id=String(id);
+
+const matched=
+matchSleeper(id);
+
+if(matched){
+
+return{
+name:matched.name,
+pos:matched.pos,
+team:matched.nflTeam||"",
+tradePlayer:matched
+};
+
 }
 
-function renderLeagueRoster(rosterId,listId,nameId,metaId){
-  const roster=syncedRosters.find(r=>String(r.roster_id)===String(rosterId));
-  if(!roster){$(nameId).textContent="Roster Not Found";$(metaId).textContent="";$(listId).innerHTML="";return}
+const sp=
+sleeperPlayers[id];
 
-  const players=(roster.players||[]).map(getSleeperRosterPlayer).filter(Boolean).sort((a,b)=>{
-    const av=a.tradePlayer?value(a.tradePlayer):-1,bv=b.tradePlayer?value(b.tradePlayer):-1;
-    return bv-av;
-  });
+if(!sp){
+return null;
+}
 
-  const valued=players.filter(p=>p.tradePlayer);
-  const total=valued.reduce((t,p)=>t+value(p.tradePlayer),0);
+return{
+name:
+sp.full_name
+||
+[
+sp.first_name,
+sp.last_name
+]
+.filter(Boolean)
+.join(" ")
+||
+"Unknown Player",
 
-  $(nameId).textContent=rosterName(roster);
-  $(metaId).textContent=`${players.length} players • ${valued.length} valued • ${total.toFixed(1)} value`;
+pos:sp.position||"",
+team:sp.team||"",
+tradePlayer:null
+};
 
-  $(listId).innerHTML=players.map(p=>{
-    const val=p.tradePlayer?value(p.tradePlayer).toFixed(1):"—";
-    const info=[p.pos,p.team].filter(Boolean).join(" • ");
-    return `<div class="roster-player"><div><strong>${esc(p.name)}</strong><small>${esc(info)}</small>${p.tradePlayer?"":'<div class="not-valued">Not yet in TradeForge database</div>'}</div><div class="roster-value">${val}</div></div>`;
-  }).join("");
+}
+
+function renderLeagueRoster(
+rosterId,
+listId,
+nameId,
+metaId
+){
+
+const roster=
+syncedRosters.find(
+r=>
+String(r.roster_id)===
+String(rosterId)
+);
+
+if(!roster){
+
+$(nameId).textContent=
+"Roster Not Found";
+
+$(metaId).textContent="";
+
+$(listId).innerHTML="";
+
+return;
+
+}
+
+const players=
+(roster.players||[])
+.map(
+getSleeperRosterPlayer
+)
+.filter(Boolean)
+.sort(
+(a,b)=>
+(
+b.tradePlayer
+?value(b.tradePlayer)
+:-1
+)
+-
+(
+a.tradePlayer
+?value(a.tradePlayer)
+:-1
+)
+);
+
+const valued=
+players.filter(
+p=>
+p.tradePlayer
+);
+
+const total=
+valued.reduce(
+(t,p)=>
+t+value(p.tradePlayer),
+0
+);
+
+$(nameId).textContent=
+rosterName(roster);
+
+$(metaId).textContent=
+`${players.length} players • ${valued.length} valued • ${total.toFixed(1)} value`;
+
+$(listId).innerHTML=
+players.map(
+p=>`
+<div class="roster-player">
+
+<div>
+
+<strong>
+${esc(p.name)}
+</strong>
+
+<small>
+${esc(
+[
+p.pos,
+p.team
+]
+.filter(Boolean)
+.join(" • ")
+)}
+</small>
+
+${
+p.tradePlayer
+?""
+:'<div class="not-valued">Not yet in TradeForge database</div>'
+}
+
+</div>
+
+<div class="roster-value">
+${
+p.tradePlayer
+?value(p.tradePlayer).toFixed(1)
+:"—"
+}
+</div>
+
+</div>`
+).join("");
+
 }
 
 function buildLeaguePage(){
-  if(!syncedLeague)return;
-  $("league-page-name").textContent=syncedLeague.name+" • "+modeLabel();
 
-  const mine=getMyRosterId();
-  renderLeagueRoster(mine,"my-team-roster","my-team-name","my-team-meta");
-
-  const opponents=syncedRosters.filter(r=>String(r.roster_id)!==String(mine));
-  const current=$("opponent-select").value;
-
-  $("opponent-select").innerHTML=opponents.map(r=>`<option value="${r.roster_id}">${esc(rosterName(r))}</option>`).join("");
-
-  let opponent=current;
-  if(!opponents.some(r=>String(r.roster_id)===String(opponent)))opponent=opponents[0]?String(opponents[0].roster_id):"";
-
-  if(opponent){
-    $("opponent-select").value=opponent;
-    renderLeagueRoster(opponent,"opponent-team-roster","opponent-team-name","opponent-team-meta");
-  }else{
-    $("opponent-team-name").textContent="No Other Team";
-    $("opponent-team-meta").textContent="";
-    $("opponent-team-roster").innerHTML="";
-  }
+if(!syncedLeague){
+return;
 }
 
-$("opponent-select").onchange=e=>renderLeagueRoster(e.target.value,"opponent-team-roster","opponent-team-name","opponent-team-meta");
+$("league-page-name").textContent=
+syncedLeague.name+
+" • "+
+modeLabel();
+
+const mine=
+getMyRosterId();
+
+renderLeagueRoster(
+mine,
+"my-team-roster",
+"my-team-name",
+"my-team-meta"
+);
+
+const opponents=
+syncedRosters.filter(
+r=>
+String(r.roster_id)!==
+String(mine)
+);
+
+const current=
+$("opponent-select").value;
+
+$("opponent-select").innerHTML=
+opponents.map(
+r=>`
+<option value="${r.roster_id}">
+${esc(rosterName(r))}
+</option>`
+).join("");
+
+let opponent=current;
+
+if(
+!opponents.some(
+r=>
+String(r.roster_id)===
+String(opponent)
+)
+){
+
+opponent=
+opponents[0]
+?String(
+opponents[0].roster_id
+)
+:"";
+
+}
+
+if(opponent){
+
+$("opponent-select").value=
+opponent;
+
+renderLeagueRoster(
+opponent,
+"opponent-team-roster",
+"opponent-team-name",
+"opponent-team-meta"
+);
+
+}
+
+}
+
+$("opponent-select").onchange=
+e=>
+renderLeagueRoster(
+e.target.value,
+"opponent-team-roster",
+"opponent-team-name",
+"opponent-team-meta"
+);
 
 function setPage(page){
-  if(page==="league"&&!syncedLeague)page="analyzer";
-  $("analyzer-page").classList.toggle("page-hidden",page!=="analyzer");
-  $("league-page").classList.toggle("page-hidden",page!=="league");
-  if(page==="league")buildLeaguePage();
-  window.scrollTo(0,0);
+
+if(
+page==="league" &&
+!syncedLeague
+){
+
+page="analyzer";
+
 }
 
-$("league-view-button").onclick=()=>{if(syncedLeague)location.hash="league"};
-$("back-to-analyzer").onclick=()=>location.hash="analyzer";
-window.addEventListener("hashchange",()=>setPage(location.hash==="#league"?"league":"analyzer"));
+$("analyzer-page")
+.classList
+.toggle(
+"page-hidden",
+page!=="analyzer"
+);
 
-/* SLEEPER SYNC */
-const modal=$("modal");
-$("sync-button").onclick=()=>modal.classList.add("show");
-$("modal-close").onclick=()=>modal.classList.remove("show");
+$("league-page")
+.classList
+.toggle(
+"page-hidden",
+page!=="league"
+);
 
-async function fetchJSON(url){
-  const r=await fetch(url);
-  if(!r.ok)throw new Error("Sleeper request failed.");
-  return r.json();
+if(page==="league"){
+
+buildLeaguePage();
+
 }
 
-$("find-leagues").onclick=async()=>{
-  const username=$("username").value.trim();
-  if(!username){$("status").textContent="Enter your Sleeper username.";return}
+window.scrollTo(0,0);
 
-  $("status").textContent="Finding your leagues...";
+}
 
-  try{
-    sleeperUser=await fetchJSON("https://api.sleeper.app/v1/user/"+encodeURIComponent(username));
-    if(!sleeperUser?.user_id)throw new Error("Username not found.");
+$("league-view-button").onclick=()=>{
 
-    const state=await fetchJSON("https://api.sleeper.app/v1/state/nfl");
-    const season=state.league_season||state.season;
+if(syncedLeague){
 
-    const leagues=await fetchJSON(`https://api.sleeper.app/v1/user/${sleeperUser.user_id}/leagues/nfl/${season}`);
-    if(!leagues.length)throw new Error("No NFL leagues found.");
+location.hash="league";
 
-    $("league-picker").innerHTML=leagues.map(l=>`<option value="${l.league_id}">${esc(l.name)}</option>`).join("");
-    $("league-wrap").style.display="block";
-    $("status").textContent=`Found ${leagues.length} league${leagues.length===1?"":"s"}.`;
-  }catch(e){
-    $("status").textContent=e.message;
-  }
+}
+
 };
 
-$("connect-league").onclick=async()=>{
-  const id=$("league-picker").value;
-  $("status").textContent="Syncing league...";
+$("back-to-analyzer").onclick=()=>{
 
-  try{
-    [syncedLeague,syncedRosters,syncedUsers,sleeperPlayers]=await Promise.all([
-      fetchJSON(`https://api.sleeper.app/v1/league/${id}`),
-      fetchJSON(`https://api.sleeper.app/v1/league/${id}/rosters`),
-      fetchJSON(`https://api.sleeper.app/v1/league/${id}/users`),
-      fetchJSON("https://api.sleeper.app/v1/players/nfl?active=true")
-    ]);
+location.hash="analyzer";
 
-    applySleeperSettings();
-    buildRosterSelectors();
+};
 
-    $("sleeper-name").textContent=syncedLeague.name;
-    $("sleeper-info").textContent=modeLabel();
-    $("sleeper-bar").style.display="block";
-    $("sync-button").textContent="Sleeper Synced ✓";
-    $("league-view-button").disabled=false;
+window.addEventListener(
+"hashchange",
+()=>setPage(
+location.hash==="#league"
+?"league"
+:"analyzer"
+)
+);
 
-    teamA=[];teamB=[];
-    modal.classList.remove("show");
-    renderBoard();render();
-  }catch(e){
-    $("status").textContent=e.message;
-  }
+/* SLEEPER */
+
+const modal=
+$("modal");
+
+$("sync-button").onclick=()=>{
+
+modal.classList.add(
+"show"
+);
+
+};
+
+$("modal-close").onclick=()=>{
+
+modal.classList.remove(
+"show"
+);
+
+};
+
+async function fetchJSON(url){
+
+const r=
+await fetch(url);
+
+if(!r.ok){
+
+throw new Error(
+"Sleeper request failed."
+);
+
+}
+
+return r.json();
+
+}
+
+$("find-leagues").onclick=
+async()=>{
+
+const username=
+$("username")
+.value
+.trim();
+
+if(!username){
+
+$("status").textContent=
+"Enter your Sleeper username.";
+
+return;
+
+}
+
+$("status").textContent=
+"Finding your leagues...";
+
+try{
+
+sleeperUser=
+await fetchJSON(
+"https://api.sleeper.app/v1/user/"+
+encodeURIComponent(username)
+);
+
+if(
+!sleeperUser?.user_id
+){
+
+throw new Error(
+"Username not found."
+);
+
+}
+
+const state=
+await fetchJSON(
+"https://api.sleeper.app/v1/state/nfl"
+);
+
+const season=
+state.league_season
+||
+state.season;
+
+const leagues=
+await fetchJSON(
+`https://api.sleeper.app/v1/user/${sleeperUser.user_id}/leagues/nfl/${season}`
+);
+
+if(
+!leagues.length
+){
+
+throw new Error(
+"No NFL leagues found."
+);
+
+}
+
+$("league-picker").innerHTML=
+leagues.map(
+l=>`
+<option value="${l.league_id}">
+${esc(l.name)}
+</option>`
+).join("");
+
+$("league-wrap").style.display=
+"block";
+
+$("status").textContent=
+`Found ${leagues.length} league${leagues.length===1?"":"s"}.`;
+
+}
+catch(e){
+
+$("status").textContent=
+e.message;
+
+}
+
+};
+
+$("connect-league").onclick=
+async()=>{
+
+const id=
+$("league-picker").value;
+
+$("status").textContent=
+"Syncing league...";
+
+try{
+
+[
+syncedLeague,
+syncedRosters,
+syncedUsers,
+sleeperPlayers
+]=
+await Promise.all([
+
+fetchJSON(
+`https://api.sleeper.app/v1/league/${id}`
+),
+
+fetchJSON(
+`https://api.sleeper.app/v1/league/${id}/rosters`
+),
+
+fetchJSON(
+`https://api.sleeper.app/v1/league/${id}/users`
+),
+
+fetchJSON(
+"https://api.sleeper.app/v1/players/nfl?active=true"
+)
+
+]);
+
+applySleeperSettings();
+
+buildRosterSelectors();
+
+$("sleeper-name").textContent=
+syncedLeague.name;
+
+$("sleeper-info").textContent=
+modeLabel();
+
+$("sleeper-bar").style.display=
+"block";
+
+$("sync-button").textContent=
+"Sleeper Synced ✓";
+
+$("league-view-button").disabled=
+false;
+
+teamA=[];
+teamB=[];
+
+modal.classList.remove(
+"show"
+);
+
+renderBoard();
+render();
+
+}
+catch(e){
+
+$("status").textContent=
+e.message;
+
+}
+
 };
 
 function applySleeperSettings(){
-  const s=syncedLeague.scoring_settings||{},rp=syncedLeague.roster_positions||[],set=syncedLeague.settings||{};
-  const rec=Number(s.rec||0),te=Number(s.bonus_rec_te||0);
 
-  scoringMode=rec>=.75?"ppr":rec>=.25?"half":"standard";
-  qbMode=rp.includes("SUPER_FLEX")?"superflex":"oneqb";
-  tePremiumMode=te>=.75?"full":te>=.25?"half":"off";
-  leagueMode=Number(set.type)===2?"dynasty":Number(set.type)===1?"keeper":"redraft";
+const s=
+syncedLeague.scoring_settings
+||{};
 
-  $("scoring").value=scoringMode;$("league").value=leagueMode;$("qb").value=qbMode;$("tep").value=tePremiumMode;
+const rp=
+syncedLeague.roster_positions
+||[];
+
+const set=
+syncedLeague.settings
+||{};
+
+const rec=
+Number(s.rec||0);
+
+const te=
+Number(
+s.bonus_rec_te||0
+);
+
+scoringMode=
+rec>=.75
+?"ppr"
+:rec>=.25
+?"half"
+:"standard";
+
+qbMode=
+rp.includes("SUPER_FLEX")
+?"superflex"
+:"oneqb";
+
+tePremiumMode=
+te>=.75
+?"full"
+:te>=.25
+?"half"
+:"off";
+
+leagueMode=
+Number(set.type)===2
+?"dynasty"
+:Number(set.type)===1
+?"keeper"
+:"redraft";
+
+$("scoring").value=
+scoringMode;
+
+$("league").value=
+leagueMode;
+
+$("qb").value=
+qbMode;
+
+$("tep").value=
+tePremiumMode;
+
 }
 
 function rosterName(r){
-  const u=syncedUsers.find(x=>String(x.user_id)===String(r.owner_id));
-  return u?.metadata?.team_name||u?.display_name||u?.username||"Roster "+r.roster_id;
+
+const u=
+syncedUsers.find(
+x=>
+String(x.user_id)===
+String(r.owner_id)
+);
+
+return(
+u?.metadata?.team_name
+||
+u?.display_name
+||
+u?.username
+||
+"Roster "+r.roster_id
+);
+
 }
 
 function buildRosterSelectors(){
-  const list=syncedRosters.map(r=>({id:String(r.roster_id),owner:String(r.owner_id||""),name:rosterName(r)}));
-  const html=list.map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join("");
 
-  $("roster-a").innerHTML=html;$("roster-b").innerHTML=html;
+const list=
+syncedRosters.map(
+r=>({
+id:String(r.roster_id),
+owner:String(r.owner_id||""),
+name:rosterName(r)
+})
+);
 
-  const mine=list.find(x=>x.owner===String(sleeperUser.user_id));
-  rosterA=mine?.id||list[0]?.id||"";
-  rosterB=list.find(x=>x.id!==rosterA)?.id||rosterA;
+const html=
+list.map(
+x=>`
+<option value="${x.id}">
+${esc(x.name)}
+</option>`
+).join("");
 
-  $("roster-a").value=rosterA;$("roster-b").value=rosterB;
+$("roster-a").innerHTML=
+html;
+
+$("roster-b").innerHTML=
+html;
+
+const mine=
+list.find(
+x=>
+x.owner===
+String(sleeperUser.user_id)
+);
+
+rosterA=
+mine?.id
+||
+list[0]?.id
+||
+"";
+
+rosterB=
+list.find(
+x=>
+x.id!==rosterA
+)?.id
+||
+rosterA;
+
+$("roster-a").value=
+rosterA;
+
+$("roster-b").value=
+rosterB;
+
 }
 
-$("roster-a").onchange=e=>{rosterA=e.target.value;teamA=[];render()};
-$("roster-b").onchange=e=>{rosterB=e.target.value;teamB=[];render()};
+$("roster-a").onchange=
+e=>{
+
+rosterA=
+e.target.value;
+
+teamA=[];
+
+render();
+
+};
+
+$("roster-b").onchange=
+e=>{
+
+rosterB=
+e.target.value;
+
+teamB=[];
+
+render();
+
+};
 
 function matchSleeper(id){
-  if(dst[id]){
-    const p=playerDatabase.find(x=>norm(x.name)===norm(dst[id]));
-    return p?{...p,sleeperId:id,nflTeam:id}:null;
-  }
 
-  const sp=sleeperPlayers[id];
-  if(!sp)return null;
+if(dst[id]){
 
-  const name=sp.full_name||[sp.first_name,sp.last_name].filter(Boolean).join(" ");
-  const p=playerDatabase.find(x=>norm(x.name)===norm(name));
+const p=
+playerDatabase.find(
+x=>
+norm(x.name)===
+norm(dst[id])
+);
 
-  return p?{...p,sleeperId:id,nflTeam:sp.team||""}:null;
+return p
+?{
+...p,
+sleeperId:id,
+nflTeam:id
+}
+:null;
+
+}
+
+const sp=
+sleeperPlayers[id];
+
+if(!sp){
+
+return null;
+
+}
+
+const name=
+sp.full_name
+||
+[
+sp.first_name,
+sp.last_name
+]
+.filter(Boolean)
+.join(" ");
+
+const p=
+playerDatabase.find(
+x=>
+norm(x.name)===
+norm(name)
+);
+
+return p
+?{
+...p,
+sleeperId:id,
+nflTeam:sp.team||""
+}
+:null;
+
 }
 
 $("disconnect").onclick=()=>{
-  syncedLeague=null;syncedRosters=[];syncedUsers=[];sleeperPlayers={};rosterA="";rosterB="";teamA=[];teamB=[];
-  $("sleeper-bar").style.display="none";
-  $("sync-button").textContent="Sync Your League";
-  $("league-view-button").disabled=true;
-  location.hash="analyzer";
-  renderBoard();render();
+
+syncedLeague=null;
+syncedRosters=[];
+syncedUsers=[];
+sleeperPlayers={};
+
+rosterA="";
+rosterB="";
+
+teamA=[];
+teamB=[];
+
+$("sleeper-bar").style.display=
+"none";
+
+$("sync-button").textContent=
+"Sync Your League";
+
+$("league-view-button").disabled=
+true;
+
+location.hash=
+"analyzer";
+
+renderBoard();
+render();
+
 };
 
 /* START */
-if(!location.hash)history.replaceState(null,"","#analyzer");
-setPage(location.hash==="#league"?"league":"analyzer");
+
+if(!location.hash){
+
+history.replaceState(
+null,
+"",
+"#analyzer"
+);
+
+}
+
+setPage(
+location.hash==="#league"
+?"league"
+:"analyzer"
+);
+
 renderBoard();
 render();
+
 </script>
 
 </body>
