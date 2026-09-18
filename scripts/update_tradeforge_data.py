@@ -17,7 +17,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT_PATH = ROOT / "tradeforge-data.json"
 
-html_files = list(ROOT.glob("*.html"))
+html_files = list(ROOT.rglob("*.html"))
 
 if (ROOT / "index.html").exists():
     INDEX_PATH = ROOT / "index.html"
@@ -25,11 +25,10 @@ elif html_files:
     INDEX_PATH = html_files[0]
 else:
     raise FileNotFoundError(
-        "TradeForge HTML file was not found in the repository root."
+        "No HTML file was found anywhere in the TradeForge repository."
     )
 
-print(f"Using TradeForge HTML file: {INDEX_PATH.name}")
-
+print(f"Using TradeForge HTML file: {INDEX_PATH}")
 NOW = datetime.now(timezone.utc)
 
 SEASON = NOW.year if NOW.month >= 3 else NOW.year - 1
