@@ -1,315 +1,343 @@
 /* Core Layout Light/Dark Mode Setting Targets */
+
 html[data-theme="dark"] {
-    --bg-main: #000000;
-    --text-main: #ffffff;
-    --text-muted: #a1a1aa;
-    --bg-surface: #111111;
-    --border-ui: #27272a;
-    --brand-color: #38bdf8;
-    --meter-track-color: #27272a;
+  --bg-main: #000000;
+  --text-main: #ffffff;
+  --text-muted: #a1a1aa;
+  --bg-surface: #111111;
+  --border-ui: #27272a;
+  --brand-color: #38bdf8;
+  --meter-track-color: #27272a;
 }
 
 html[data-theme="light"] {
-    --bg-main: #ffffff;
-    --text-main: #000000;
-    --text-muted: #4b5563;
-    --bg-surface: #f3f4f6;
-    --border-ui: #e5e7eb;
-    --brand-color: #0284c7;
-    --meter-track-color: #e5e7eb;
+  --bg-main: #ffffff;
+  --text-main: #000000;
+  --text-muted: #4b5563;
+  --bg-surface: #f3f4f6;
+  --border-ui: #e5e7eb;
+  --brand-color: #0284c7;
+  --meter-track-color: #e5e7eb;
 }
 
-/* Global Engine Setup resets */
+
+/* Global Setup Resets */
+
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 body {
-    background-color: var(--bg-main);
-    color: var(--text-main);
-    transition: background-color 0.2s, color 0.2s;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  transition: background-color 0.2s, color 0.2s;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
+
 /* Navbar Layout Controls */
+
 .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.25rem 5%;
-    background-color: var(--bg-surface);
-    border-bottom: 1px solid var(--border-ui);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 5%;
+  background-color: var(--bg-surface);
+  border-bottom: 1px solid var(--border-ui);
 }
 
 .navbar .logo {
-    font-size: 1.4rem;
-    font-weight: 800;
-    color: var(--brand-color);
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--brand-color);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .ppr-badge {
-    font-size: 0.75rem;
-    background-color: var(--brand-color);
-    color: #ffffff;
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    font-weight: bold;
-    text-transform: uppercase;
+  font-size: 0.75rem;
+  background-color: var(--brand-color);
+  color: #ffffff;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-weight: bold;
+  text-transform: uppercase;
 }
 
 .toggle-btn {
-    background-color: var(--text-main);
-    color: var(--bg-main);
-    border: 1px solid var(--border-ui);
-    padding: 0.5rem 1.25rem;
-    border-radius: 20px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 0.85rem;
-    transition: background-color 0.2s, color 0.2s;
+  background-color: var(--text-main);
+  color: var(--bg-main);
+  border: 1px solid var(--border-ui);
+  padding: 0.5rem 1.25rem;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: background-color 0.2s, color 0.2s;
 }
 
+
 /* Global Value Cheat-Sheet Header */
+
 .value-board-section {
-    width: 90%;
-    max-width: 1200px;
-    margin: 1.5rem auto 0 auto;
-    background-color: var(--bg-surface);
-    border: 1px solid var(--border-ui);
-    border-radius: 10px;
-    padding: 1.25rem;
+  width: 90%;
+  max-width: 1200px;
+  margin: 1.5rem auto 0 auto;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-ui);
+  border-radius: 10px;
+  padding: 1.25rem;
 }
 
 .value-board-section h3 {
-    font-size: 1.1rem;
-    margin-bottom: 0.75rem;
-    color: var(--brand-color);
-    text-align: center;
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+  color: var(--brand-color);
+  text-align: center;
 }
 
 .value-board-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
 }
 
 .value-card {
-    background-color: var(--bg-main);
-    border: 1px solid var(--border-ui);
-    padding: 0.75rem;
-    border-radius: 6px;
-    font-size: 0.9rem;
+  background-color: var(--bg-main);
+  border: 1px solid var(--border-ui);
+  padding: 0.75rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
 }
 
 .value-card h4 {
-    color: var(--brand-color);
-    margin-bottom: 0.25rem;
-    border-bottom: 1px solid var(--border-ui);
+  color: var(--brand-color);
+  margin-bottom: 0.25rem;
+  border-bottom: 1px solid var(--border-ui);
 }
 
 .value-card p {
-    color: var(--text-muted);
+  color: var(--text-muted);
 }
 
+
 /* Visual Balance Meter Components */
+
 .meter-dashboard {
-    width: 90%;
-    max-width: 1200px;
-    margin: 1.5rem auto 0 auto;
-    text-align: center;
+  width: 90%;
+  max-width: 1200px;
+  margin: 1.5rem auto 0 auto;
+  text-align: center;
 }
 
 .meter-labels {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.9rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
 }
 
-.left-label { color: #38bdf8; }
-.right-label { color: #f43f5e; }
+.left-label {
+  color: #38bdf8;
+}
+
+.right-label {
+  color: #f43f5e;
+}
 
 .meter-track {
-    width: 100%;
-    height: 18px;
-    background-color: #f43f5e;
-    border-radius: 9px;
-    overflow: hidden;
-    border: 1px solid var(--border-ui);
-    position: relative;
+  width: 100%;
+  height: 18px;
+  background-color: var(--meter-track-color);
+  border-radius: 9px;
+  overflow: hidden;
+  border: 1px solid var(--border-ui);
+  position: relative;
 }
 
 .meter-fill {
-    height: 100%;
-    background-color: #38bdf8;
-    width: 50%;
-    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 100%;
+  background-color: #38bdf8;
+  width: 50%;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+
 /* Main Two Column Workspace Panels */
+
 .analyzer-container {
-    display: flex;
-    flex: 1;
-    width: 90%;
-    max-width: 1200px;
-    margin: 1.5rem auto;
-    gap: 2rem;
+  display: flex;
+  flex: 1;
+  width: 90%;
+  max-width: 1200px;
+  margin: 1.5rem auto;
+  gap: 2rem;
 }
 
 .team-column {
-    flex: 1;
-    background-color: var(--bg-surface);
-    border: 1px solid var(--border-ui);
-    border-radius: 12px;
-    padding: 2rem;
-    display: flex;
-    flex-direction: column;
+  flex: 1;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-ui);
+  border-radius: 12px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
 }
 
 .team-column h2 {
-    font-size: 1.5rem;
-    margin-bottom: 1.25rem;
-    text-align: center;
+  font-size: 1.5rem;
+  margin-bottom: 1.25rem;
+  text-align: center;
 }
 
+
 /* Dropdown Autocomplete Layout Forms */
+
 .search-container {
-    position: relative;
-    margin-bottom: 1.5rem;
+  position: relative;
+  margin-bottom: 1.5rem;
 }
 
 .search-container input {
-    width: 100%;
-    padding: 0.85rem 1rem;
-    background-color: var(--bg-main);
-    border: 1px solid var(--border-ui);
-    border-radius: 8px;
-    color: var(--text-main);
-    font-size: 1rem;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  background-color: var(--bg-main);
+  border: 1px solid var(--border-ui);
+  border-radius: 8px;
+  color: var(--text-main);
+  font-size: 1rem;
 }
 
 .search-container input:focus {
-    outline: 2px solid var(--brand-color);
+  outline: 2px solid var(--brand-color);
 }
 
 .dropdown-list {
-    position: absolute;
-    top: 100%; left: 0; right: 0;
-    background-color: var(--bg-surface);
-    border: 1px solid var(--border-ui);
-    border-radius: 8px;
-    max-height: 200px;
-    overflow-y: auto;
-    z-index: 50;
-    display: none;
-    margin-top: 0.25rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-ui);
+  border-radius: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 50;
+  display: none;
+  margin-top: 0.25rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .dropdown-item {
-    padding: 0.75rem 1rem;
-    cursor: pointer;
-    border-bottom: 1px solid var(--border-ui);
-    color: var(--text-main);
-    background-color: var(--bg-surface);
-    text-align: left;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border-ui);
+  color: var(--text-main);
+  background-color: var(--bg-surface);
+  text-align: left;
 }
 
 .dropdown-item:hover {
-    background-color: var(--brand-color);
-    color: #ffffff;
+  background-color: var(--brand-color);
+  color: #ffffff;
 }
 
+
 /* Player Render Roster Cards & Mirrored Utilities */
+
 .player-list {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    margin-bottom: 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
 }
 
 .player-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background-color: var(--bg-main);
-    border: 1px solid var(--border-ui);
-    padding: 0.75rem 1rem;
-    border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--bg-main);
+  border: 1px solid var(--border-ui);
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
 }
 
 .player-identity {
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .pos-badge {
-    background-color: var(--border-ui);
-    color: var(--text-muted);
-    font-size: 0.75rem;
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    font-weight: bold;
+  background-color: var(--border-ui);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-weight: bold;
 }
 
 .trend-indicator {
-    margin-left: 0.25rem;
-    font-size: 0.9rem;
+  margin-left: 0.25rem;
+  font-size: 0.9rem;
 }
 
 .player-score-label {
-    font-weight: 700;
-    color: var(--brand-color);
+  font-weight: 700;
+  color: var(--brand-color);
 }
 
 .remove-btn {
-    background: none;
-    border: none;
-    color: #ef4444;
-    cursor: pointer;
-    font-size: 1.1rem;
+  background: none;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  font-size: 1.1rem;
 }
 
+
 /* Bottom Calculation Summary Elements */
+
 .total-score {
-    font-size: 1.2rem;
-    font-weight: 700;
-    text-align: center;
-    border-top: 2px dashed var(--border-ui);
-    padding-top: 1rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-align: center;
+  border-top: 2px dashed var(--border-ui);
+  padding-top: 1rem;
 }
 
 .verdict-container {
-    text-align: center;
-    padding: 2rem 1rem;
-    background-color: var(--bg-surface);
-    border-top: 1px solid var(--border-ui);
+  text-align: center;
+  padding: 2rem 1rem;
+  background-color: var(--bg-surface);
+  border-top: 1px solid var(--border-ui);
 }
 
 .verdict-container h1 {
-    font-size: 2.2rem;
-    font-weight: 800;
+  font-size: 2.2rem;
+  font-weight: 800;
 }
 
+
 /* Collapse Structural Breakpoints */
+
 @media (max-width: 768px) {
-    .analyzer-container {
-        flex-direction: column;
-        gap: 1.5rem;
-    }
+  .analyzer-container {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
 }
+
+
 /* ===== TRADE VERDICT UPGRADE ===== */
 
 #verdict {
@@ -335,6 +363,8 @@ body {
 #verdict:empty {
   display: none;
 }
+
+
 /* ===== LEAGUE SETTINGS ===== */
 
 .league-settings {
@@ -343,12 +373,12 @@ body {
   margin: 18px auto 24px;
   padding: 18px 20px;
 
-  border: 1px solid rgba(255,255,255,0.12);
+  border: 1px solid var(--border-ui);
   border-radius: 14px;
 
-  background: rgba(255,255,255,0.04);
+  background: var(--bg-surface);
 
-  box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
 }
 
 .league-settings-title {
@@ -383,7 +413,10 @@ body {
   padding: 10px 12px;
 
   border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.15);
+  border: 1px solid var(--border-ui);
+
+  background-color: var(--bg-main);
+  color: var(--text-main);
 
   font-size: 14px;
   font-weight: 600;
