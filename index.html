@@ -43,18 +43,9 @@ color:var(--text);
 font-family:Arial,sans-serif
 }
 
-button,input,select{
-font:inherit
-}
-
-button{
-cursor:pointer
-}
-
-button:disabled{
-opacity:.5;
-cursor:not-allowed
-}
+button,input,select{font:inherit}
+button{cursor:pointer}
+button:disabled{opacity:.5;cursor:not-allowed}
 
 .wrap{
 max-width:1400px;
@@ -246,9 +237,7 @@ max-height:320px;
 overflow:auto
 }
 
-.results.show{
-display:block
-}
+.results.show{display:block}
 
 .result-item{
 padding:9px;
@@ -273,7 +262,8 @@ border-bottom:1px solid var(--border)
 }
 
 .player small,
-.roster-player small{
+.roster-player small,
+.trade-roster-player small{
 display:block;
 color:var(--muted);
 margin-top:3px
@@ -349,21 +339,10 @@ color:var(--muted);
 margin-top:6px
 }
 
-.verdict.fair{
-border-color:var(--good)
-}
-
-.verdict.slight{
-border-color:var(--warn)
-}
-
-.verdict.adv{
-border-color:var(--orange)
-}
-
-.verdict.major{
-border-color:var(--bad)
-}
+.verdict.fair{border-color:var(--good)}
+.verdict.slight{border-color:var(--warn)}
+.verdict.adv{border-color:var(--orange)}
+.verdict.major{border-color:var(--bad)}
 
 .grade{
 display:flex;
@@ -490,7 +469,73 @@ margin-top:12px
 .roster-select-grid{
 display:grid;
 grid-template-columns:1fr 1fr;
-gap:10px
+gap:12px
+}
+
+.trade-roster-box{
+margin-top:10px;
+background:var(--card2);
+border:1px solid var(--border);
+border-radius:12px;
+overflow:hidden
+}
+
+.trade-roster-head{
+display:flex;
+justify-content:space-between;
+gap:8px;
+align-items:center;
+padding:10px 12px;
+border-bottom:1px solid var(--border)
+}
+
+.trade-roster-head strong{
+font-size:13px
+}
+
+.trade-roster-head span{
+font-size:11px;
+color:var(--muted)
+}
+
+.trade-roster-list{
+max-height:300px;
+overflow:auto
+}
+
+.trade-roster-player{
+display:grid;
+grid-template-columns:1fr auto auto;
+gap:8px;
+align-items:center;
+padding:10px 12px;
+border-bottom:1px solid var(--border)
+}
+
+.trade-roster-player:last-child{
+border-bottom:0
+}
+
+.trade-roster-value{
+font-weight:900;
+min-width:38px;
+text-align:right
+}
+
+.add-roster-player{
+border:1px solid var(--blue);
+background:var(--blue);
+color:#fff;
+border-radius:7px;
+padding:6px 9px;
+font-size:12px;
+font-weight:800
+}
+
+.add-roster-player:disabled{
+background:var(--card);
+color:var(--muted);
+border-color:var(--border)
 }
 
 .roster-view-grid{
@@ -557,13 +602,13 @@ margin:0
 @media(max-width:900px){
 .trade-grid{grid-template-columns:1fr}
 .top-grid,.settings{grid-template-columns:1fr 1fr}
-.roster-view-grid{grid-template-columns:1fr}
+.roster-view-grid,.roster-select-grid{grid-template-columns:1fr}
 }
 
 @media(max-width:550px){
 header{display:block}
 .header-buttons{width:100%;margin-top:15px}
-.top-grid,.settings,.analysis,.roster-select-grid{grid-template-columns:1fr}
+.top-grid,.settings,.analysis{grid-template-columns:1fr}
 .page-toolbar{display:block}
 .page-toolbar button{width:100%;margin-top:12px}
 }
@@ -602,59 +647,125 @@ Sleeper League
 </button>
 
 </div>
+
 </div>
 
 </header>
 
 
-<!-- =====================================================
-     HOME CALCULATOR
-     ===================================================== -->
+<!-- HOME CALCULATOR -->
 
 <main id="home-page">
 
 <section class="card">
 
 <div class="settings-title">
-<span>League Settings</span>
-<span id="home-mode-label" class="mode-label"></span>
+
+<span>
+League Settings
+</span>
+
+<span id="home-mode-label" class="mode-label">
+</span>
+
 </div>
+
 
 <div class="settings">
 
 <label class="setting">
-<span>SCORING</span>
+
+<span>
+SCORING
+</span>
+
 <select id="home-scoring">
-<option value="ppr">PPR</option>
-<option value="half">0.5 PPR</option>
-<option value="standard">No PPR</option>
+
+<option value="ppr">
+PPR
+</option>
+
+<option value="half">
+0.5 PPR
+</option>
+
+<option value="standard">
+No PPR
+</option>
+
 </select>
+
 </label>
 
+
 <label class="setting">
-<span>LEAGUE</span>
+
+<span>
+LEAGUE
+</span>
+
 <select id="home-league">
-<option value="redraft">Redraft</option>
-<option value="keeper">Keeper</option>
-<option value="dynasty">Dynasty</option>
+
+<option value="redraft">
+Redraft
+</option>
+
+<option value="keeper">
+Keeper
+</option>
+
+<option value="dynasty">
+Dynasty
+</option>
+
 </select>
+
 </label>
 
+
 <label class="setting">
-<span>QB FORMAT</span>
+
+<span>
+QB FORMAT
+</span>
+
 <select id="home-qb">
-<option value="oneqb">1QB</option>
-<option value="superflex">Superflex</option>
+
+<option value="oneqb">
+1QB
+</option>
+
+<option value="superflex">
+Superflex
+</option>
+
 </select>
+
 </label>
 
+
 <label class="setting">
-<span>TE PREMIUM</span>
+
+<span>
+TE PREMIUM
+</span>
+
 <select id="home-tep">
-<option value="off">Off</option>
-<option value="half">+0.5 PPR</option>
-<option value="full">+1.0 PPR</option>
+
+<option value="off">
+Off
+</option>
+
+<option value="half">
++0.5 PPR
+</option>
+
+<option value="full">
++1.0 PPR
+</option>
+
 </select>
+
 </label>
 
 </div>
@@ -697,9 +808,12 @@ Top Players
 
 <div class="trade-grid">
 
+
 <section class="team card">
 
-<h2>Team A</h2>
+<h2>
+Team A
+</h2>
 
 <div class="search-wrap">
 
@@ -716,7 +830,8 @@ class="results">
 
 </div>
 
-<div id="home-team-a"></div>
+<div id="home-team-a">
+</div>
 
 <div class="totals">
 
@@ -752,8 +867,15 @@ Add players to both sides.
 </div>
 
 <div class="grade">
-<span>Trade Grade</span>
-<strong id="home-grade">—</strong>
+
+<span>
+Trade Grade
+</span>
+
+<strong id="home-grade">
+—
+</strong>
+
 </div>
 
 <div class="actions">
@@ -773,7 +895,9 @@ Clear Trade
 
 <section class="team card">
 
-<h2>Team B</h2>
+<h2>
+Team B
+</h2>
 
 <div class="search-wrap">
 
@@ -790,7 +914,8 @@ class="results">
 
 </div>
 
-<div id="home-team-b"></div>
+<div id="home-team-b">
+</div>
 
 <div class="totals">
 
@@ -843,9 +968,7 @@ Build a trade to see packages.
 </main>
 
 
-<!-- =====================================================
-     SLEEPER PAGE
-     ===================================================== -->
+<!-- SLEEPER PAGE -->
 
 <main
 id="sleeper-page"
@@ -1005,9 +1128,7 @@ Off
 <button
 id="disconnect"
 class="close">
-
 Disconnect Sleeper
-
 </button>
 
 </div>
@@ -1020,17 +1141,20 @@ Disconnect Sleeper
 <div class="settings-title">
 
 <span>
-Choose the two Sleeper rosters for this trade
+Choose the two Sleeper teams making the trade
 </span>
 
 <span class="sub">
-Searches below only use players on the selected rosters.
+Selecting a team now shows that team's roster below the dropdown.
 </span>
 
 </div>
 
 
 <div class="roster-select-grid">
+
+
+<div>
 
 <label class="setting">
 
@@ -1043,6 +1167,15 @@ TEAM A ROSTER
 
 </label>
 
+<div
+id="sleeper-roster-preview-a"
+class="trade-roster-box">
+</div>
+
+</div>
+
+
+<div>
 
 <label class="setting">
 
@@ -1055,6 +1188,14 @@ TEAM B ROSTER
 
 </label>
 
+<div
+id="sleeper-roster-preview-b"
+class="trade-roster-box">
+</div>
+
+</div>
+
+
 </div>
 
 </section>
@@ -1066,54 +1207,26 @@ TEAM B ROSTER
 Top Players
 </h3>
 
-
 <div class="top-grid" style="margin-top:10px">
 
 <div class="top-box">
-
-<h3>
-RB
-</h3>
-
-<div id="sleeper-top-rb">
+<h3>RB</h3>
+<div id="sleeper-top-rb"></div>
 </div>
-
-</div>
-
 
 <div class="top-box">
-
-<h3>
-WR
-</h3>
-
-<div id="sleeper-top-wr">
+<h3>WR</h3>
+<div id="sleeper-top-wr"></div>
 </div>
-
-</div>
-
 
 <div class="top-box">
-
-<h3>
-QB
-</h3>
-
-<div id="sleeper-top-qb">
+<h3>QB</h3>
+<div id="sleeper-top-qb"></div>
 </div>
-
-</div>
-
 
 <div class="top-box">
-
-<h3>
-TE
-</h3>
-
-<div id="sleeper-top-te">
-</div>
-
+<h3>TE</h3>
+<div id="sleeper-top-te"></div>
 </div>
 
 </div>
@@ -1122,6 +1235,7 @@ TE
 
 
 <div class="trade-grid">
+
 
 <section class="team card">
 
@@ -1133,7 +1247,7 @@ Team A
 
 <input
 id="sleeper-search-a"
-placeholder="Search Team A roster"
+placeholder="Search selected Team A roster"
 autocomplete="off"
 >
 
@@ -1147,32 +1261,16 @@ class="results">
 <div id="sleeper-team-a">
 </div>
 
-
 <div class="totals">
 
 <div class="total">
-
-<small>
-Base
-</small>
-
-<strong id="sleeper-base-a">
-0.0
-</strong>
-
+<small>Base</small>
+<strong id="sleeper-base-a">0.0</strong>
 </div>
 
-
 <div class="total">
-
-<small>
-Adjusted
-</small>
-
-<strong id="sleeper-adj-a">
-0.0
-</strong>
-
+<small>Adjusted</small>
+<strong id="sleeper-adj-a">0.0</strong>
 </div>
 
 </div>
@@ -1183,12 +1281,10 @@ Adjusted
 <section class="result-card card">
 
 <div class="meter">
-
 <div
 id="sleeper-marker"
 class="marker">
 </div>
-
 </div>
 
 
@@ -1243,7 +1339,7 @@ Team B
 
 <input
 id="sleeper-search-b"
-placeholder="Search Team B roster"
+placeholder="Search selected Team B roster"
 autocomplete="off"
 >
 
@@ -1261,28 +1357,13 @@ class="results">
 <div class="totals">
 
 <div class="total">
-
-<small>
-Base
-</small>
-
-<strong id="sleeper-base-b">
-0.0
-</strong>
-
+<small>Base</small>
+<strong id="sleeper-base-b">0.0</strong>
 </div>
 
-
 <div class="total">
-
-<small>
-Adjusted
-</small>
-
-<strong id="sleeper-adj-b">
-0.0
-</strong>
-
+<small>Adjusted</small>
+<strong id="sleeper-adj-b">0.0</strong>
 </div>
 
 </div>
@@ -1333,6 +1414,7 @@ League Rosters
 class="roster-view-grid"
 style="margin-top:12px"
 >
+
 
 <section class="roster-card">
 
@@ -1412,6 +1494,7 @@ class="roster-list">
 
 </section>
 
+
 </div>
 
 </section>
@@ -1421,9 +1504,7 @@ class="roster-list">
 </div>
 
 
-<!-- =====================================================
-     SLEEPER LOGIN MODAL
-     ===================================================== -->
+<!-- SLEEPER LOGIN MODAL -->
 
 <div
 id="modal"
@@ -1465,9 +1546,7 @@ autocomplete="off"
 <button
 id="find-leagues"
 class="primary">
-
 Find My Leagues
-
 </button>
 
 
@@ -1479,9 +1558,7 @@ Find My Leagues
 <button
 id="connect-league"
 class="primary">
-
 Sync Selected League
-
 </button>
 
 </div>
@@ -1554,9 +1631,7 @@ standard:1
 };
 
 
-/* =========================================================
-   PLAYER DATABASE
-   ========================================================= */
+/* PLAYER DATABASE */
 
 const playerDatabase = [
 
@@ -1908,10 +1983,6 @@ const playerDatabase = [
 ];
 
 
-/* =========================================================
-   DYNASTY PICKS
-   ========================================================= */
-
 const picks=[
 
 ["2027 Early 1st",52,58],
@@ -1939,10 +2010,6 @@ superflex:x[2]
 );
 
 
-/* =========================================================
-   DEFENSE NAME MATCHING
-   ========================================================= */
-
 const dst={
 
 HOU:"Houston Texans DST",
@@ -1961,10 +2028,6 @@ KC:"Kansas City Chiefs DST"
 
 };
 
-
-/* =========================================================
-   HELPERS
-   ========================================================= */
 
 const $=
 id=>
@@ -2034,10 +2097,6 @@ p.pos
 p.name;
 
 
-/* =========================================================
-   TWO COMPLETELY SEPARATE CALCULATORS
-   ========================================================= */
-
 const homeSettings={
 
 scoring:"ppr",
@@ -2080,10 +2139,6 @@ type:"sleeper"
 };
 
 
-/* =========================================================
-   SLEEPER DATA
-   ========================================================= */
-
 let sleeperUser=null;
 
 let syncedLeague=null;
@@ -2098,10 +2153,6 @@ let sleeperRosterA="";
 
 let sleeperRosterB="";
 
-
-/* =========================================================
-   PLAYER VALUE
-   ========================================================= */
 
 function assetsForSettings(
 settings
@@ -2267,10 +2318,6 @@ v*10
 }
 
 
-/* =========================================================
-   TRADE MATH
-   ========================================================= */
-
 function adjustedPlayer(
 v
 ){
@@ -2389,10 +2436,6 @@ avg
 }
 
 
-/* =========================================================
-   MODE LABEL
-   ========================================================= */
-
 function modeLabel(
 settings
 ){
@@ -2467,10 +2510,6 @@ return `${s} • ${l} • ${q}${t}`;
 
 }
 
-
-/* =========================================================
-   TOP PLAYERS
-   ========================================================= */
 
 function renderTop(
 ctx,
@@ -2584,10 +2623,6 @@ ctx,
 }
 
 
-/* =========================================================
-   TEAM HELPERS
-   ========================================================= */
-
 function getTeam(
 ctx,
 side
@@ -2605,10 +2640,6 @@ ctx.teamB;
 
 }
 
-
-/* =========================================================
-   RENDER TEAM
-   ========================================================= */
 
 function renderTeam(
 ctx,
@@ -2642,7 +2673,7 @@ class="sub"
 style="padding:20px 0"
 >
 
-Search above to add players.
+Search above or use the roster buttons to add players.
 
 </div>
 
@@ -2759,10 +2790,6 @@ ctx
 }
 
 
-/* =========================================================
-   RENDER CALCULATOR
-   ========================================================= */
-
 function renderCalculator(
 ctx
 ){
@@ -2781,12 +2808,24 @@ calculate(
 ctx
 );
 
+if(
+ctx.type==="sleeper"
+&&
+syncedLeague
+){
+
+renderTradeRosterPreview(
+"A"
+);
+
+renderTradeRosterPreview(
+"B"
+);
+
 }
 
+}
 
-/* =========================================================
-   CALCULATE TRADE
-   ========================================================= */
 
 function calculate(
 ctx
@@ -3085,10 +3124,6 @@ ab
 }
 
 
-/* =========================================================
-   SLEEPER ROSTER ASSETS
-   ========================================================= */
-
 function selectedSleeperRoster(
 side
 ){
@@ -3106,20 +3141,35 @@ sleeperRosterB;
 }
 
 
-function rosterAssets(
+function getSleeperRosterObject(
 id
 ){
 
-const r=
+return syncedRosters.find(
 
-syncedRosters
-.find(
 x=>
 String(
 x.roster_id
 )
 ===
 String(id)
+
+)
+
+||
+
+null;
+
+}
+
+
+function sleeperRosterEntries(
+id
+){
+
+const r=
+getSleeperRosterObject(
+id
 );
 
 
@@ -3139,37 +3189,498 @@ r.players
 )
 
 .map(
-pid=>
+pid=>{
+
+const sleeperId=
+String(pid);
+
+
+const tradePlayer=
 matchSleeper(
-String(pid)
-)
-)
+sleeperId
+);
+
+
+const sp=
+
+sleeperPlayers[
+sleeperId
+]
+
+||
+
+{};
+
+
+const name=
+
+tradePlayer?.name
+
+||
+
+sp.full_name
+
+||
+
+[
+sp.first_name,
+sp.last_name
+]
 
 .filter(Boolean)
 
+.join(" ")
+
+||
+
+"Unknown Player";
+
+
+const pos=
+
+tradePlayer?.pos
+
+||
+
+sp.position
+
+||
+
+"";
+
+
+const team=
+
+tradePlayer?.nflTeam
+
+||
+
+sp.team
+
+||
+
+"";
+
+
+return{
+
+sleeperId,
+name,
+pos,
+team,
+tradePlayer
+
+};
+
+}
+)
+
 .sort(
-(a,b)=>
+(a,b)=>{
+
+const av=
+
+a.tradePlayer
+
+?
 
 calcValue(
-b,
+a.tradePlayer,
 sleeperSettings
 )
 
--
+:
+
+-1;
+
+
+const bv=
+
+b.tradePlayer
+
+?
 
 calcValue(
-a,
+b.tradePlayer,
 sleeperSettings
 )
 
+:
+
+-1;
+
+
+return
+
+bv-av
+
+||
+
+a.name.localeCompare(
+b.name
+);
+
+}
 );
 
 }
 
 
-/* =========================================================
-   PLAYER POOL
-   ========================================================= */
+function rosterAssets(
+id
+){
+
+return sleeperRosterEntries(
+id
+)
+
+.map(
+x=>
+x.tradePlayer
+)
+
+.filter(Boolean);
+
+}
+
+
+function renderTradeRosterPreview(
+side
+){
+
+const id=
+selectedSleeperRoster(
+side
+);
+
+
+const box=
+
+$(
+`sleeper-roster-preview-${side.toLowerCase()}`
+);
+
+
+if(
+!box
+){
+
+return;
+
+}
+
+
+const roster=
+getSleeperRosterObject(
+id
+);
+
+
+if(
+!roster
+){
+
+box.innerHTML=
+
+`
+
+<div
+class="sub"
+style="padding:12px"
+>
+
+Choose a roster.
+
+</div>
+
+`;
+
+return;
+
+}
+
+
+const entries=
+sleeperRosterEntries(
+id
+);
+
+
+const used=
+
+new Set(
+
+sleeperCtx.teamA
+
+.concat(
+sleeperCtx.teamB
+)
+
+.map(key)
+
+);
+
+
+box.innerHTML=
+
+`
+
+<div class="trade-roster-head">
+
+<strong>
+${esc(
+rosterName(
+roster
+)
+)}
+</strong>
+
+<span>
+${entries.length} players
+</span>
+
+</div>
+
+
+<div class="trade-roster-list">
+
+${
+entries.length
+
+?
+
+entries.map(
+(entry,i)=>{
+
+const valueText=
+
+entry.tradePlayer
+
+?
+
+calcValue(
+entry.tradePlayer,
+sleeperSettings
+)
+.toFixed(1)
+
+:
+
+"—";
+
+
+const alreadyUsed=
+
+entry.tradePlayer
+
+?
+
+used.has(
+key(
+entry.tradePlayer
+)
+)
+
+:
+
+true;
+
+
+return`
+
+<div class="trade-roster-player">
+
+<div>
+
+<strong>
+${esc(entry.name)}
+</strong>
+
+<small>
+
+${esc(
+
+[
+entry.pos,
+entry.team
+]
+
+.filter(Boolean)
+
+.join(
+" • "
+)
+
+)}
+
+</small>
+
+${
+entry.tradePlayer
+
+?
+
+""
+
+:
+
+'<div class="not-valued">Not yet in TradeForge database</div>'
+}
+
+</div>
+
+
+<div class="trade-roster-value">
+
+${valueText}
+
+</div>
+
+
+<button
+class="add-roster-player"
+data-roster-add="${side}|${i}"
+${alreadyUsed?"disabled":""}
+>
+
+${alreadyUsed?"Added":"+ Add"}
+
+</button>
+
+</div>
+
+`;
+
+}
+)
+
+.join("")
+
+:
+
+`
+
+<div
+class="sub"
+style="padding:12px"
+>
+
+No players found on this roster.
+
+</div>
+
+`
+}
+
+</div>
+
+`;
+
+
+box
+
+.querySelectorAll(
+"[data-roster-add]"
+)
+
+.forEach(
+btn=>{
+
+btn.onclick=
+()=>{
+
+const [
+buttonSide,
+indexText
+]
+=
+
+btn.dataset.rosterAdd
+.split("|");
+
+
+const index=
+Number(
+indexText
+);
+
+
+const selectedEntries=
+
+sleeperRosterEntries(
+
+selectedSleeperRoster(
+buttonSide
+)
+
+);
+
+
+const entry=
+selectedEntries[
+index
+];
+
+
+if(
+!entry?.tradePlayer
+){
+
+return;
+
+}
+
+
+const alreadyUsed=
+
+new Set(
+
+sleeperCtx.teamA
+
+.concat(
+sleeperCtx.teamB
+)
+
+.map(key)
+
+);
+
+
+if(
+alreadyUsed.has(
+key(
+entry.tradePlayer
+)
+)
+){
+
+return;
+
+}
+
+
+getTeam(
+sleeperCtx,
+buttonSide
+)
+.push(
+{
+...entry.tradePlayer
+}
+);
+
+
+renderCalculator(
+sleeperCtx
+);
+
+};
+
+}
+);
+
+}
+
 
 function pool(
 ctx,
@@ -3222,10 +3733,6 @@ roster;
 
 }
 
-
-/* =========================================================
-   FAIRNESS SUGGESTIONS
-   ========================================================= */
 
 function suggestions(
 ctx,
@@ -3431,10 +3938,6 @@ No matching player was found in the available pool.
 }
 
 
-/* =========================================================
-   PACKAGE SUGGESTIONS
-   ========================================================= */
-
 function packages(
 ctx,
 aa,
@@ -3561,7 +4064,7 @@ for(
 let i=0;
 i<available.length;
 i++
-)
+){
 
 for(
 let j=i+1;
@@ -3603,6 +4106,8 @@ target
 )
 
 });
+
+}
 
 }
 
@@ -3684,10 +4189,6 @@ No two-player package was found in the available pool.
 
 }
 
-
-/* =========================================================
-   PLAYER SEARCH
-   ========================================================= */
 
 function setupSearch(
 ctx,
@@ -3898,10 +4399,6 @@ ctx
 }
 
 
-/* =========================================================
-   HOME SETTINGS
-   ========================================================= */
-
 function updateHomeSettings(){
 
 homeSettings.scoring=
@@ -3971,10 +4468,6 @@ updateHomeSettings
 
 );
 
-
-/* =========================================================
-   CALCULATOR BUTTONS
-   ========================================================= */
 
 function setupCalculatorButtons(
 ctx
@@ -4082,10 +4575,6 @@ sleeperCtx
 );
 
 
-/* =========================================================
-   THEME
-   ========================================================= */
-
 $("theme-toggle").onclick=
 ()=>{
 
@@ -4124,10 +4613,6 @@ next==="dark"
 
 };
 
-
-/* =========================================================
-   PAGE NAVIGATION
-   ========================================================= */
 
 function setPage(
 page
@@ -4230,10 +4715,6 @@ location.hash==="#sleeper"
 );
 
 
-/* =========================================================
-   SLEEPER MODAL
-   ========================================================= */
-
 const modal=
 $("modal");
 
@@ -4280,10 +4761,6 @@ modal
 };
 
 
-/* =========================================================
-   SLEEPER REQUEST
-   ========================================================= */
-
 async function fetchJSON(
 url
 ){
@@ -4317,10 +4794,6 @@ return r.json();
 
 }
 
-
-/* =========================================================
-   FIND SLEEPER LEAGUES
-   ========================================================= */
 
 $("find-leagues").onclick=
 async()=>{
@@ -4460,10 +4933,6 @@ e.message
 };
 
 
-/* =========================================================
-   CONNECT SLEEPER LEAGUE
-   ========================================================= */
-
 $("connect-league").onclick=
 async()=>{
 
@@ -4578,10 +5047,6 @@ e.message
 
 };
 
-
-/* =========================================================
-   READ SLEEPER SETTINGS
-   ========================================================= */
 
 function readSleeperSettings(){
 
@@ -4732,10 +5197,6 @@ sleeperSettings.tep;
 }
 
 
-/* =========================================================
-   ROSTER NAME
-   ========================================================= */
-
 function rosterName(
 r
 ){
@@ -4775,10 +5236,6 @@ r.roster_id;
 
 }
 
-
-/* =========================================================
-   BUILD SLEEPER ROSTER SELECTORS
-   ========================================================= */
 
 function buildRosterSelectors(){
 
@@ -4877,50 +5334,94 @@ sleeperRosterA;
 $("sleeper-roster-b").value=
 sleeperRosterB;
 
+
+renderTradeRosterPreview(
+"A"
+);
+
+
+renderTradeRosterPreview(
+"B"
+);
+
 }
 
 
-/* =========================================================
-   ROSTER CHANGES
-   ========================================================= */
-
-$("sleeper-roster-a").onchange=
+$("sleeper-roster-a")
+.addEventListener(
+"change",
 e=>{
 
 sleeperRosterA=
-e.target.value;
+String(
+e.target.value
+);
 
 
 sleeperCtx.teamA=[];
 
 
+$("sleeper-search-a").value=
+"";
+
+
+$("sleeper-results-a")
+.classList
+.remove(
+"show"
+);
+
+
+renderTradeRosterPreview(
+"A"
+);
+
+
 renderCalculator(
 sleeperCtx
 );
 
-};
+}
+);
 
 
-$("sleeper-roster-b").onchange=
+$("sleeper-roster-b")
+.addEventListener(
+"change",
 e=>{
 
 sleeperRosterB=
-e.target.value;
+String(
+e.target.value
+);
 
 
 sleeperCtx.teamB=[];
 
 
+$("sleeper-search-b").value=
+"";
+
+
+$("sleeper-results-b")
+.classList
+.remove(
+"show"
+);
+
+
+renderTradeRosterPreview(
+"B"
+);
+
+
 renderCalculator(
 sleeperCtx
 );
 
-};
+}
+);
 
-
-/* =========================================================
-   MATCH SLEEPER PLAYERS TO TRADEFORGE
-   ========================================================= */
 
 function matchSleeper(
 id
@@ -5036,10 +5537,6 @@ null;
 }
 
 
-/* =========================================================
-   USER'S ROSTER
-   ========================================================= */
-
 function getMyRosterId(){
 
 return
@@ -5071,10 +5568,6 @@ syncedRosters[0]
 }
 
 
-/* =========================================================
-   RENDER LEAGUE ROSTER
-   ========================================================= */
-
 function renderLeagueRoster(
 id,
 listId,
@@ -5083,15 +5576,8 @@ metaId
 ){
 
 const r=
-
-syncedRosters
-.find(
-x=>
-String(
-x.roster_id
-)
-===
-String(id)
+getSleeperRosterObject(
+id
 );
 
 
@@ -5122,130 +5608,8 @@ rosterName(r);
 
 const all=
 
-(
-r.players
-||
-[]
-)
-
-.map(
-pid=>{
-
-const tradePlayer=
-
-matchSleeper(
-String(pid)
-);
-
-
-const sp=
-
-sleeperPlayers[
-String(pid)
-]
-
-||
-
-{};
-
-
-const name=
-
-tradePlayer?.name
-
-||
-
-sp.full_name
-
-||
-
-[
-sp.first_name,
-sp.last_name
-]
-
-.filter(Boolean)
-
-.join(" ")
-
-||
-
-"Unknown Player";
-
-
-const pos=
-
-tradePlayer?.pos
-
-||
-
-sp.position
-
-||
-
-"";
-
-
-const team=
-
-tradePlayer?.nflTeam
-
-||
-
-sp.team
-
-||
-
-"";
-
-
-return{
-
-name,
-pos,
-team,
-tradePlayer
-
-};
-
-}
-)
-
-.sort(
-(a,b)=>
-
-(
-b.tradePlayer
-
-?
-
-calcValue(
-b.tradePlayer,
-sleeperSettings
-)
-
-:
-
--1
-)
-
--
-
-(
-a.tradePlayer
-
-?
-
-calcValue(
-a.tradePlayer,
-sleeperSettings
-)
-
-:
-
--1
-)
-
+sleeperRosterEntries(
+id
 );
 
 
@@ -5333,10 +5697,6 @@ sleeperSettings
 
 }
 
-
-/* =========================================================
-   BUILD LEAGUE ROSTERS
-   ========================================================= */
 
 function buildLeagueRosters(){
 
@@ -5489,10 +5849,6 @@ e.target.value,
 );
 
 
-/* =========================================================
-   RENDER SLEEPER PAGE
-   ========================================================= */
-
 function renderSleeperPage(){
 
 if(
@@ -5540,10 +5896,6 @@ buildLeagueRosters();
 }
 
 
-/* =========================================================
-   DISCONNECT SLEEPER
-   ========================================================= */
-
 $("disconnect").onclick=
 ()=>{
 
@@ -5580,15 +5932,19 @@ $("status").textContent=
 "";
 
 
+$("sleeper-roster-preview-a").innerHTML=
+"";
+
+
+$("sleeper-roster-preview-b").innerHTML=
+"";
+
+
 location.hash=
 "home";
 
 };
 
-
-/* =========================================================
-   START
-   ========================================================= */
 
 if(
 !location.hash
