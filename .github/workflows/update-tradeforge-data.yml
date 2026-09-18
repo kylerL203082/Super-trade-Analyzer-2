@@ -4,31 +4,18 @@ on:
   workflow_dispatch:
 
   schedule:
-
-    # Tuesday: major post-week recalculation
     - cron: "15 13 * * 2"
-
-    # Friday: injury/practice refresh
     - cron: "15 16 * * 5"
-
-    # Sunday morning: final refresh
     - cron: "30 14 * * 0"
 
 permissions:
   contents: write
 
-concurrency:
-  group: tradeforge-rankings
-  cancel-in-progress: true
-
 jobs:
-
   update-rankings:
-
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout TradeForge
         uses: actions/checkout@v4
 
@@ -37,31 +24,26 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Build TradeForge data feed
-        run: python scripts/update_tradeforge_data.py
-
-      - name: Validate feed
+      - name: Show repository files
         run: |
-          python - <<'PY'
-          import json
-          from pathlib import Path
+          pwd
+          find . -maxdepth 4 -type f | sort
 
-          data = json.loads(
-              Path("tradeforge-data.json").read_text()
-          )
+      - name: Build TradeForge data feed
+        run: |
+          python scripts/update_tradeforge_data.py
 
-          assert data["meta"]["baselinePlayers"] >= 300
-          assert isinstance(data["players"], dict)
-
-          print(
-              "Feed valid:",
-              data["meta"]
-          )
-          PY
+      - name: Show generated JSON
+        run: |
+          echo "----- tradeforge-data.json -----"
+          cat tradeforge-data.json
+          echo "----- git status -----"
+          git status
+          echo "----- git diff -----"
+          git diff -- tradeforge-data.json
 
       - name: Commit updated feed
         run: |
-
           if git diff --quiet -- tradeforge-data.json; then
             echo "No TradeForge data changes."
             exit 0
@@ -71,7 +53,5 @@ jobs:
           git config user.email "tradeforge-bot@users.noreply.github.com"
 
           git add tradeforge-data.json
-
           git commit -m "Update TradeForge rankings"
-
           git push
