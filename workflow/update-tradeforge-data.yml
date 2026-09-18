@@ -1,0 +1,53 @@
+name: Update TradeForge Data
+
+on:
+  workflow_dispatch:
+
+  schedule:
+    # Daily morning refresh
+    - cron: "15 12 * * *"
+
+    # Extra Sunday refresh before games
+    - cron: "30 15 * * 0"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tradeforge-data-update
+  cancel-in-progress: true
+
+jobs:
+  update-data:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout TradeForge
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Build TradeForge data feed
+        env:
+          FANTASYPROS_API_KEY: ${{ secrets.FANTASYPROS_API_KEY }}
+        run: |
+          node scripts/update-tradeforge-data.mjs
+
+      - name: Commit updated player data
+        run: |
+          if git diff --quiet -- tradeforge-data.json; then
+            echo "No TradeForge data changes."
+            exit 0
+          fi
+
+          git config user.name "TradeForge Bot"
+          git config user.email "tradeforge-bot@users.noreply.github.com"
+
+          git add tradeforge-data.json
+          git commit -m "Update TradeForge player values"
+          git push
