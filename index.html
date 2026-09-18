@@ -7,112 +7,578 @@
 
 <style>
 *{box-sizing:border-box}
-:root{--bg:#f4f7fb;--card:#fff;--card2:#eef3f9;--text:#142033;--muted:#68778c;--border:#d8e1ee;--blue:#1976ff;--input:#fff;--sync:#fff}
-html[data-theme="dark"]{--bg:#0c111b;--card:#151d2a;--card2:#101722;--text:#eef4ff;--muted:#9eabc0;--border:#29364b;--blue:#2583ff;--input:#0f1622;--sync:#000}
-body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
-button,input,select{font:inherit}
-button{cursor:pointer}
-.wrap{max-width:1400px;margin:auto;padding:20px}
-header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);padding-bottom:18px}
-.brand{display:flex;align-items:center;gap:12px}
-.logo{background:var(--blue);color:#fff;font-weight:900;font-size:20px;padding:15px;border-radius:13px}
-h1{margin:0;font-size:30px}
-.sub{color:var(--muted);font-size:13px;margin-top:4px}
-.header-buttons{display:flex;flex-direction:column;gap:7px;width:360px}
-.header-buttons button{padding:10px;border-radius:9px;font-weight:800}
-.sync-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px}
-#theme-toggle{background:var(--card);color:var(--text);border:1px solid var(--border)}
-#sync-button{background:var(--blue);color:var(--sync);border:0}
-#league-view-button{background:var(--card);color:var(--text);border:1px solid var(--border)}
-#league-view-button:disabled{opacity:.45;cursor:not-allowed}
-.card,.team,.result-card{background:var(--card);border:1px solid var(--border);border-radius:15px;padding:16px;margin-top:16px}
-.settings{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.setting{display:flex;flex-direction:column;gap:5px}
-.setting span{font-size:11px;font-weight:800;color:var(--muted)}
-select,input{width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--input);color:var(--text)}
-.settings-title{display:flex;justify-content:space-between;margin-bottom:12px;font-weight:900}
-#mode-label{color:var(--blue);font-size:12px}
-.engine-strip{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:12px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--card2);font-size:12px}
-.engine-strip strong{color:var(--blue)}
-.engine-strip span{color:var(--muted);text-align:right}
-.top-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.top-box{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:10px}
-.top-box h3{margin:0 0 8px;font-size:13px}
-.top-row{display:flex;justify-content:space-between;font-size:12px;padding:5px 0}
-.trade-grid{display:grid;grid-template-columns:1fr 320px 1fr;gap:15px;margin-top:16px}
-.team{margin-top:0}
-.team h2{margin-top:0}
-.search-wrap{position:relative}
-.results{display:none;position:absolute;left:0;right:0;top:46px;background:var(--card);border:1px solid var(--border);border-radius:9px;z-index:20;max-height:320px;overflow:auto}
-.results.show{display:block}
-.result-item{padding:9px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;justify-content:space-between;gap:10px}
-.result-item:hover{background:var(--card2)}
-.player{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
-.player small,.roster-player small{display:block;color:var(--muted);margin-top:3px}
-.remove{border:1px solid var(--border);background:var(--card2);color:var(--text);border-radius:6px}
-.totals{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:15px}
-.total{background:var(--card2);padding:10px;border-radius:9px;text-align:center}
-.total small{display:block;color:var(--muted)}
-.total strong{font-size:20px}
-.result-card{margin-top:0}
-.meter{height:15px;background:linear-gradient(90deg,#3380ff,#26a269,#ff9b3d,#ef5350);border-radius:20px;position:relative;margin:15px 0 24px}
-#marker{position:absolute;width:5px;height:25px;background:var(--text);top:-5px;left:50%;border-radius:3px;transition:.2s}
-#verdict{padding:18px;text-align:center;font-size:25px;font-weight:900;border:2px solid var(--border);border-radius:12px;background:var(--card2)}
-#verdict small{display:block;font-size:11px;color:var(--muted);margin-top:6px}
-#verdict.fair{border-color:#22a06b}
-#verdict.slight{border-color:#e3a008}
-#verdict.adv{border-color:#e87722}
-#verdict.major{border-color:#d64545}
-.grade{display:flex;justify-content:space-between;padding:12px;background:var(--card2);border-radius:9px;margin-top:10px}
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
-.actions button,.close{padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--card2);color:var(--text);font-weight:800}
-.analysis{display:grid;grid-template-columns:1fr 1fr;gap:15px}
-.suggestion{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:9px;margin-top:7px;font-size:12px}
-#sleeper-bar{display:none;border-color:var(--blue)}
-.sync-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-.primary{background:var(--blue);color:#fff;border:0;width:100%;margin-top:10px;padding:10px;border-radius:8px;font-weight:800}
-.modal-bg{display:none;position:fixed;inset:0;background:#000b;z-index:100;align-items:center;justify-content:center;padding:15px}
-.modal-bg.show{display:flex}
-.modal{width:min(550px,100%);background:var(--card);padding:20px;border-radius:15px}
-.modal-head{display:flex;justify-content:space-between;gap:10px}
-.modal h2{margin-top:0}
-#league-wrap{display:none;margin-top:12px}
-#status{font-size:12px;color:var(--muted);margin-top:10px}
-.page-hidden{display:none!important}
-.league-toolbar{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:16px}
-.league-toolbar h2{margin:0}
-.league-view-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.roster-card{background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:16px}
-.roster-title{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding-bottom:12px;border-bottom:1px solid var(--border)}
-.roster-title h3{margin:4px 0 0}
-.roster-meta{color:var(--muted);font-size:12px}
-.roster-list{margin-top:8px}
-.roster-player{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid var(--border)}
-.roster-player:last-child{border-bottom:0}
-.roster-value{font-weight:900}
-.not-valued{font-size:10px;color:var(--muted)}
+
+:root{
+--bg:#f4f7fb;
+--card:#fff;
+--card2:#eef3f9;
+--text:#142033;
+--muted:#68778c;
+--border:#d8e1ee;
+--blue:#1976ff;
+--input:#fff;
+--sync:#fff;
+--good:#22a06b;
+--warn:#e3a008;
+--orange:#e87722;
+--bad:#d64545
+}
+
+html[data-theme="dark"]{
+--bg:#0c111b;
+--card:#151d2a;
+--card2:#101722;
+--text:#eef4ff;
+--muted:#9eabc0;
+--border:#29364b;
+--blue:#2583ff;
+--input:#0f1622;
+--sync:#000
+}
+
+body{
+margin:0;
+background:var(--bg);
+color:var(--text);
+font-family:Arial,sans-serif
+}
+
+button,input,select{
+font:inherit
+}
+
+button{
+cursor:pointer
+}
+
+button:disabled{
+opacity:.5;
+cursor:not-allowed
+}
+
+.wrap{
+max-width:1400px;
+margin:auto;
+padding:20px
+}
+
+header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+border-bottom:1px solid var(--border);
+padding-bottom:18px
+}
+
+.brand{
+display:flex;
+align-items:center;
+gap:12px
+}
+
+.logo{
+background:var(--blue);
+color:#fff;
+font-weight:900;
+font-size:20px;
+padding:15px;
+border-radius:13px
+}
+
+h1{
+margin:0;
+font-size:30px
+}
+
+.sub{
+color:var(--muted);
+font-size:13px;
+margin-top:4px
+}
+
+.header-buttons{
+display:flex;
+flex-direction:column;
+gap:7px;
+width:180px
+}
+
+.header-buttons button{
+padding:10px;
+border-radius:9px;
+font-weight:800
+}
+
+.sync-actions{
+display:grid;
+grid-template-columns:1fr;
+gap:7px
+}
+
+#theme-toggle{
+background:var(--card);
+color:var(--text);
+border:1px solid var(--border)
+}
+
+#sync-button{
+background:var(--blue);
+color:var(--sync);
+border:0
+}
+
+#sleeper-page-button{
+background:var(--card);
+color:var(--text);
+border:1px solid var(--blue)
+}
+
+.card{
+background:var(--card);
+border:1px solid var(--border);
+border-radius:15px;
+padding:16px;
+margin-top:16px
+}
+
+.settings{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:12px
+}
+
+.setting{
+display:flex;
+flex-direction:column;
+gap:5px
+}
+
+.setting span{
+font-size:11px;
+font-weight:800;
+color:var(--muted)
+}
+
+select,input{
+width:100%;
+padding:10px;
+border-radius:8px;
+border:1px solid var(--border);
+background:var(--input);
+color:var(--text)
+}
+
+select:disabled{
+opacity:1;
+color:var(--text)
+}
+
+.settings-title{
+display:flex;
+justify-content:space-between;
+gap:12px;
+margin-bottom:12px;
+font-weight:900
+}
+
+.mode-label{
+color:var(--blue);
+font-size:12px;
+text-align:right
+}
+
+.top-grid{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:10px
+}
+
+.top-box{
+background:var(--card2);
+border:1px solid var(--border);
+border-radius:10px;
+padding:10px
+}
+
+.top-box h3{
+margin:0 0 8px;
+font-size:13px
+}
+
+.top-row{
+display:flex;
+justify-content:space-between;
+gap:8px;
+font-size:12px;
+padding:5px 0
+}
+
+.trade-grid{
+display:grid;
+grid-template-columns:1fr 320px 1fr;
+gap:15px;
+margin-top:16px
+}
+
+.team{
+margin-top:0
+}
+
+.team h2{
+margin-top:0
+}
+
+.search-wrap{
+position:relative
+}
+
+.results{
+display:none;
+position:absolute;
+left:0;
+right:0;
+top:46px;
+background:var(--card);
+border:1px solid var(--border);
+border-radius:9px;
+z-index:20;
+max-height:320px;
+overflow:auto
+}
+
+.results.show{
+display:block
+}
+
+.result-item{
+padding:9px;
+border-bottom:1px solid var(--border);
+cursor:pointer;
+display:flex;
+justify-content:space-between;
+gap:10px
+}
+
+.result-item:hover{
+background:var(--card2)
+}
+
+.player{
+display:grid;
+grid-template-columns:1fr auto auto;
+gap:8px;
+align-items:center;
+padding:10px 0;
+border-bottom:1px solid var(--border)
+}
+
+.player small,
+.roster-player small{
+display:block;
+color:var(--muted);
+margin-top:3px
+}
+
+.remove{
+border:1px solid var(--border);
+background:var(--card2);
+color:var(--text);
+border-radius:6px
+}
+
+.totals{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:8px;
+margin-top:15px
+}
+
+.total{
+background:var(--card2);
+padding:10px;
+border-radius:9px;
+text-align:center
+}
+
+.total small{
+display:block;
+color:var(--muted)
+}
+
+.total strong{
+font-size:20px
+}
+
+.result-card{
+margin-top:0
+}
+
+.meter{
+height:15px;
+background:linear-gradient(90deg,#3380ff,#26a269,#ff9b3d,#ef5350);
+border-radius:20px;
+position:relative;
+margin:15px 0 24px
+}
+
+.marker{
+position:absolute;
+width:5px;
+height:25px;
+background:var(--text);
+top:-5px;
+left:50%;
+border-radius:3px;
+transition:.2s
+}
+
+.verdict{
+padding:18px;
+text-align:center;
+font-size:25px;
+font-weight:900;
+border:2px solid var(--border);
+border-radius:12px;
+background:var(--card2)
+}
+
+.verdict small{
+display:block;
+font-size:11px;
+color:var(--muted);
+margin-top:6px
+}
+
+.verdict.fair{
+border-color:var(--good)
+}
+
+.verdict.slight{
+border-color:var(--warn)
+}
+
+.verdict.adv{
+border-color:var(--orange)
+}
+
+.verdict.major{
+border-color:var(--bad)
+}
+
+.grade{
+display:flex;
+justify-content:space-between;
+padding:12px;
+background:var(--card2);
+border-radius:9px;
+margin-top:10px
+}
+
+.actions{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:7px;
+margin-top:10px
+}
+
+.actions button,
+.close{
+padding:10px;
+border-radius:8px;
+border:1px solid var(--border);
+background:var(--card2);
+color:var(--text);
+font-weight:800
+}
+
+.analysis{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:15px
+}
+
+.suggestion{
+background:var(--card2);
+border:1px solid var(--border);
+border-radius:8px;
+padding:9px;
+margin-top:7px;
+font-size:12px
+}
+
+.primary{
+background:var(--blue);
+color:#fff;
+border:0;
+width:100%;
+margin-top:10px;
+padding:10px;
+border-radius:8px;
+font-weight:800
+}
+
+.modal-bg{
+display:none;
+position:fixed;
+inset:0;
+background:#000b;
+z-index:100;
+align-items:center;
+justify-content:center;
+padding:15px
+}
+
+.modal-bg.show{
+display:flex
+}
+
+.modal{
+width:min(550px,100%);
+background:var(--card);
+padding:20px;
+border-radius:15px
+}
+
+.modal-head{
+display:flex;
+justify-content:space-between;
+gap:10px
+}
+
+.modal h2{
+margin-top:0
+}
+
+#league-wrap{
+display:none;
+margin-top:12px
+}
+
+#status{
+font-size:12px;
+color:var(--muted);
+margin-top:10px
+}
+
+.page-hidden{
+display:none!important
+}
+
+.page-toolbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:15px;
+margin-top:16px
+}
+
+.page-toolbar h2{
+margin:0
+}
+
+.sleeper-banner{
+border-color:var(--blue)
+}
+
+.sleeper-banner-actions{
+display:flex;
+gap:8px;
+flex-wrap:wrap;
+margin-top:12px
+}
+
+.roster-select-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px
+}
+
+.roster-view-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:16px
+}
+
+.roster-card{
+background:var(--card2);
+border:1px solid var(--border);
+border-radius:14px;
+padding:16px
+}
+
+.roster-title{
+display:flex;
+justify-content:space-between;
+gap:10px;
+align-items:flex-start;
+padding-bottom:12px;
+border-bottom:1px solid var(--border)
+}
+
+.roster-title h3{
+margin:4px 0 0
+}
+
+.roster-meta{
+color:var(--muted);
+font-size:12px
+}
+
+.roster-list{
+margin-top:8px
+}
+
+.roster-player{
+display:grid;
+grid-template-columns:1fr auto;
+gap:10px;
+align-items:center;
+padding:11px 0;
+border-bottom:1px solid var(--border)
+}
+
+.roster-player:last-child{
+border-bottom:0
+}
+
+.roster-value{
+font-weight:900
+}
+
+.not-valued{
+font-size:10px;
+color:var(--muted)
+}
+
+.section-heading{
+margin:0
+}
 
 @media(max-width:900px){
 .trade-grid{grid-template-columns:1fr}
 .top-grid,.settings{grid-template-columns:1fr 1fr}
+.roster-view-grid{grid-template-columns:1fr}
 }
 
 @media(max-width:550px){
 header{display:block}
 .header-buttons{width:100%;margin-top:15px}
-.top-grid,.settings,.analysis,.sync-grid,.league-view-grid{grid-template-columns:1fr}
-.league-toolbar{display:block}
-.league-toolbar button{width:100%;margin-top:12px}
+.top-grid,.settings,.analysis,.roster-select-grid{grid-template-columns:1fr}
+.page-toolbar{display:block}
+.page-toolbar button{width:100%;margin-top:12px}
 }
 </style>
 </head>
 
 <body>
+
 <div class="wrap">
 
 <header>
+
 <div class="brand">
 <div class="logo">TF</div>
+
 <div>
 <h1>TradeForge Fantasy</h1>
 <div class="sub">Super Trade Analyzer</div>
@@ -120,28 +586,45 @@ header{display:block}
 </div>
 
 <div class="header-buttons">
-<button id="theme-toggle">☀ Light Theme</button>
+
+<button id="theme-toggle">
+☀ Light Theme
+</button>
+
 <div class="sync-actions">
-<button id="sync-button">Sync Your League</button>
-<button id="league-view-button" disabled>League View</button>
+
+<button id="sync-button">
+Sync Your League
+</button>
+
+<button id="sleeper-page-button" disabled>
+Sleeper League
+</button>
+
 </div>
 </div>
+
 </header>
 
-<main id="analyzer-page">
+
+<!-- =====================================================
+     HOME CALCULATOR
+     ===================================================== -->
+
+<main id="home-page">
 
 <section class="card">
 
 <div class="settings-title">
 <span>League Settings</span>
-<span id="mode-label"></span>
+<span id="home-mode-label" class="mode-label"></span>
 </div>
 
 <div class="settings">
 
 <label class="setting">
 <span>SCORING</span>
-<select id="scoring">
+<select id="home-scoring">
 <option value="ppr">PPR</option>
 <option value="half">0.5 PPR</option>
 <option value="standard">No PPR</option>
@@ -150,7 +633,7 @@ header{display:block}
 
 <label class="setting">
 <span>LEAGUE</span>
-<select id="league">
+<select id="home-league">
 <option value="redraft">Redraft</option>
 <option value="keeper">Keeper</option>
 <option value="dynasty">Dynasty</option>
@@ -159,7 +642,7 @@ header{display:block}
 
 <label class="setting">
 <span>QB FORMAT</span>
-<select id="qb">
+<select id="home-qb">
 <option value="oneqb">1QB</option>
 <option value="superflex">Superflex</option>
 </select>
@@ -167,7 +650,7 @@ header{display:block}
 
 <label class="setting">
 <span>TE PREMIUM</span>
-<select id="tep">
+<select id="home-tep">
 <option value="off">Off</option>
 <option value="half">+0.5 PPR</option>
 <option value="full">+1.0 PPR</option>
@@ -176,199 +659,756 @@ header{display:block}
 
 </div>
 
-<div class="engine-strip">
-<strong>TradeForge Engine v1.0</strong>
-<span id="engine-status">Baseline mode</span>
-</div>
-
 </section>
 
-<section id="sleeper-bar" class="card">
-
-<strong id="sleeper-name">Sleeper League</strong>
-<div id="sleeper-info" class="sub"></div>
-
-<div class="sync-grid">
-
-<label class="setting">
-<span>TEAM A ROSTER</span>
-<select id="roster-a"></select>
-</label>
-
-<label class="setting">
-<span>TEAM B ROSTER</span>
-<select id="roster-b"></select>
-</label>
-
-</div>
-
-<button id="disconnect" class="close" style="margin-top:10px">
-Disconnect Sleeper
-</button>
-
-</section>
 
 <section class="card">
 
-<h3 style="margin-top:0">Top Players</h3>
+<h3 class="section-heading">
+Top Players
+</h3>
 
-<div class="top-grid">
-<div class="top-box"><h3>RB</h3><div id="top-rb"></div></div>
-<div class="top-box"><h3>WR</h3><div id="top-wr"></div></div>
-<div class="top-box"><h3>QB</h3><div id="top-qb"></div></div>
-<div class="top-box"><h3>TE</h3><div id="top-te"></div></div>
+<div class="top-grid" style="margin-top:10px">
+
+<div class="top-box">
+<h3>RB</h3>
+<div id="home-top-rb"></div>
+</div>
+
+<div class="top-box">
+<h3>WR</h3>
+<div id="home-top-wr"></div>
+</div>
+
+<div class="top-box">
+<h3>QB</h3>
+<div id="home-top-qb"></div>
+</div>
+
+<div class="top-box">
+<h3>TE</h3>
+<div id="home-top-te"></div>
+</div>
+
 </div>
 
 </section>
 
+
 <div class="trade-grid">
 
-<section class="team">
+<section class="team card">
 
 <h2>Team A</h2>
 
 <div class="search-wrap">
-<input id="search-a" placeholder="Search player or pick" autocomplete="off">
-<div id="results-a" class="results"></div>
+
+<input
+id="home-search-a"
+placeholder="Search player or pick"
+autocomplete="off"
+>
+
+<div
+id="home-results-a"
+class="results">
 </div>
 
-<div id="team-a"></div>
+</div>
+
+<div id="home-team-a"></div>
 
 <div class="totals">
+
 <div class="total">
 <small>Base</small>
-<strong id="base-a">0.0</strong>
+<strong id="home-base-a">0.0</strong>
 </div>
 
 <div class="total">
 <small>Adjusted</small>
-<strong id="adj-a">0.0</strong>
+<strong id="home-adj-a">0.0</strong>
 </div>
+
 </div>
 
 </section>
 
-<section class="result-card">
+
+<section class="result-card card">
 
 <div class="meter">
-<div id="marker"></div>
+<div id="home-marker" class="marker"></div>
 </div>
 
-<div id="verdict">
+<div id="home-verdict" class="verdict">
+
 Build a Trade
-<small>Add players to both sides.</small>
+
+<small>
+Add players to both sides.
+</small>
+
 </div>
 
 <div class="grade">
 <span>Trade Grade</span>
-<strong id="grade">—</strong>
+<strong id="home-grade">—</strong>
 </div>
 
 <div class="actions">
-<button id="swap">Swap Sides</button>
-<button id="clear">Clear Trade</button>
+
+<button id="home-swap">
+Swap Sides
+</button>
+
+<button id="home-clear">
+Clear Trade
+</button>
+
 </div>
 
 </section>
 
-<section class="team">
+
+<section class="team card">
 
 <h2>Team B</h2>
 
 <div class="search-wrap">
-<input id="search-b" placeholder="Search player or pick" autocomplete="off">
-<div id="results-b" class="results"></div>
+
+<input
+id="home-search-b"
+placeholder="Search player or pick"
+autocomplete="off"
+>
+
+<div
+id="home-results-b"
+class="results">
 </div>
 
-<div id="team-b"></div>
+</div>
+
+<div id="home-team-b"></div>
 
 <div class="totals">
+
 <div class="total">
 <small>Base</small>
-<strong id="base-b">0.0</strong>
+<strong id="home-base-b">0.0</strong>
 </div>
 
 <div class="total">
 <small>Adjusted</small>
-<strong id="adj-b">0.0</strong>
+<strong id="home-adj-b">0.0</strong>
 </div>
+
 </div>
 
 </section>
 
 </div>
+
 
 <div class="analysis">
 
 <section class="card">
-<h3>What Makes This Fair?</h3>
-<div id="fair">Build a trade to see suggestions.</div>
+
+<h3>
+What Makes This Fair?
+</h3>
+
+<div id="home-fair">
+Build a trade to see suggestions.
+</div>
+
 </section>
 
+
 <section class="card">
-<h3>Suggested Package</h3>
-<div id="packages">Build a trade to see packages.</div>
+
+<h3>
+Suggested Package
+</h3>
+
+<div id="home-packages">
+Build a trade to see packages.
+</div>
+
 </section>
 
 </div>
 
 </main>
 
-<main id="league-page" class="page-hidden">
 
-<section class="card">
+<!-- =====================================================
+     SLEEPER PAGE
+     ===================================================== -->
 
-<div class="league-toolbar">
+<main
+id="sleeper-page"
+class="page-hidden"
+>
+
+<div class="page-toolbar">
 
 <div>
-<h2>League View</h2>
-<div id="league-page-name" class="sub"></div>
+
+<h2>
+Sleeper League
+</h2>
+
+<div
+id="sleeper-page-name"
+class="sub">
 </div>
 
-<button id="back-to-analyzer" class="close">
+</div>
+
+<button
+id="back-home"
+class="close">
 ← Back to Trade Analyzer
 </button>
 
 </div>
 
-<div class="league-view-grid">
+
+<section class="card sleeper-banner">
+
+<div class="settings-title">
+
+<span>
+Synced League Settings
+</span>
+
+<span
+id="sleeper-mode-label"
+class="mode-label">
+</span>
+
+</div>
+
+
+<div class="settings">
+
+<label class="setting">
+
+<span>
+SCORING
+</span>
+
+<select
+id="sleeper-scoring"
+disabled>
+
+<option value="ppr">
+PPR
+</option>
+
+<option value="half">
+0.5 PPR
+</option>
+
+<option value="standard">
+No PPR
+</option>
+
+</select>
+
+</label>
+
+
+<label class="setting">
+
+<span>
+LEAGUE
+</span>
+
+<select
+id="sleeper-league"
+disabled>
+
+<option value="redraft">
+Redraft
+</option>
+
+<option value="keeper">
+Keeper
+</option>
+
+<option value="dynasty">
+Dynasty
+</option>
+
+</select>
+
+</label>
+
+
+<label class="setting">
+
+<span>
+QB FORMAT
+</span>
+
+<select
+id="sleeper-qb"
+disabled>
+
+<option value="oneqb">
+1QB
+</option>
+
+<option value="superflex">
+Superflex
+</option>
+
+</select>
+
+</label>
+
+
+<label class="setting">
+
+<span>
+TE PREMIUM
+</span>
+
+<select
+id="sleeper-tep"
+disabled>
+
+<option value="off">
+Off
+</option>
+
+<option value="half">
++0.5 PPR
+</option>
+
+<option value="full">
++1.0 PPR
+</option>
+
+</select>
+
+</label>
+
+</div>
+
+
+<div class="sleeper-banner-actions">
+
+<button
+id="disconnect"
+class="close">
+
+Disconnect Sleeper
+
+</button>
+
+</div>
+
+</section>
+
+
+<section class="card">
+
+<div class="settings-title">
+
+<span>
+Choose the two Sleeper rosters for this trade
+</span>
+
+<span class="sub">
+Searches below only use players on the selected rosters.
+</span>
+
+</div>
+
+
+<div class="roster-select-grid">
+
+<label class="setting">
+
+<span>
+TEAM A ROSTER
+</span>
+
+<select id="sleeper-roster-a">
+</select>
+
+</label>
+
+
+<label class="setting">
+
+<span>
+TEAM B ROSTER
+</span>
+
+<select id="sleeper-roster-b">
+</select>
+
+</label>
+
+</div>
+
+</section>
+
+
+<section class="card">
+
+<h3 class="section-heading">
+Top Players
+</h3>
+
+
+<div class="top-grid" style="margin-top:10px">
+
+<div class="top-box">
+
+<h3>
+RB
+</h3>
+
+<div id="sleeper-top-rb">
+</div>
+
+</div>
+
+
+<div class="top-box">
+
+<h3>
+WR
+</h3>
+
+<div id="sleeper-top-wr">
+</div>
+
+</div>
+
+
+<div class="top-box">
+
+<h3>
+QB
+</h3>
+
+<div id="sleeper-top-qb">
+</div>
+
+</div>
+
+
+<div class="top-box">
+
+<h3>
+TE
+</h3>
+
+<div id="sleeper-top-te">
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<div class="trade-grid">
+
+<section class="team card">
+
+<h2>
+Team A
+</h2>
+
+<div class="search-wrap">
+
+<input
+id="sleeper-search-a"
+placeholder="Search Team A roster"
+autocomplete="off"
+>
+
+<div
+id="sleeper-results-a"
+class="results">
+</div>
+
+</div>
+
+<div id="sleeper-team-a">
+</div>
+
+
+<div class="totals">
+
+<div class="total">
+
+<small>
+Base
+</small>
+
+<strong id="sleeper-base-a">
+0.0
+</strong>
+
+</div>
+
+
+<div class="total">
+
+<small>
+Adjusted
+</small>
+
+<strong id="sleeper-adj-a">
+0.0
+</strong>
+
+</div>
+
+</div>
+
+</section>
+
+
+<section class="result-card card">
+
+<div class="meter">
+
+<div
+id="sleeper-marker"
+class="marker">
+</div>
+
+</div>
+
+
+<div
+id="sleeper-verdict"
+class="verdict">
+
+Build a Trade
+
+<small>
+Add players to both sides.
+</small>
+
+</div>
+
+
+<div class="grade">
+
+<span>
+Trade Grade
+</span>
+
+<strong id="sleeper-grade">
+—
+</strong>
+
+</div>
+
+
+<div class="actions">
+
+<button id="sleeper-swap">
+Swap Sides
+</button>
+
+<button id="sleeper-clear">
+Clear Trade
+</button>
+
+</div>
+
+</section>
+
+
+<section class="team card">
+
+<h2>
+Team B
+</h2>
+
+<div class="search-wrap">
+
+<input
+id="sleeper-search-b"
+placeholder="Search Team B roster"
+autocomplete="off"
+>
+
+<div
+id="sleeper-results-b"
+class="results">
+</div>
+
+</div>
+
+<div id="sleeper-team-b">
+</div>
+
+
+<div class="totals">
+
+<div class="total">
+
+<small>
+Base
+</small>
+
+<strong id="sleeper-base-b">
+0.0
+</strong>
+
+</div>
+
+
+<div class="total">
+
+<small>
+Adjusted
+</small>
+
+<strong id="sleeper-adj-b">
+0.0
+</strong>
+
+</div>
+
+</div>
+
+</section>
+
+</div>
+
+
+<div class="analysis">
+
+<section class="card">
+
+<h3>
+What Makes This Fair?
+</h3>
+
+<div id="sleeper-fair">
+Build a trade to see suggestions.
+</div>
+
+</section>
+
+
+<section class="card">
+
+<h3>
+Suggested Package
+</h3>
+
+<div id="sleeper-packages">
+Build a trade to see packages.
+</div>
+
+</section>
+
+</div>
+
+
+<section class="card">
+
+<h3 class="section-heading">
+League Rosters
+</h3>
+
+
+<div
+class="roster-view-grid"
+style="margin-top:12px"
+>
 
 <section class="roster-card">
 
 <div class="roster-title">
 
 <div>
-<div class="roster-meta">YOUR TEAM</div>
-<h3 id="my-team-name">Your Team</h3>
+
+<div class="roster-meta">
+YOUR TEAM
 </div>
 
-<div id="my-team-meta" class="roster-meta"></div>
+<h3 id="my-team-name">
+Your Team
+</h3>
 
 </div>
 
-<div id="my-team-roster" class="roster-list"></div>
+<div
+id="my-team-meta"
+class="roster-meta">
+</div>
+
+</div>
+
+
+<div
+id="my-team-roster"
+class="roster-list">
+</div>
 
 </section>
+
 
 <section class="roster-card">
 
 <label class="setting">
-<span>COMPARE WITH TEAM</span>
-<select id="opponent-select"></select>
+
+<span>
+COMPARE WITH TEAM
+</span>
+
+<select id="opponent-select">
+</select>
+
 </label>
 
-<div class="roster-title" style="margin-top:15px">
+
+<div
+class="roster-title"
+style="margin-top:15px"
+>
 
 <div>
-<div class="roster-meta">OTHER TEAM</div>
-<h3 id="opponent-team-name">Team</h3>
+
+<div class="roster-meta">
+OTHER TEAM
 </div>
 
-<div id="opponent-team-meta" class="roster-meta"></div>
+<h3 id="opponent-team-name">
+Team
+</h3>
 
 </div>
 
-<div id="opponent-team-roster" class="roster-list"></div>
+<div
+id="opponent-team-meta"
+class="roster-meta">
+</div>
+
+</div>
+
+
+<div
+id="opponent-team-roster"
+class="roster-list">
+</div>
 
 </section>
 
@@ -380,22 +1420,40 @@ Build a Trade
 
 </div>
 
-<div id="modal" class="modal-bg">
+
+<!-- =====================================================
+     SLEEPER LOGIN MODAL
+     ===================================================== -->
+
+<div
+id="modal"
+class="modal-bg"
+>
 
 <div class="modal">
 
 <div class="modal-head">
 
 <div>
-<h2>Sync Your Sleeper League</h2>
+
+<h2>
+Sync Your Sleeper League
+</h2>
+
 <div class="sub">
 Enter your Sleeper username. No password is needed.
 </div>
-</div>
-
-<button id="modal-close" class="close">×</button>
 
 </div>
+
+<button
+id="modal-close"
+class="close">
+×
+</button>
+
+</div>
+
 
 <input
 id="username"
@@ -403,67 +1461,96 @@ placeholder="Sleeper username"
 autocomplete="off"
 >
 
-<button id="find-leagues" class="primary">
+
+<button
+id="find-leagues"
+class="primary">
+
 Find My Leagues
+
 </button>
+
 
 <div id="league-wrap">
 
-<select id="league-picker"></select>
+<select id="league-picker">
+</select>
 
-<button id="connect-league" class="primary">
+<button
+id="connect-league"
+class="primary">
+
 Sync Selected League
+
 </button>
 
 </div>
 
-<div id="status" aria-live="polite"></div>
 
+<div
+id="status"
+aria-live="polite">
 </div>
 
 </div>
+
+</div>
+
 
 <script>
-
-let teamA=[];
-let teamB=[];
-
-let scoringMode="ppr";
-let leagueMode="redraft";
-let qbMode="oneqb";
-let tePremiumMode="off";
-
-let sleeperUser=null;
-let syncedLeague=null;
-let syncedRosters=[];
-let syncedUsers=[];
-let sleeperPlayers={};
-let rosterA="";
-let rosterB="";
-
-let sleeperTrendMarket={},sleeperIdByName={};
-let tradeForgeFeedMeta=null;
 
 const SUPERSTAR_FACTOR=1.25;
 
 const PACKAGE_WEIGHTS=[
-1.00,
-0.95,
-0.90,
-0.85,
-0.80,
-0.80,
-0.80,
-0.80
+1,
+.95,
+.90,
+.85,
+.80,
+.80,
+.80,
+.80
 ];
 
+
 const multipliers={
-RB:{ppr:1,half:.98,standard:.95},
-WR:{ppr:1,half:.96,standard:.91},
-TE:{ppr:1,half:.95,standard:.89},
-QB:{ppr:1,half:1,standard:1},
-K:{ppr:1,half:1,standard:1},
-DST:{ppr:1,half:1,standard:1}
+
+RB:{
+ppr:1,
+half:.98,
+standard:.95
+},
+
+WR:{
+ppr:1,
+half:.96,
+standard:.91
+},
+
+TE:{
+ppr:1,
+half:.95,
+standard:.89
+},
+
+QB:{
+ppr:1,
+half:1,
+standard:1
+},
+
+K:{
+ppr:1,
+half:1,
+standard:1
+},
+
+DST:{
+ppr:1,
+half:1,
+standard:1
+}
+
 };
 
 
@@ -826,26 +1913,38 @@ const playerDatabase = [
    ========================================================= */
 
 const picks=[
+
 ["2027 Early 1st",52,58],
 ["2027 Mid 1st",44,50],
 ["2027 Late 1st",36,42],
 ["2027 2nd",22,25],
 ["2027 3rd",10,12],
+
 ["2028 Early 1st",47,53],
 ["2028 Mid 1st",40,46],
 ["2028 Late 1st",33,39],
 ["2028 2nd",19,22],
 ["2028 3rd",8,10]
-].map((x,i)=>({
+
+].map(
+(x,i)=>({
+
 rank:1001+i,
 name:x[0],
 pos:"PICK",
 oneqb:x[1],
 superflex:x[2]
-}));
 
+})
+);
+
+
+/* =========================================================
+   DEFENSE NAME MATCHING
+   ========================================================= */
 
 const dst={
+
 HOU:"Houston Texans DST",
 DEN:"Denver Broncos DST",
 SEA:"Seattle Seahawks DST",
@@ -859,1029 +1958,249 @@ GB:"Green Bay Packers DST",
 BAL:"Baltimore Ravens DST",
 JAC:"Jacksonville Jaguars DST",
 KC:"Kansas City Chiefs DST"
+
 };
 
 
-const $=id=>document.getElementById(id);
+/* =========================================================
+   HELPERS
+   ========================================================= */
 
-const key=p=>p.sleeperId||p.pos+"|"+p.name;
+const $=
+id=>
+document.getElementById(id);
 
-const norm=s=>String(s||"")
+
+const esc=
+s=>
+String(s??"")
+
+.replace(
+/&/g,
+"&amp;"
+)
+
+.replace(
+/</g,
+"&lt;"
+)
+
+.replace(
+/>/g,
+"&gt;"
+)
+
+.replace(
+/"/g,
+"&quot;"
+)
+
+.replace(
+/'/g,
+"&#039;"
+);
+
+
+const norm=
+s=>
+String(s||"")
+
 .toLowerCase()
-.replace(/[.'’\-]/g,"")
-.replace(/\b(jr|sr|ii|iii|iv)\b/g,"")
-.replace(/[^a-z0-9]/g,"");
 
-const esc=s=>String(s??"")
-.replace(/&/g,"&amp;")
-.replace(/</g,"&lt;")
-.replace(/>/g,"&gt;")
-.replace(/"/g,"&quot;")
-.replace(/'/g,"&#039;");
-
-const assets=()=>leagueMode==="dynasty"
-?playerDatabase.concat(picks)
-:playerDatabase;
-
-
-/* =========================================================
-   TRADEFORGE ENGINE v1.0
-   ========================================================= */
-
-const TRADEFORGE_ENGINE={
-
-enabled:true,
-
-useReplacementValue:false,
-
-useSleeperTrendingMarket:false,
-
-useDynamicPickValues:false,
-
-redraftWeights:{
-projection:.55,
-consensus:.20,
-opportunity:.15,
-recent:.10
-},
-
-expectedWeight:.85,
-
-upsideWeight:.15,
-
-roleFactorMin:.92,
-
-roleFactorMax:1.05,
-
-marketAdjustmentMax:.03,
-
-keeperWeights:{
-redraft:.60,
-dynasty:.40
-},
-
-dynastyWeights:{
-multiYear:.55,
-consensus:.25,
-roleSecurity:.10,
-prospectDraft:.05,
-marketMomentum:.05
-},
-
-dynastyYears:{
-year1:.50,
-year2:.30,
-year3:.20
-},
-
-rookieWeights:{
-prospect:.30,
-draftCapital:.20,
-opportunity:.20,
-consensus:.20,
-ageScore:.10
-},
-
-rookieTransitionGames:8,
-
-futurePickDiscounts:[
-1,
-.91,
-.84,
-.78
-]
-
-};
-
-
-const tfClamp=(v,min,max)=>Math.max(min,Math.min(max,v));
-
-const tfRound=v=>Math.round(v*10)/10;
-
-const tfNum=(v,fallback)=>
-Number.isFinite(Number(v))
-?Number(v)
-:fallback;
-
-const tfStoredRawValue=(p,mode)=>
-tfNum(
-p?.[mode],
-.1
-);
-
-
-function tfHasNumericData(obj,keys){
-
-return !!obj&&keys.some(
-k=>Number.isFinite(Number(obj[k]))
-);
-
-}
-
-
-function tfHasRedraftData(p){
-
-return tfHasNumericData(
-p.engine?.redraft,
-[
-"projection",
-"consensus",
-"opportunity",
-"recent",
-"replacement",
-"availability",
-"roleConfidence",
-"upside",
-"marketChange"
-]
-);
-
-}
-
-
-function tfHasDynastyData(p){
-
-const e=p.engine?.dynasty;
-
-return !!e&&(
-tfHasNumericData(
-e,
-[
-"year1",
-"year2",
-"year3",
-"consensus",
-"roleSecurity",
-"prospect",
-"draftCapital",
-"marketMomentum",
-"opportunity",
-"age",
-"ageScore",
-"nflGames"
-]
+.replace(
+/[.'’\-]/g,
+""
 )
-||
-e.isRookie===true
-);
 
-}
-
-
-function tfHasAnyEngineData(p){
-
-return tfHasRedraftData(p)||tfHasDynastyData(p);
-
-}
-
-
-/* =========================================================
-   ROLE CONFIDENCE
-   ========================================================= */
-
-function tfRoleFactor(confidence){
-
-confidence=tfClamp(
-tfNum(confidence,50),
-0,
-100
-);
-
-if(confidence<=50){
-
-return TRADEFORGE_ENGINE.roleFactorMin
-+
-(confidence/50)
-*
-(
-1-TRADEFORGE_ENGINE.roleFactorMin
-);
-
-}
-
-return 1
-+
-(
-(confidence-50)/50
+.replace(
+/\b(jr|sr|ii|iii|iv)\b/g,
+""
 )
-*
-(
-TRADEFORGE_ENGINE.roleFactorMax-1
-);
 
-}
-
-
-/* =========================================================
-   DYNASTY AGE CURVES
-   ========================================================= */
-
-function tfDynastyAgeFactor(pos,age){
-
-if(!Number.isFinite(Number(age))){
-return 1;
-}
-
-age=Number(age);
-
-if(pos==="RB"){
-
-if(age<=23)return 1.04;
-if(age<=25)return 1.02;
-if(age===26)return .99;
-if(age===27)return .95;
-if(age===28)return .90;
-
-return .84;
-
-}
-
-
-if(pos==="WR"){
-
-if(age<=24)return 1.04;
-if(age<=27)return 1.02;
-if(age===28)return .99;
-if(age===29)return .95;
-if(age===30)return .90;
-
-return .85;
-
-}
-
-
-if(pos==="TE"){
-
-if(age<=25)return 1.03;
-if(age<=29)return 1.02;
-if(age===30)return .98;
-
-return .90;
-
-}
-
-
-if(pos==="QB"){
-
-if(age<=25)return 1.02;
-if(age<=32)return 1.02;
-if(age<=35)return .98;
-
-return .93;
-
-}
-
-
-return 1;
-
-}
-
-
-function tfAgeScore(pos,age,fallback){
-
-return Number.isFinite(Number(age))
-?
-tfClamp(
-fallback
-*
-tfDynastyAgeFactor(
-pos,
-Number(age)
-),
-0,
-100
-)
-:
-fallback;
-
-}
-
-
-/* =========================================================
-   LEAGUE-SPECIFIC REPLACEMENT VALUE
-   ========================================================= */
-
-function tfRosteredNameSet(){
-
-const set=new Set();
-
-if(!syncedLeague){
-return set;
-}
-
-
-syncedRosters.forEach(
-r=>
-(r.players||[]).forEach(
-id=>{
-
-id=String(id);
-
-if(dst[id]){
-
-set.add(
-norm(dst[id])
-);
-
-return;
-
-}
-
-
-const sp=sleeperPlayers[id];
-
-if(!sp){
-return;
-}
-
-
-const name=
-sp.full_name
-||
-[
-sp.first_name,
-sp.last_name
-]
-.filter(Boolean)
-.join(" ");
-
-
-if(name){
-
-set.add(
-norm(name)
-);
-
-}
-
-}
-)
+.replace(
+/[^a-z0-9]/g,
+""
 );
 
 
-return set;
-
-}
-
-
-function tfSyncedReplacementRaw(pos,mode){
-
-if(!syncedLeague){
-return 0;
-}
-
-
-const rostered=tfRosteredNameSet();
-
-
-const available=
-playerDatabase
-
-.filter(
+const key=
 p=>
-p.pos===pos
-&&
-!rostered.has(
-norm(p.name)
-)
-)
-
-.map(
-p=>
-tfStoredRawValue(
-p,
-mode
-)
-)
-
-.filter(Number.isFinite)
-
-.sort(
-(a,b)=>b-a
-)
-
-.slice(
-0,
-3
-);
-
-
-if(!available.length){
-return 0;
-}
-
-
-return available.reduce(
-(a,b)=>a+b,
-0
-)
-/
-available.length;
-
-}
-
-
-/* =========================================================
-   MARKET MOVEMENT
-   ========================================================= */
-
-function tfAutoMarketChange(p){
-
-if(
-!TRADEFORGE_ENGINE.useSleeperTrendingMarket
-){
-return 0;
-}
-
-
-const id=
 p.sleeperId
 ||
-sleeperIdByName[
-norm(p.name)
-];
-
-
-return id
-&&
-Number.isFinite(
-sleeperTrendMarket[id]
-)
-?
-sleeperTrendMarket[id]
-:
-0;
-
-}
+p.pos
++
+"|"
++
+p.name;
 
 
 /* =========================================================
-   REDRAFT ENGINE
+   TWO COMPLETELY SEPARATE CALCULATORS
    ========================================================= */
 
-function tfRedraftRaw(p){
+const homeSettings={
 
-const fallback=tfStoredRawValue(
-p,
-"redraft"
-);
+scoring:"ppr",
+league:"redraft",
+qb:"oneqb",
+tep:"off"
 
-const e=p.engine?.redraft;
+};
 
 
-if(!tfHasRedraftData(p)){
+const sleeperSettings={
 
-return fallback;
+scoring:"ppr",
+league:"redraft",
+qb:"oneqb",
+tep:"off"
+
+};
+
+
+const homeCtx={
+
+prefix:"home",
+teamA:[],
+teamB:[],
+settings:homeSettings,
+type:"home"
+
+};
+
+
+const sleeperCtx={
+
+prefix:"sleeper",
+teamA:[],
+teamB:[],
+settings:sleeperSettings,
+type:"sleeper"
+
+};
+
+
+/* =========================================================
+   SLEEPER DATA
+   ========================================================= */
+
+let sleeperUser=null;
+
+let syncedLeague=null;
+
+let syncedRosters=[];
+
+let syncedUsers=[];
+
+let sleeperPlayers={};
+
+let sleeperRosterA="";
+
+let sleeperRosterB="";
+
+
+/* =========================================================
+   PLAYER VALUE
+   ========================================================= */
+
+function assetsForSettings(
+settings
+){
+
+return settings.league==="dynasty"
+
+?
+
+playerDatabase.concat(
+picks
+)
+
+:
+
+playerDatabase;
 
 }
 
 
-const w=TRADEFORGE_ENGINE.redraftWeights;
-
-
-const projection=
-tfNum(
-e.projection,
-fallback
-);
-
-
-const consensus=
-tfNum(
-e.consensus,
-fallback
-);
-
-
-const opportunity=
-tfNum(
-e.opportunity,
-fallback
-);
-
-
-const recent=
-tfNum(
-e.recent,
-fallback
-);
-
-
-const performance=
-
-projection*w.projection
-+
-consensus*w.consensus
-+
-opportunity*w.opportunity
-+
-recent*w.recent;
-
-
-const upside=
-tfNum(
-e.upside,
-fallback
-);
-
-
-let score=
-
-performance
-*
-TRADEFORGE_ENGINE.expectedWeight
-
-+
-
-upside
-*
-TRADEFORGE_ENGINE.upsideWeight;
-
-
-/* VALUE OVER REPLACEMENT */
+function calcValue(
+p,
+settings
+){
 
 if(
-TRADEFORGE_ENGINE.useReplacementValue
+p.pos==="PICK"
 ){
 
-const replacement=
-
-Number.isFinite(
-Number(e.replacement)
-)
+return settings.qb==="superflex"
 
 ?
-Number(e.replacement)
 
-:
-tfSyncedReplacementRaw(
-p.pos,
-"redraft"
-);
-
-
-score=Math.max(
-0,
-score-replacement
-);
-
-}
-
-
-/* AVAILABILITY */
-
-score*=tfClamp(
-tfNum(
-e.availability,
-1
-),
-0,
-1
-);
-
-
-/* ROLE SECURITY */
-
-score*=tfRoleFactor(
-tfNum(
-e.roleConfidence,
-50
-)
-);
-
-
-/* MARKET MOVEMENT */
-
-const market=
-
-Number.isFinite(
-Number(e.marketChange)
-)
-
-?
-Number(e.marketChange)
-
-:
-tfAutoMarketChange(p);
-
-
-score*=
-
-1
-+
-tfClamp(
-market,
--TRADEFORGE_ENGINE.marketAdjustmentMax,
-TRADEFORGE_ENGINE.marketAdjustmentMax
-);
-
-
-return tfClamp(
-tfRound(score),
-.1,
-100
-);
-
-}
-
-
-/* =========================================================
-   DYNASTY ENGINE
-   ========================================================= */
-
-function tfDynastyRaw(p){
-
-const fallback=tfStoredRawValue(
-p,
-"dynasty"
-);
-
-const e=p.engine?.dynasty;
-
-
-if(!tfHasDynastyData(p)){
-
-return fallback;
-
-}
-
-
-const y=TRADEFORGE_ENGINE.dynastyYears;
-
-const w=TRADEFORGE_ENGINE.dynastyWeights;
-
-
-const year1=
-tfNum(
-e.year1,
-fallback
-);
-
-
-const year2=
-tfNum(
-e.year2,
-fallback
-);
-
-
-const year3=
-tfNum(
-e.year3,
-fallback
-);
-
-
-const multiYear=
-
-year1*y.year1
-+
-year2*y.year2
-+
-year3*y.year3;
-
-
-const consensus=
-tfNum(
-e.consensus,
-fallback
-);
-
-
-const role=
-tfNum(
-e.roleSecurity,
-fallback
-);
-
-
-const prospect=
-tfNum(
-e.prospect,
-fallback
-);
-
-
-const draftCapital=
-tfNum(
-e.draftCapital,
-fallback
-);
-
-
-const prospectDraft=
-(
-prospect
-+
-draftCapital
-)
-/
-2;
-
-
-const marketMomentum=
-tfNum(
-e.marketMomentum,
-fallback
-);
-
-
-let score=
-
-multiYear*w.multiYear
-+
-consensus*w.consensus
-+
-role*w.roleSecurity
-+
-prospectDraft*w.prospectDraft
-+
-marketMomentum*w.marketMomentum;
-
-
-/* ROOKIE TRANSITION MODEL */
-
-if(
-e.isRookie===true
-){
-
-const rw=TRADEFORGE_ENGINE.rookieWeights;
-
-
-const opportunity=
-tfNum(
-e.opportunity,
-fallback
-);
-
-
-const ageScore=
-tfNum(
-e.ageScore,
-tfAgeScore(
-p.pos,
-e.age,
-fallback
-)
-);
-
-
-const rookie=
-
-prospect*rw.prospect
-+
-draftCapital*rw.draftCapital
-+
-opportunity*rw.opportunity
-+
-consensus*rw.consensus
-+
-ageScore*rw.ageScore;
-
-
-const games=tfClamp(
-tfNum(
-e.nflGames,
-0
-),
-0,
-TRADEFORGE_ENGINE.rookieTransitionGames
-);
-
-
-const rookieWeight=
-
-1
--
-games
-/
-TRADEFORGE_ENGINE.rookieTransitionGames;
-
-
-score=
-
-rookie*rookieWeight
-+
-score
-*
-(
-1-rookieWeight
-);
-
-}
-
-else if(
-Number.isFinite(
-Number(e.age)
-)
-){
-
-score*=tfDynastyAgeFactor(
-p.pos,
-Number(e.age)
-);
-
-}
-
-
-return tfClamp(
-tfRound(score),
-.1,
-100
-);
-
-}
-
-
-/* =========================================================
-   KEEPER ENGINE
-   ========================================================= */
-
-function tfKeeperRaw(p){
-
-if(!tfHasAnyEngineData(p)){
-
-return tfStoredRawValue(
-p,
-"keeper"
-);
-
-}
-
-
-const w=TRADEFORGE_ENGINE.keeperWeights;
-
-
-return tfClamp(
-
-tfRound(
-
-tfRedraftRaw(p)
-*
-w.redraft
-
-+
-
-tfDynastyRaw(p)
-*
-w.dynasty
-
-),
-
-.1,
-100
-
-);
-
-}
-
-
-/* =========================================================
-   DYNAMIC FUTURE PICKS
-   ========================================================= */
-
-function tfDynamicPickValue(p){
-
-const baseline=
-
-qbMode==="superflex"
-?
 p.superflex
+
 :
+
 p.oneqb;
 
-
-if(
-!TRADEFORGE_ENGINE.useDynamicPickValues
-){
-
-return baseline;
-
 }
 
-
-const year=
-
-Number(
-String(p.name)
-.match(
-/20\d{2}/
-)?.[0]
-);
-
-
-if(!year){
-
-return baseline;
-
-}
-
-
-const upcoming=
-
-new Date()
-.getFullYear()
-+
-1;
-
-
-const yearsOut=
-
-Math.max(
-0,
-year-upcoming
-);
-
-
-const d=
-TRADEFORGE_ENGINE.futurePickDiscounts;
-
-
-const discount=
-
-d[
-Math.min(
-yearsOut,
-d.length-1
-)
-]
-
-??
-
-d[
-d.length-1
-];
-
-
-return tfClamp(
-tfRound(
-baseline
-*
-discount
-),
-.1,
-100
-);
-
-}
-
-
-/* =========================================================
-   LEAGUE SETTING ADJUSTMENTS
-   ========================================================= */
-
-function tfApplyLeagueSettings(
-p,
-raw,
-mode
-){
 
 let v=
 
-raw
+Number(
+p[
+settings.league
+]
+||
+0
+)
+
 *
+
 (
 multipliers[
 p.pos
-]?.[
-scoringMode
+]
+?.[
+settings.scoring
 ]
 ||
 1
 );
 
 
-/* SUPERFLEX */
-
 if(
-qbMode==="superflex"
+settings.qb==="superflex"
 &&
 p.pos==="QB"
 ){
 
 v*=
 
-mode==="dynasty"
+settings.league==="dynasty"
+
 ?
+
 1.45
 
 :
-mode==="keeper"
+
+settings.league==="keeper"
+
 ?
+
 1.40
 
 :
+
 1.35;
 
 }
 
 
-/* TE PREMIUM */
-
 if(
 p.pos==="TE"
 &&
-tePremiumMode==="half"
+settings.tep==="half"
 ){
 
 v*=
@@ -1889,17 +2208,14 @@ v*=
 v>=75
 ?
 1.10
-
 :
 v>=50
 ?
 1.08
-
 :
 v>=25
 ?
 1.06
-
 :
 1.04;
 
@@ -1909,7 +2225,7 @@ v>=25
 if(
 p.pos==="TE"
 &&
-tePremiumMode==="full"
+settings.tep==="full"
 ){
 
 v*=
@@ -1917,348 +2233,56 @@ v*=
 v>=75
 ?
 1.18
-
 :
 v>=50
 ?
 1.14
-
 :
 v>=25
 ?
 1.10
-
 :
 1.06;
 
 }
 
 
-return tfClamp(
-tfRound(v),
+return Math.max(
+
 .1,
-100
+
+Math.min(
+
+100,
+
+Math.round(
+v*10
+)
+/10
+
+)
+
 );
 
 }
 
 
 /* =========================================================
-   BASELINE VALUE
+   TRADE MATH
    ========================================================= */
 
-function legacyValue(p){
-
-if(
-p.pos==="PICK"
+function adjustedPlayer(
+v
 ){
-
-return qbMode==="superflex"
-?
-p.superflex
-:
-p.oneqb;
-
-}
-
-
-return tfApplyLeagueSettings(
-p,
-tfStoredRawValue(
-p,
-leagueMode
-),
-leagueMode
-);
-
-}
-
-
-/* =========================================================
-   FINAL TRADEFORGE PLAYER VALUE
-   ========================================================= */
-
-function value(p){
-
-if(
-p.pos==="PICK"
-){
-
-return tfDynamicPickValue(p);
-
-}
-
-
-if(
-!TRADEFORGE_ENGINE.enabled
-||
-!tfHasAnyEngineData(p)
-){
-
-return legacyValue(p);
-
-}
-
-
-let raw;
-
-
-if(
-leagueMode==="dynasty"
-){
-
-raw=tfDynastyRaw(p);
-
-}
-
-else if(
-leagueMode==="keeper"
-){
-
-raw=tfKeeperRaw(p);
-
-}
-
-else{
-
-raw=tfRedraftRaw(p);
-
-}
-
-
-return tfApplyLeagueSettings(
-p,
-raw,
-leagueMode
-);
-
-}
-
-
-/* =========================================================
-   CONFIDENCE SCORE
-   ========================================================= */
-
-function tradeForgeConfidence(p){
-
-const r=p.engine?.redraft||{};
-
-const d=p.engine?.dynasty||{};
-
-let score=35;
-
-
-if(Number.isFinite(Number(r.projection)))score+=12;
-if(Number.isFinite(Number(r.consensus)))score+=10;
-if(Number.isFinite(Number(r.opportunity)))score+=8;
-if(Number.isFinite(Number(r.recent)))score+=5;
-if(Number.isFinite(Number(r.availability)))score+=5;
-if(Number.isFinite(Number(r.roleConfidence)))score+=5;
-if(Number.isFinite(Number(r.upside)))score+=5;
-
-if(Number.isFinite(Number(d.year1)))score+=4;
-if(Number.isFinite(Number(d.year2)))score+=3;
-if(Number.isFinite(Number(d.year3)))score+=3;
-if(Number.isFinite(Number(d.consensus)))score+=3;
-if(Number.isFinite(Number(d.roleSecurity)))score+=2;
-
-
-return Math.round(
-tfClamp(
-score,
-0,
-100
-)
-);
-
-}
-
-
-/* =========================================================
-   ENGINE BREAKDOWN
-   ========================================================= */
-
-function tradeForgeBreakdown(p){
-
-return{
-
-player:p.name,
-
-mode:leagueMode,
-
-baseline:legacyValue(p),
-
-redraftRaw:tfRedraftRaw(p),
-
-keeperRaw:tfKeeperRaw(p),
-
-dynastyRaw:tfDynastyRaw(p),
-
-finalValue:value(p),
-
-confidence:tradeForgeConfidence(p),
-
-liveInputs:tfHasAnyEngineData(p)
-
-};
-
-}
-
-
-function updateEngineStatus(){
-
-const live=
-playerDatabase
-.filter(
-tfHasAnyEngineData
-)
-.length;
-
-let text=
-live
-?
-`TradeForge Live • ${live} auto-updated players`
-:
-`Baseline mode • ${playerDatabase.length} ranked players`;
-
-if(
-tradeForgeFeedMeta?.week
-){
-text+=
-` • Week ${tradeForgeFeedMeta.week}`;
-}
-
-if(
-tradeForgeFeedMeta?.generatedAt
-){
-const d=
-new Date(
-tradeForgeFeedMeta.generatedAt
-);
-
-if(
-!Number.isNaN(
-d.getTime()
-)
-){
-text+=
-` • Updated ${d.toLocaleString()}`;
-}
-}
-
-$("engine-status")
-.textContent=
-text;
-
-}
-
-
-async function loadTradeForgeFeed(){
-
-try{
-
-const response=
-await fetch(
-`./tradeforge-data.json?v=${Date.now()}`,
-{
-cache:"no-store"
-}
-);
-
-if(!response.ok){
-throw new Error(
-`Feed HTTP ${response.status}`
-);
-}
-
-const feed=
-await response.json();
-
-tradeForgeFeedMeta=
-feed.meta
-||
-null;
-
-let applied=0;
-
-playerDatabase
-.forEach(
-player=>{
-
-const live=
-feed.players
-?.[
-norm(
-player.name
-)
-];
-
-if(
-live?.engine
-){
-player.engine=
-live.engine;
-
-player.liveData=
-live;
-
-applied++;
-}
-
-}
-);
-
-console.log(
-`TradeForge nflverse feed applied to ${applied} players.`
-);
-
-renderBoard();
-render();
-
-if(
-syncedLeague
-&&
-!(
-$("league-page")
-.classList
-.contains(
-"page-hidden"
-)
-)
-){
-buildLeaguePage();
-}
-
-}
-
-catch(error){
-
-console.warn(
-"TradeForge live feed unavailable; baseline values remain active.",
-error
-);
-
-tradeForgeFeedMeta=
-null;
-
-renderBoard();
-render();
-
-}
-
-}
-
-
-/* =========================================================
-   TRADE PACKAGE MATH
-   ========================================================= */
-
-function adjustedPlayer(v){
 
 return v<=0
+
 ?
+
 0
+
 :
+
 100
 *
 Math.pow(
@@ -2269,31 +2293,63 @@ SUPERSTAR_FACTOR
 }
 
 
-function adjusted(team){
+function adjusted(
+team,
+settings
+){
 
 return team
 
 .map(
 p=>
 adjustedPlayer(
-value(p)
+calcValue(
+p,
+settings
+)
 )
 )
 
 .sort(
-(a,b)=>b-a
+(a,b)=>
+b-a
 )
 
 .reduce(
 (t,v,i)=>
+
 t
+
 +
+
 v
+
 *
+
 (
 PACKAGE_WEIGHTS[i]
 ??
 .8
+),
+
+0
+);
+
+}
+
+
+function base(
+team,
+settings
+){
+
+return team.reduce(
+(t,p)=>
+t
++
+calcValue(
+p,
+settings
 ),
 0
 );
@@ -2301,33 +2357,33 @@ PACKAGE_WEIGHTS[i]
 }
 
 
-function base(team){
+function diff(
+a,
+b
+){
 
-return team.reduce(
-(t,p)=>
-t
-+
-value(p),
-0
-);
+const avg=
+(a+b)/2;
 
-}
-
-
-function diff(a,b){
-
-const avg=(a+b)/2;
 
 return avg
+
 ?
+
 Math.abs(
 a-b
 )
+
 /
+
 avg
+
 *
+
 100
+
 :
+
 0;
 
 }
@@ -2337,48 +2393,73 @@ avg
    MODE LABEL
    ========================================================= */
 
-function modeLabel(){
+function modeLabel(
+settings
+){
 
 const s=
 
-scoringMode==="ppr"
+settings.scoring==="ppr"
+
 ?
+
 "PPR"
+
 :
-scoringMode==="half"
+
+settings.scoring==="half"
+
 ?
+
 "0.5 PPR"
+
 :
+
 "No PPR";
 
 
 const l=
 
-leagueMode[0]
+settings.league[0]
 .toUpperCase()
+
 +
-leagueMode.slice(1);
+
+settings.league
+.slice(1);
 
 
 const q=
 
-qbMode==="superflex"
+settings.qb==="superflex"
+
 ?
+
 "Superflex"
+
 :
+
 "1QB";
 
 
 const t=
 
-tePremiumMode==="half"
+settings.tep==="half"
+
 ?
+
 " • TEP +0.5"
+
 :
-tePremiumMode==="full"
+
+settings.tep==="full"
+
 ?
+
 " • TEP +1.0"
+
 :
+
 "";
 
 
@@ -2391,132 +2472,180 @@ return `${s} • ${l} • ${q}${t}`;
    TOP PLAYERS
    ========================================================= */
 
-function renderTop(pos,id){
+function renderTop(
+ctx,
+pos,
+id
+){
 
-const top=
+$(id).innerHTML=
 
 playerDatabase
 
 .filter(
 p=>
 p.pos===pos
-&&
-Number.isFinite(
-value(p)
-)
 )
 
 .slice()
 
 .sort(
 (a,b)=>
-value(b)
+
+calcValue(
+b,
+ctx.settings
+)
+
 -
-value(a)
+
+calcValue(
+a,
+ctx.settings
+)
+
 ||
+
 a.rank-b.rank
 )
 
 .slice(
 0,
 3
-);
+)
 
-
-$(id).innerHTML=
-
-top.length
-
-?
-
-top.map(
+.map(
 (p,i)=>
 `
+
 <div class="top-row">
-<span>#${i+1} ${esc(p.name)}</span>
-<strong>${value(p).toFixed(1)}</strong>
+
+<span>
+#${i+1} ${esc(p.name)}
+</span>
+
+<strong>
+${calcValue(
+p,
+ctx.settings
+).toFixed(1)}
+</strong>
+
 </div>
+
 `
 )
 
-.join("")
-
-:
-
-'<div class="sub">No ranked players</div>';
+.join("");
 
 }
 
 
-function renderBoard(){
+function renderBoard(
+ctx
+){
 
-$("mode-label")
+$(
+`${ctx.prefix}-mode-label`
+)
 .textContent=
-modeLabel();
-
-
-updateEngineStatus();
+modeLabel(
+ctx.settings
+);
 
 
 renderTop(
+ctx,
 "RB",
-"top-rb"
+`${ctx.prefix}-top-rb`
 );
 
 
 renderTop(
+ctx,
 "WR",
-"top-wr"
+`${ctx.prefix}-top-wr`
 );
 
 
 renderTop(
+ctx,
 "QB",
-"top-qb"
+`${ctx.prefix}-top-qb`
 );
 
 
 renderTop(
+ctx,
 "TE",
-"top-te"
+`${ctx.prefix}-top-te`
 );
 
 }
 
 
 /* =========================================================
-   TRADE DISPLAY
+   TEAM HELPERS
    ========================================================= */
 
-function renderTeam(side){
+function getTeam(
+ctx,
+side
+){
+
+return side==="A"
+
+?
+
+ctx.teamA
+
+:
+
+ctx.teamB;
+
+}
+
+
+/* =========================================================
+   RENDER TEAM
+   ========================================================= */
+
+function renderTeam(
+ctx,
+side
+){
 
 const team=
-
-side==="A"
-?
-teamA
-:
-teamB;
+getTeam(
+ctx,
+side
+);
 
 
 const box=
 
 $(
-side==="A"
-?
-"team-a"
-:
-"team-b"
+`${ctx.prefix}-team-${side.toLowerCase()}`
 );
 
 
-if(!team.length){
+if(
+!team.length
+){
 
 box.innerHTML=
+
 `
-<div class="sub" style="padding:20px 0">
+
+<div
+class="sub"
+style="padding:20px 0"
+>
+
 Search above to add players.
+
 </div>
+
 `;
 
 return;
@@ -2529,6 +2658,7 @@ box.innerHTML=
 team.map(
 (p,i)=>
 `
+
 <div class="player">
 
 <div>
@@ -2542,106 +2672,193 @@ ${esc(p.name)}
 ${esc(p.pos)}
 
 ${
-
 p.nflTeam
 ?
 " • "
 +
-esc(p.nflTeam)
+esc(
+p.nflTeam
+)
 :
 ""
-
 }
 
 </small>
 
 </div>
 
+
 <strong>
-${value(p).toFixed(1)}
+
+${calcValue(
+p,
+ctx.settings
+).toFixed(1)}
+
 </strong>
+
 
 <button
 class="remove"
-onclick="removePlayer('${side}',${i})"
+data-remove="${ctx.prefix}|${side}|${i}"
 >
+
 ×
+
 </button>
 
 </div>
+
 `
 )
 
 .join("");
 
-}
+
+box
+
+.querySelectorAll(
+"[data-remove]"
+)
+
+.forEach(
+btn=>
+
+btn.onclick=
+()=>{
+
+const [
+,
+s,
+index
+]
+=
+
+btn.dataset.remove
+.split("|");
 
 
-function removePlayer(side,i){
-
-(
-side==="A"
-?
-teamA
-:
-teamB
+getTeam(
+ctx,
+s
 )
 .splice(
-i,
+Number(index),
 1
 );
 
 
-render();
+renderCalculator(
+ctx
+);
 
 }
 
-
-function render(){
-
-renderTeam("A");
-
-renderTeam("B");
-
-calculate();
+);
 
 }
 
 
 /* =========================================================
-   TRADE CALCULATION
+   RENDER CALCULATOR
    ========================================================= */
 
-function calculate(){
+function renderCalculator(
+ctx
+){
 
-const ba=base(teamA);
+renderTeam(
+ctx,
+"A"
+);
 
-const bb=base(teamB);
+renderTeam(
+ctx,
+"B"
+);
 
-const aa=adjusted(teamA);
+calculate(
+ctx
+);
 
-const ab=adjusted(teamB);
+}
 
-const d=diff(
+
+/* =========================================================
+   CALCULATE TRADE
+   ========================================================= */
+
+function calculate(
+ctx
+){
+
+const ba=
+base(
+ctx.teamA,
+ctx.settings
+);
+
+
+const bb=
+base(
+ctx.teamB,
+ctx.settings
+);
+
+
+const aa=
+adjusted(
+ctx.teamA,
+ctx.settings
+);
+
+
+const ab=
+adjusted(
+ctx.teamB,
+ctx.settings
+);
+
+
+const d=
+diff(
 aa,
 ab
 );
 
 
-$("base-a").textContent=
+$(
+`${ctx.prefix}-base-a`
+)
+.textContent=
 ba.toFixed(1);
 
-$("base-b").textContent=
+
+$(
+`${ctx.prefix}-base-b`
+)
+.textContent=
 bb.toFixed(1);
 
-$("adj-a").textContent=
+
+$(
+`${ctx.prefix}-adj-a`
+)
+.textContent=
 aa.toFixed(1);
 
-$("adj-b").textContent=
+
+$(
+`${ctx.prefix}-adj-b`
+)
+.textContent=
 ab.toFixed(1);
 
 
-$("marker").style.left=
+$(
+`${ctx.prefix}-marker`
+)
+.style.left=
 
 (
 aa+ab
@@ -2649,20 +2866,25 @@ aa+ab
 ?
 
 Math.max(
+
 5,
+
 Math.min(
+
 95,
+
 ab
 /
-(
-aa+ab
-)
+(aa+ab)
 *
 100
+
 )
+
 )
 
 :
+
 50
 )
 
@@ -2670,18 +2892,25 @@ aa+ab
 "%";
 
 
-const v=$("verdict");
+const verdict=
 
-v.className="";
+$(
+`${ctx.prefix}-verdict`
+);
+
+
+verdict.className=
+"verdict";
 
 
 if(
-!teamA.length
+!ctx.teamA.length
 ||
-!teamB.length
+!ctx.teamB.length
 ){
 
-v.innerHTML=
+verdict.innerHTML=
+
 `
 Build a Trade
 <small>
@@ -2689,13 +2918,27 @@ Add players to both sides.
 </small>
 `;
 
-$("grade").textContent="—";
 
-$("fair").textContent=
+$(
+`${ctx.prefix}-grade`
+)
+.textContent=
+"—";
+
+
+$(
+`${ctx.prefix}-fair`
+)
+.textContent=
 "Build a trade to see suggestions.";
 
-$("packages").textContent=
+
+$(
+`${ctx.prefix}-packages`
+)
+.textContent=
 "Build a trade to see packages.";
+
 
 return;
 
@@ -2707,45 +2950,64 @@ let title;
 let cls;
 
 
-if(d<=5){
+if(
+d<=5
+){
 
-title="FAIR TRADE";
+title=
+"FAIR TRADE";
 
-cls="fair";
-
-}
-
-else if(d<=10){
-
-title="SLIGHT ADVANTAGE";
-
-cls="slight";
+cls=
+"fair";
 
 }
 
-else if(d<=20){
+else if(
+d<=10
+){
 
-title="ADVANTAGE";
+title=
+"SLIGHT ADVANTAGE";
 
-cls="adv";
+cls=
+"slight";
+
+}
+
+else if(
+d<=20
+){
+
+title=
+"ADVANTAGE";
+
+cls=
+"adv";
 
 }
 
 else{
 
-title="MAJOR ADVANTAGE";
+title=
+"MAJOR ADVANTAGE";
 
-cls="major";
+cls=
+"major";
 
 }
 
 
-v.className=cls;
+verdict
+.classList
+.add(
+cls
+);
 
 
-v.innerHTML=
+verdict.innerHTML=
 
 `
+
 ${title}
 
 <small>
@@ -2753,7 +3015,6 @@ ${title}
 ${d.toFixed(1)}% difference
 
 ${
-
 d>5
 
 ?
@@ -2773,14 +3034,17 @@ aa>ab
 :
 
 ""
-
 }
 
 </small>
+
 `;
 
 
-$("grade").textContent=
+$(
+`${ctx.prefix}-grade`
+)
+.textContent=
 
 d<=5
 ?
@@ -2806,12 +3070,14 @@ d<=40
 
 
 suggestions(
+ctx,
 aa,
 ab
 );
 
 
 packages(
+ctx,
 aa,
 ab
 );
@@ -2820,21 +3086,29 @@ ab
 
 
 /* =========================================================
-   ROSTER POOLS
+   SLEEPER ROSTER ASSETS
    ========================================================= */
 
-function selectedRoster(side){
+function selectedSleeperRoster(
+side
+){
 
 return side==="A"
+
 ?
-rosterA
+
+sleeperRosterA
+
 :
-rosterB;
+
+sleeperRosterB;
 
 }
 
 
-function rosterAssets(id){
+function rosterAssets(
+id
+){
 
 const r=
 
@@ -2849,14 +3123,16 @@ String(id)
 );
 
 
-if(!r){
+if(
+!r
+){
 
 return[];
 
 }
 
 
-return (
+return(
 r.players
 ||
 []
@@ -2873,38 +3149,76 @@ String(pid)
 
 .sort(
 (a,b)=>
-value(b)
+
+calcValue(
+b,
+sleeperSettings
+)
+
 -
-value(a)
+
+calcValue(
+a,
+sleeperSettings
+)
+
 );
 
 }
 
 
-function pool(side){
+/* =========================================================
+   PLAYER POOL
+   ========================================================= */
 
-if(
-syncedLeague
-&&
-selectedRoster(side)
+function pool(
+ctx,
+side
 ){
 
-const r=
-rosterAssets(
-selectedRoster(side)
+if(
+ctx.type==="home"
+){
+
+return assetsForSettings(
+ctx.settings
 );
-
-
-return leagueMode==="dynasty"
-?
-r.concat(picks)
-:
-r;
 
 }
 
 
-return assets();
+const id=
+selectedSleeperRoster(
+side
+);
+
+
+const roster=
+
+id
+
+?
+
+rosterAssets(
+id
+)
+
+:
+
+[];
+
+
+return ctx.settings.league==="dynasty"
+
+?
+
+roster.concat(
+picks
+)
+
+:
+
+roster;
 
 }
 
@@ -2913,17 +3227,29 @@ return assets();
    FAIRNESS SUGGESTIONS
    ========================================================= */
 
-function suggestions(aa,ab){
+function suggestions(
+ctx,
+aa,
+ab
+){
 
-const box=$("fair");
+const box=
 
-const d=diff(
+$(
+`${ctx.prefix}-fair`
+);
+
+
+const d=
+diff(
 aa,
 ab
 );
 
 
-if(d<=5){
+if(
+d<=5
+){
 
 box.textContent=
 "This trade is already inside the fair range.";
@@ -2933,7 +3259,7 @@ return;
 }
 
 
-const side=
+const losingSide=
 
 aa<ab
 ?
@@ -2944,7 +3270,7 @@ aa<ab
 
 const sourceSide=
 
-side==="A"
+losingSide==="A"
 ?
 "B"
 :
@@ -2953,16 +3279,15 @@ side==="A"
 
 const losing=
 
-side==="A"
-?
-teamA
-:
-teamB;
+getTeam(
+ctx,
+losingSide
+);
 
 
 const target=
 
-side==="A"
+losingSide==="A"
 ?
 ab
 :
@@ -2972,15 +3297,24 @@ aa;
 const used=
 
 new Set(
-teamA
-.concat(teamB)
+
+ctx.teamA
+
+.concat(
+ctx.teamB
+)
+
 .map(key)
+
 );
 
 
 const opts=
 
-pool(sourceSide)
+pool(
+ctx,
+sourceSide
+)
 
 .filter(
 p=>
@@ -2995,7 +3329,11 @@ p=>{
 const n=
 
 adjusted(
-losing.concat(p)
+
+losing.concat(p),
+
+ctx.settings
+
 );
 
 
@@ -3039,31 +3377,40 @@ opts.length
 opts.map(
 (o,i)=>
 `
+
 <div class="suggestion">
 
 <strong>
 
-${[
+${
+[
 "Closest Match",
 "Alternative",
 "Another Option"
-][i]}:
+][i]
+}:
 
 </strong>
 
 Team ${sourceSide}
 adds ${esc(o.p.name)}
-to Team ${side}
+to Team ${losingSide}
 
 <br>
 
 ${esc(o.p.pos)}
 •
-Value ${value(o.p).toFixed(1)}
+Value
+${calcValue(
+o.p,
+ctx.settings
+).toFixed(1)}
 •
-New difference ${o.pct.toFixed(1)}%
+New difference
+${o.pct.toFixed(1)}%
 
 </div>
+
 `
 )
 
@@ -3071,26 +3418,46 @@ New difference ${o.pct.toFixed(1)}%
 
 :
 
-"No matching single-player adjustment found.";
+`
+
+<div class="suggestion">
+
+No matching player was found in the available pool.
+
+</div>
+
+`;
 
 }
 
 
 /* =========================================================
-   TWO PLAYER PACKAGES
+   PACKAGE SUGGESTIONS
    ========================================================= */
 
-function packages(aa,ab){
+function packages(
+ctx,
+aa,
+ab
+){
 
-const box=$("packages");
+const box=
 
-const d=diff(
+$(
+`${ctx.prefix}-packages`
+);
+
+
+const d=
+diff(
 aa,
 ab
 );
 
 
-if(d<=5){
+if(
+d<=5
+){
 
 box.textContent=
 "No package needed — trade is already balanced.";
@@ -3100,7 +3467,7 @@ return;
 }
 
 
-const side=
+const losingSide=
 
 aa<ab
 ?
@@ -3111,7 +3478,7 @@ aa<ab
 
 const sourceSide=
 
-side==="A"
+losingSide==="A"
 ?
 "B"
 :
@@ -3120,16 +3487,15 @@ side==="A"
 
 const losing=
 
-side==="A"
-?
-teamA
-:
-teamB;
+getTeam(
+ctx,
+losingSide
+);
 
 
 const target=
 
-side==="A"
+losingSide==="A"
 ?
 ab
 :
@@ -3139,15 +3505,24 @@ aa;
 const used=
 
 new Set(
-teamA
-.concat(teamB)
+
+ctx.teamA
+
+.concat(
+ctx.teamB
+)
+
 .map(key)
+
 );
 
 
 const available=
 
-pool(sourceSide)
+pool(
+ctx,
+sourceSide
+)
 
 .filter(
 p=>
@@ -3158,9 +3533,19 @@ key(p)
 
 .sort(
 (a,b)=>
-value(b)
+
+calcValue(
+b,
+ctx.settings
+)
+
 -
-value(a)
+
+calcValue(
+a,
+ctx.settings
+)
+
 )
 
 .slice(
@@ -3176,7 +3561,7 @@ for(
 let i=0;
 i<available.length;
 i++
-){
+)
 
 for(
 let j=i+1;
@@ -3187,10 +3572,14 @@ j++
 const n=
 
 adjusted(
+
 losing.concat(
 available[i],
 available[j]
-)
+),
+
+ctx.settings
+
 );
 
 
@@ -3217,8 +3606,6 @@ target
 
 }
 
-}
-
 
 list.sort(
 (a,b)=>
@@ -3232,7 +3619,9 @@ list.length
 
 ?
 
-list.slice(
+list
+
+.slice(
 0,
 3
 )
@@ -3240,6 +3629,7 @@ list.slice(
 .map(
 (x,i)=>
 `
+
 <div class="suggestion">
 
 <strong>
@@ -3258,17 +3648,23 @@ i
 
 Team ${sourceSide}
 adds
+
 ${esc(x.a.name)}
+
 +
+
 ${esc(x.b.name)}
-to Team ${side}
+
+to Team ${losingSide}
 
 <br>
 
 New difference
+
 ${x.pct.toFixed(1)}%
 
 </div>
+
 `
 )
 
@@ -3276,36 +3672,43 @@ ${x.pct.toFixed(1)}%
 
 :
 
-"No two-player package found.";
+`
+
+<div class="suggestion">
+
+No two-player package was found in the available pool.
+
+</div>
+
+`;
 
 }
 
 
 /* =========================================================
-   SEARCH
+   PLAYER SEARCH
    ========================================================= */
 
-function setupSearch(side){
+function setupSearch(
+ctx,
+side
+){
+
+const prefix=
+ctx.prefix;
+
 
 const input=
 
 $(
-side==="A"
-?
-"search-a"
-:
-"search-b"
+`${prefix}-search-${side.toLowerCase()}`
 );
 
 
 const results=
 
 $(
-side==="A"
-?
-"results-a"
-:
-"results-b"
+`${prefix}-results-${side.toLowerCase()}`
 );
 
 
@@ -3319,9 +3722,13 @@ input.value
 .toLowerCase();
 
 
-if(!q){
+if(
+!q
+){
 
-results.classList.remove(
+results
+.classList
+.remove(
 "show"
 );
 
@@ -3333,15 +3740,24 @@ return;
 const used=
 
 new Set(
-teamA
-.concat(teamB)
+
+ctx.teamA
+
+.concat(
+ctx.teamB
+)
+
 .map(key)
+
 );
 
 
 const found=
 
-pool(side)
+pool(
+ctx,
+side
+)
 
 .filter(
 p=>
@@ -3368,26 +3784,33 @@ p.pos
 
 .sort(
 (a,b)=>
-value(b)
+
+calcValue(
+b,
+ctx.settings
+)
+
 -
-value(a)
+
+calcValue(
+a,
+ctx.settings
+)
+
 )
 
 .slice(
 0,
-15
+12
 );
 
 
 results.innerHTML=
 
-found.length
-
-?
-
 found.map(
 (p,i)=>
 `
+
 <div
 class="result-item"
 data-i="${i}"
@@ -3404,47 +3827,45 @@ ${esc(p.pos)}
 </span>
 
 <strong>
-${value(p).toFixed(1)}
+
+${calcValue(
+p,
+ctx.settings
+).toFixed(1)}
+
 </strong>
 
 </div>
+
 `
 )
 
-.join("")
-
-:
-
-`
-<div class="result-item">
-<span>
-No matching players found
-</span>
-</div>
-`;
+.join("");
 
 
-results.classList.add(
-"show"
+results
+.classList
+.toggle(
+"show",
+found.length>0
 );
 
 
 results
+
 .querySelectorAll(
-"[data-i]"
+".result-item"
 )
+
 .forEach(
 (el,i)=>
 
 el.onclick=
 ()=>{
 
-(
-side==="A"
-?
-teamA
-:
-teamB
+getTeam(
+ctx,
+side
 )
 .push(
 {
@@ -3453,7 +3874,8 @@ teamB
 );
 
 
-input.value="";
+input.value=
+"";
 
 
 results
@@ -3463,7 +3885,9 @@ results
 );
 
 
-render();
+renderCalculator(
+ctx
+);
 
 }
 
@@ -3475,37 +3899,44 @@ render();
 
 
 /* =========================================================
-   CONTROLS
+   HOME SETTINGS
    ========================================================= */
 
-function applyControls(){
+function updateHomeSettings(){
 
-scoringMode=
-$("scoring").value;
+homeSettings.scoring=
+$("home-scoring").value;
 
-leagueMode=
-$("league").value;
 
-qbMode=
-$("qb").value;
+homeSettings.league=
+$("home-league").value;
 
-tePremiumMode=
-$("tep").value;
+
+homeSettings.qb=
+$("home-qb").value;
+
+
+homeSettings.tep=
+$("home-tep").value;
 
 
 if(
-leagueMode!=="dynasty"
+homeSettings.league!=="dynasty"
 ){
 
-teamA=
-teamA.filter(
+homeCtx.teamA=
+
+homeCtx.teamA
+.filter(
 x=>
 x.pos!=="PICK"
 );
 
 
-teamB=
-teamB.filter(
+homeCtx.teamB=
+
+homeCtx.teamB
+.filter(
 x=>
 x.pos!=="PICK"
 );
@@ -3513,98 +3944,142 @@ x.pos!=="PICK"
 }
 
 
-renderBoard();
+renderBoard(
+homeCtx
+);
 
-render();
 
-
-if(
-syncedLeague
-&&
-!(
-$("league-page")
-.classList
-.contains(
-"page-hidden"
-)
-)
-){
-
-buildLeaguePage();
-
-}
+renderCalculator(
+homeCtx
+);
 
 }
 
 
 [
-"scoring",
-"league",
-"qb",
-"tep"
+"home-scoring",
+"home-league",
+"home-qb",
+"home-tep"
 ]
+
 .forEach(
 id=>
+
 $(id).onchange=
-applyControls
+updateHomeSettings
+
 );
 
 
 /* =========================================================
-   TRADE BUTTONS
+   CALCULATOR BUTTONS
    ========================================================= */
 
-$("swap").onclick=
+function setupCalculatorButtons(
+ctx
+){
+
+$(
+`${ctx.prefix}-swap`
+)
+.onclick=
 ()=>{
 
 [
-teamA,
-teamB
+ctx.teamA,
+ctx.teamB
 ]
+
 =
+
 [
-teamB,
-teamA
+ctx.teamB,
+ctx.teamA
 ];
 
 
+if(
+ctx.type==="sleeper"
+){
+
 [
-rosterA,
-rosterB
+sleeperRosterA,
+sleeperRosterB
 ]
+
 =
+
 [
-rosterB,
-rosterA
+sleeperRosterB,
+sleeperRosterA
 ];
 
 
-if(syncedLeague){
+$("sleeper-roster-a").value=
+sleeperRosterA;
 
-$("roster-a").value=
-rosterA;
 
-$("roster-b").value=
-rosterB;
+$("sleeper-roster-b").value=
+sleeperRosterB;
 
 }
 
 
-render();
+renderCalculator(
+ctx
+);
 
 };
 
 
-$("clear").onclick=
+$(
+`${ctx.prefix}-clear`
+)
+.onclick=
 ()=>{
 
-teamA=[];
+ctx.teamA=[];
 
-teamB=[];
+ctx.teamB=[];
 
-render();
+renderCalculator(
+ctx
+);
 
 };
+
+}
+
+
+setupSearch(
+homeCtx,
+"A"
+);
+
+setupSearch(
+homeCtx,
+"B"
+);
+
+setupSearch(
+sleeperCtx,
+"A"
+);
+
+setupSearch(
+sleeperCtx,
+"B"
+);
+
+
+setupCalculatorButtons(
+homeCtx
+);
+
+setupCalculatorButtons(
+sleeperCtx
+);
 
 
 /* =========================================================
@@ -3614,14 +4089,20 @@ render();
 $("theme-toggle").onclick=
 ()=>{
 
-const html=document.documentElement;
+const html=
+document.documentElement;
+
 
 const next=
 
 html.dataset.theme==="dark"
+
 ?
+
 "light"
+
 :
+
 "dark";
 
 
@@ -3632,487 +4113,65 @@ next;
 $("theme-toggle").textContent=
 
 next==="dark"
+
 ?
+
 "☀ Light Theme"
+
 :
+
 "☾ Dark Theme";
 
 };
 
 
-setupSearch("A");
-
-setupSearch("B");
-
-
 /* =========================================================
-   LEAGUE VIEW
+   PAGE NAVIGATION
    ========================================================= */
 
-function getMyRosterId(){
-
-const mine=
-
-syncedRosters
-.find(
-r=>
-String(
-r.owner_id
-)
-===
-String(
-sleeperUser?.user_id
-)
-);
-
-
-return mine
-?
-String(
-mine.roster_id
-)
-:
-String(
-rosterA
-||
-""
-);
-
-}
-
-
-function getSleeperRosterPlayer(id){
-
-id=String(id);
-
-
-const matched=
-matchSleeper(id);
-
-
-if(matched){
-
-return{
-
-name:
-matched.name,
-
-pos:
-matched.pos,
-
-team:
-matched.nflTeam
-||
-"",
-
-tradePlayer:
-matched
-
-};
-
-}
-
-
-const sp=
-sleeperPlayers[id];
-
-
-if(!sp){
-
-return null;
-
-}
-
-
-return{
-
-name:
-
-sp.full_name
-
-||
-
-[
-sp.first_name,
-sp.last_name
-]
-
-.filter(Boolean)
-
-.join(" ")
-
-||
-
-"Unknown Player",
-
-
-pos:
-sp.position
-||
-"",
-
-
-team:
-sp.team
-||
-"",
-
-
-tradePlayer:
-null
-
-};
-
-}
-
-
-function renderLeagueRoster(
-rosterId,
-listId,
-nameId,
-metaId
+function setPage(
+page
 ){
 
-const roster=
-
-syncedRosters
-.find(
-r=>
-String(
-r.roster_id
-)
-===
-String(
-rosterId
-)
-);
-
-
-if(!roster){
-
-$(nameId).textContent=
-"Roster Not Found";
-
-$(metaId).textContent="";
-
-$(listId).innerHTML="";
-
-return;
-
-}
-
-
-const players=
-
-(
-roster.players
-||
-[]
-)
-
-.map(
-getSleeperRosterPlayer
-)
-
-.filter(Boolean)
-
-.sort(
-(a,b)=>{
-
-const bv=
-
-b.tradePlayer
-?
-value(
-b.tradePlayer
-)
-:
--1;
-
-
-const av=
-
-a.tradePlayer
-?
-value(
-a.tradePlayer
-)
-:
--1;
-
-
-return bv-av;
-
-}
-);
-
-
-const valued=
-
-players.filter(
-p=>
-p.tradePlayer
-);
-
-
-const total=
-
-valued.reduce(
-(t,p)=>
-t
-+
-value(
-p.tradePlayer
-),
-0
-);
-
-
-$(nameId).textContent=
-rosterName(roster);
-
-
-$(metaId).textContent=
-
-`${players.length} players • ${valued.length} valued • ${total.toFixed(1)} value`;
-
-
-$(listId).innerHTML=
-
-players.map(
-p=>{
-
-const val=
-
-p.tradePlayer
-?
-value(
-p.tradePlayer
-)
-.toFixed(1)
-:
-"—";
-
-
-const info=
-
-[
-p.pos,
-p.team
-]
-
-.filter(Boolean)
-
-.join(
-" • "
-);
-
-
-return `
-<div class="roster-player">
-
-<div>
-
-<strong>
-${esc(p.name)}
-</strong>
-
-<small>
-${esc(info)}
-</small>
-
-${
-p.tradePlayer
-?
-""
-:
-'<div class="not-valued">Not yet in TradeForge database</div>'
-}
-
-</div>
-
-<div class="roster-value">
-${val}
-</div>
-
-</div>
-`;
-
-}
-)
-
-.join("");
-
-}
-
-
-function buildLeaguePage(){
-
-if(!syncedLeague){
-
-return;
-
-}
-
-
-$("league-page-name").textContent=
-
-syncedLeague.name
-+
-" • "
-+
-modeLabel();
-
-
-const mine=
-getMyRosterId();
-
-
-renderLeagueRoster(
-mine,
-"my-team-roster",
-"my-team-name",
-"my-team-meta"
-);
-
-
-const opponents=
-
-syncedRosters
-.filter(
-r=>
-String(
-r.roster_id
-)
-!==
-String(
-mine
-)
-);
-
-
-const current=
-$("opponent-select").value;
-
-
-$("opponent-select").innerHTML=
-
-opponents.map(
-r=>
-`
-<option value="${r.roster_id}">
-${esc(rosterName(r))}
-</option>
-`
-)
-
-.join("");
-
-
-let opponent=
-current;
-
-
 if(
-!opponents.some(
-r=>
-String(
-r.roster_id
-)
-===
-String(
-opponent
-)
-)
-){
-
-opponent=
-
-opponents[0]
-?
-String(
-opponents[0].roster_id
-)
-:
-"";
-
-}
-
-
-if(opponent){
-
-$("opponent-select").value=
-opponent;
-
-
-renderLeagueRoster(
-opponent,
-"opponent-team-roster",
-"opponent-team-name",
-"opponent-team-meta"
-);
-
-}
-
-else{
-
-$("opponent-team-name").textContent=
-"No Other Team";
-
-$("opponent-team-meta").textContent="";
-
-$("opponent-team-roster").innerHTML="";
-
-}
-
-}
-
-
-$("opponent-select").onchange=
-e=>
-
-renderLeagueRoster(
-e.target.value,
-"opponent-team-roster",
-"opponent-team-name",
-"opponent-team-meta"
-);
-
-
-function setPage(page){
-
-if(
-page==="league"
+page==="sleeper"
 &&
 !syncedLeague
 ){
 
-page="analyzer";
+page=
+"home";
 
 }
 
 
-$("analyzer-page")
+$("home-page")
+
 .classList
+
 .toggle(
 "page-hidden",
-page!=="analyzer"
+page!=="home"
 );
 
 
-$("league-page")
+$("sleeper-page")
+
 .classList
+
 .toggle(
 "page-hidden",
-page!=="league"
+page!=="sleeper"
 );
 
 
 if(
-page==="league"
+page==="sleeper"
+&&
+syncedLeague
 ){
 
-buildLeaguePage();
+renderSleeperPage();
 
 }
 
@@ -4125,24 +4184,26 @@ window.scrollTo(
 }
 
 
-$("league-view-button").onclick=
+$("sleeper-page-button").onclick=
 ()=>{
 
-if(syncedLeague){
+if(
+syncedLeague
+){
 
 location.hash=
-"league";
+"sleeper";
 
 }
 
 };
 
 
-$("back-to-analyzer").onclick=
+$("back-home").onclick=
 ()=>{
 
 location.hash=
-"analyzer";
+"home";
 
 };
 
@@ -4152,11 +4213,17 @@ window.addEventListener(
 ()=>{
 
 setPage(
-location.hash==="#league"
+
+location.hash==="#sleeper"
+
 ?
-"league"
+
+"sleeper"
+
 :
-"analyzer"
+
+"home"
+
 );
 
 }
@@ -4164,7 +4231,7 @@ location.hash==="#league"
 
 
 /* =========================================================
-   SLEEPER SYNC
+   SLEEPER MODAL
    ========================================================= */
 
 const modal=
@@ -4174,7 +4241,9 @@ $("modal");
 $("sync-button").onclick=
 ()=>{
 
-modal.classList.add(
+modal
+.classList
+.add(
 "show"
 );
 
@@ -4184,27 +4253,61 @@ modal.classList.add(
 $("modal-close").onclick=
 ()=>{
 
-modal.classList.remove(
+modal
+.classList
+.remove(
 "show"
 );
 
 };
 
 
-async function fetchJSON(url){
+modal.onclick=
+e=>{
+
+if(
+e.target===modal
+){
+
+modal
+.classList
+.remove(
+"show"
+);
+
+}
+
+};
+
+
+/* =========================================================
+   SLEEPER REQUEST
+   ========================================================= */
+
+async function fetchJSON(
+url
+){
 
 const r=
 await fetch(url);
 
 
-if(!r.ok){
+if(
+!r.ok
+){
 
 throw new Error(
+
 "Sleeper request failed ("
+
 +
+
 r.status
+
 +
+
 ")."
+
 );
 
 }
@@ -4215,28 +4318,8 @@ return r.json();
 }
 
 
-async function fetchJSONSafe(
-url,
-fallback=[]
-){
-
-try{
-
-return await fetchJSON(url);
-
-}
-
-catch{
-
-return fallback;
-
-}
-
-}
-
-
 /* =========================================================
-   FIND LEAGUES
+   FIND SLEEPER LEAGUES
    ========================================================= */
 
 $("find-leagues").onclick=
@@ -4249,7 +4332,9 @@ $("username")
 .trim();
 
 
-if(!username){
+if(
+!username
+){
 
 $("status").textContent=
 "Enter your Sleeper username.";
@@ -4302,7 +4387,9 @@ await fetchJSON(
 const season=
 
 state.league_season
+
 ||
+
 state.season;
 
 
@@ -4322,7 +4409,9 @@ if(
 ){
 
 throw new Error(
+
 "No NFL leagues found for the current Sleeper season."
+
 );
 
 }
@@ -4333,9 +4422,13 @@ $("league-picker").innerHTML=
 leagues.map(
 l=>
 `
+
 <option value="${l.league_id}">
+
 ${esc(l.name)}
+
 </option>
+
 `
 )
 
@@ -4357,7 +4450,9 @@ catch(e){
 $("status").textContent=
 
 e.message
+
 ||
+
 "Unable to find Sleeper leagues.";
 
 }
@@ -4366,7 +4461,7 @@ e.message
 
 
 /* =========================================================
-   CONNECT LEAGUE
+   CONNECT SLEEPER LEAGUE
    ========================================================= */
 
 $("connect-league").onclick=
@@ -4376,7 +4471,9 @@ const id=
 $("league-picker").value;
 
 
-if(!id){
+if(
+!id
+){
 
 $("status").textContent=
 "Choose a league first.";
@@ -4417,66 +4514,53 @@ fetchJSON(
 ),
 
 fetchJSON(
-"https://api.sleeper.app/v1/players/nfl?active=true"
+"https://api.sleeper.app/v1/players/nfl"
 )
 
 ]);
 
 
-applySleeperSettings();
+readSleeperSettings();
 
 
 buildRosterSelectors();
 
 
-buildSleeperNameMap();
+sleeperCtx.teamA=[];
 
-
-$("sleeper-name").textContent=
-
-syncedLeague.name
-||
-"Sleeper League";
-
-
-$("sleeper-info").textContent=
-modeLabel();
-
-
-$("sleeper-bar").style.display=
-"block";
+sleeperCtx.teamB=[];
 
 
 $("sync-button").textContent=
 "Sleeper Synced ✓";
 
 
-$("league-view-button").disabled=
+$("sleeper-page-button").disabled=
 false;
 
 
-teamA=[];
-
-teamB=[];
-
-
-modal.classList.remove(
+modal
+.classList
+.remove(
 "show"
 );
 
 
-renderBoard();
+renderBoard(
+sleeperCtx
+);
 
-render();
+
+renderCalculator(
+sleeperCtx
+);
 
 
-if(
-TRADEFORGE_ENGINE.useSleeperTrendingMarket
-){
+buildLeagueRosters();
 
-refreshSleeperTrends();
 
-}
+location.hash=
+"sleeper";
 
 }
 
@@ -4485,7 +4569,9 @@ catch(e){
 $("status").textContent=
 
 e.message
+
 ||
+
 "Unable to sync this Sleeper league.";
 
 }
@@ -4494,30 +4580,40 @@ e.message
 
 
 /* =========================================================
-   APPLY SLEEPER SETTINGS
+   READ SLEEPER SETTINGS
    ========================================================= */
 
-function applySleeperSettings(){
+function readSleeperSettings(){
 
 const s=
+
 syncedLeague?.scoring_settings
+
 ||
+
 {};
 
 
 const rp=
+
 syncedLeague?.roster_positions
+
 ||
+
 [];
 
 
 const set=
+
 syncedLeague?.settings
+
 ||
+
 {};
 
 
 const rec=
+
 Number(
 s.rec
 ||
@@ -4526,6 +4622,7 @@ s.rec
 
 
 const te=
+
 Number(
 s.bonus_rec_te
 ||
@@ -4533,76 +4630,104 @@ s.bonus_rec_te
 );
 
 
-scoringMode=
+sleeperSettings.scoring=
 
 rec>=.75
+
 ?
+
 "ppr"
+
 :
+
 rec>=.25
+
 ?
+
 "half"
+
 :
+
 "standard";
 
 
-qbMode=
+sleeperSettings.qb=
 
 rp.includes(
 "SUPER_FLEX"
 )
+
 ?
+
 "superflex"
+
 :
+
 "oneqb";
 
 
-tePremiumMode=
+sleeperSettings.tep=
 
 te>=.75
+
 ?
+
 "full"
+
 :
+
 te>=.25
+
 ?
+
 "half"
+
 :
+
 "off";
 
 
-leagueMode=
+sleeperSettings.league=
 
 Number(
 set.type
 )
 ===2
+
 ?
+
 "dynasty"
+
 :
+
 Number(
 set.type
 )
 ===1
+
 ?
+
 "keeper"
+
 :
+
 "redraft";
 
 
-$("scoring").value=
-scoringMode;
+$("sleeper-scoring").value=
+sleeperSettings.scoring;
 
 
-$("league").value=
-leagueMode;
+$("sleeper-league").value=
+sleeperSettings.league;
 
 
-$("qb").value=
-qbMode;
+$("sleeper-qb").value=
+sleeperSettings.qb;
 
 
-$("tep").value=
-tePremiumMode;
+$("sleeper-tep").value=
+sleeperSettings.tep;
 
 }
 
@@ -4611,7 +4736,9 @@ tePremiumMode;
    ROSTER NAME
    ========================================================= */
 
-function rosterName(r){
+function rosterName(
+r
+){
 
 const u=
 
@@ -4628,12 +4755,20 @@ r.owner_id
 );
 
 
-return u?.metadata?.team_name
+return
+
+u?.metadata?.team_name
+
 ||
+
 u?.display_name
+
 ||
+
 u?.username
+
 ||
+
 "Roster "
 +
 r.roster_id;
@@ -4642,7 +4777,7 @@ r.roster_id;
 
 
 /* =========================================================
-   ROSTER SELECTORS
+   BUILD SLEEPER ROSTER SELECTORS
    ========================================================= */
 
 function buildRosterSelectors(){
@@ -4676,20 +4811,24 @@ const html=
 list.map(
 x=>
 `
+
 <option value="${x.id}">
+
 ${esc(x.name)}
+
 </option>
+
 `
 )
 
 .join("");
 
 
-$("roster-a").innerHTML=
+$("sleeper-roster-a").innerHTML=
 html;
 
 
-$("roster-b").innerHTML=
+$("sleeper-roster-b").innerHTML=
 html;
 
 
@@ -4705,278 +4844,90 @@ sleeperUser?.user_id
 );
 
 
-rosterA=
+sleeperRosterA=
 
 mine?.id
+
 ||
+
 list[0]?.id
+
 ||
+
 "";
 
 
-rosterB=
+sleeperRosterB=
 
 list.find(
 x=>
-x.id!==rosterA
+x.id!==sleeperRosterA
 )
 ?.id
 
 ||
 
-rosterA;
+sleeperRosterA;
 
 
-$("roster-a").value=
-rosterA;
+$("sleeper-roster-a").value=
+sleeperRosterA;
 
 
-$("roster-b").value=
-rosterB;
+$("sleeper-roster-b").value=
+sleeperRosterB;
 
 }
 
 
-$("roster-a").onchange=
+/* =========================================================
+   ROSTER CHANGES
+   ========================================================= */
+
+$("sleeper-roster-a").onchange=
 e=>{
 
-rosterA=
+sleeperRosterA=
 e.target.value;
 
-teamA=[];
 
-render();
+sleeperCtx.teamA=[];
+
+
+renderCalculator(
+sleeperCtx
+);
 
 };
 
 
-$("roster-b").onchange=
+$("sleeper-roster-b").onchange=
 e=>{
 
-rosterB=
+sleeperRosterB=
 e.target.value;
 
-teamB=[];
 
-render();
+sleeperCtx.teamB=[];
+
+
+renderCalculator(
+sleeperCtx
+);
 
 };
 
 
 /* =========================================================
-   SLEEPER MARKET MAPS
+   MATCH SLEEPER PLAYERS TO TRADEFORGE
    ========================================================= */
 
-function buildSleeperNameMap(){
+function matchSleeper(
+id
+){
 
-sleeperIdByName={};
-
-
-Object.entries(
-sleeperPlayers
-||
-{}
-)
-
-.forEach(
-(
-[
-id,
-sp
-]
-)=>{
-
-const name=
-
-sp?.full_name
-
-||
-
-[
-sp?.first_name,
-sp?.last_name
-]
-
-.filter(Boolean)
-
-.join(" ");
-
-
-if(name){
-
-sleeperIdByName[
-norm(name)
-]
-=
+id=
 String(id);
-
-}
-
-}
-);
-
-}
-
-
-async function refreshSleeperTrends(){
-
-const [
-adds,
-drops
-]
-
-=
-
-await Promise.all([
-
-fetchJSONSafe(
-"https://api.sleeper.app/v1/players/nfl/trending/add?lookback_hours=24&limit=100",
-[]
-),
-
-fetchJSONSafe(
-"https://api.sleeper.app/v1/players/nfl/trending/drop?lookback_hours=24&limit=100",
-[]
-)
-
-]);
-
-
-const addMax=
-
-Math.max(
-1,
-...
-adds.map(
-x=>
-Number(
-x.count
-||
-0
-)
-)
-);
-
-
-const dropMax=
-
-Math.max(
-1,
-...
-drops.map(
-x=>
-Number(
-x.count
-||
-0
-)
-)
-);
-
-
-const ids=
-
-new Set(
-[
-...
-adds.map(
-x=>
-String(
-x.player_id
-)
-),
-
-...
-drops.map(
-x=>
-String(
-x.player_id
-)
-)
-]
-);
-
-
-sleeperTrendMarket={};
-
-
-ids.forEach(
-id=>{
-
-const add=
-
-Number(
-adds.find(
-x=>
-String(
-x.player_id
-)
-===
-id
-)
-?.count
-||
-0
-)
-/
-addMax;
-
-
-const drop=
-
-Number(
-drops.find(
-x=>
-String(
-x.player_id
-)
-===
-id
-)
-?.count
-||
-0
-)
-/
-dropMax;
-
-
-sleeperTrendMarket[id]=
-
-tfClamp(
-
-(
-add
--
-drop
-)
-*
-TRADEFORGE_ENGINE.marketAdjustmentMax,
-
--TRADEFORGE_ENGINE.marketAdjustmentMax,
-
-TRADEFORGE_ENGINE.marketAdjustmentMax
-
-);
-
-}
-);
-
-
-renderBoard();
-
-render();
-
-}
-
-
-/* =========================================================
-   MATCH SLEEPER PLAYERS
-   ========================================================= */
-
-function matchSleeper(id){
-
-id=String(id);
 
 
 if(
@@ -4999,13 +4950,21 @@ dst[id]
 
 
 return p
+
 ?
+
 {
+
 ...p,
+
 sleeperId:id,
+
 nflTeam:id
+
 }
+
 :
+
 null;
 
 }
@@ -5015,7 +4974,9 @@ const sp=
 sleeperPlayers[id];
 
 
-if(!sp){
+if(
+!sp
+){
 
 return null;
 
@@ -5047,30 +5008,540 @@ norm(
 x.name
 )
 ===
-norm(
-name
-)
+norm(name)
 );
 
 
 return p
+
 ?
+
 {
+
 ...p,
+
 sleeperId:id,
+
 nflTeam:
 sp.team
 ||
 ""
+
 }
+
 :
+
 null;
 
 }
 
 
 /* =========================================================
-   DISCONNECT
+   USER'S ROSTER
+   ========================================================= */
+
+function getMyRosterId(){
+
+return
+
+syncedRosters
+
+.find(
+r=>
+String(
+r.owner_id
+)
+===
+String(
+sleeperUser?.user_id
+)
+)
+
+?.roster_id
+
+||
+
+syncedRosters[0]
+?.roster_id
+
+||
+
+"";
+
+}
+
+
+/* =========================================================
+   RENDER LEAGUE ROSTER
+   ========================================================= */
+
+function renderLeagueRoster(
+id,
+listId,
+nameId,
+metaId
+){
+
+const r=
+
+syncedRosters
+.find(
+x=>
+String(
+x.roster_id
+)
+===
+String(id)
+);
+
+
+if(
+!r
+){
+
+$(nameId).textContent=
+"Roster";
+
+
+$(metaId).textContent=
+"";
+
+
+$(listId).innerHTML=
+"";
+
+
+return;
+
+}
+
+
+$(nameId).textContent=
+rosterName(r);
+
+
+const all=
+
+(
+r.players
+||
+[]
+)
+
+.map(
+pid=>{
+
+const tradePlayer=
+
+matchSleeper(
+String(pid)
+);
+
+
+const sp=
+
+sleeperPlayers[
+String(pid)
+]
+
+||
+
+{};
+
+
+const name=
+
+tradePlayer?.name
+
+||
+
+sp.full_name
+
+||
+
+[
+sp.first_name,
+sp.last_name
+]
+
+.filter(Boolean)
+
+.join(" ")
+
+||
+
+"Unknown Player";
+
+
+const pos=
+
+tradePlayer?.pos
+
+||
+
+sp.position
+
+||
+
+"";
+
+
+const team=
+
+tradePlayer?.nflTeam
+
+||
+
+sp.team
+
+||
+
+"";
+
+
+return{
+
+name,
+pos,
+team,
+tradePlayer
+
+};
+
+}
+)
+
+.sort(
+(a,b)=>
+
+(
+b.tradePlayer
+
+?
+
+calcValue(
+b.tradePlayer,
+sleeperSettings
+)
+
+:
+
+-1
+)
+
+-
+
+(
+a.tradePlayer
+
+?
+
+calcValue(
+a.tradePlayer,
+sleeperSettings
+)
+
+:
+
+-1
+)
+
+);
+
+
+$(metaId).textContent=
+
+`${all.length} players`;
+
+
+$(listId).innerHTML=
+
+all.map(
+p=>
+`
+
+<div class="roster-player">
+
+<div>
+
+<strong>
+
+${esc(p.name)}
+
+</strong>
+
+<small>
+
+${esc(
+
+[
+p.pos,
+p.team
+]
+
+.filter(Boolean)
+
+.join(
+" • "
+)
+
+)}
+
+</small>
+
+${
+p.tradePlayer
+
+?
+
+""
+
+:
+
+'<div class="not-valued">Not yet in TradeForge database</div>'
+}
+
+</div>
+
+
+<div class="roster-value">
+
+${
+p.tradePlayer
+
+?
+
+calcValue(
+p.tradePlayer,
+sleeperSettings
+)
+.toFixed(1)
+
+:
+
+"—"
+}
+
+</div>
+
+</div>
+
+`
+)
+
+.join("");
+
+}
+
+
+/* =========================================================
+   BUILD LEAGUE ROSTERS
+   ========================================================= */
+
+function buildLeagueRosters(){
+
+if(
+!syncedLeague
+){
+
+return;
+
+}
+
+
+const mine=
+
+String(
+getMyRosterId()
+);
+
+
+renderLeagueRoster(
+
+mine,
+
+"my-team-roster",
+
+"my-team-name",
+
+"my-team-meta"
+
+);
+
+
+const opponents=
+
+syncedRosters
+.filter(
+r=>
+String(
+r.roster_id
+)
+!==
+mine
+);
+
+
+const current=
+
+$("opponent-select").value;
+
+
+$("opponent-select").innerHTML=
+
+opponents.map(
+r=>
+`
+
+<option value="${r.roster_id}">
+
+${esc(
+rosterName(r)
+)}
+
+</option>
+
+`
+)
+
+.join("");
+
+
+const opponent=
+
+opponents.some(
+r=>
+String(
+r.roster_id
+)
+===
+String(
+current
+)
+)
+
+?
+
+current
+
+:
+
+String(
+opponents[0]?.roster_id
+||
+""
+);
+
+
+if(
+opponent
+){
+
+$("opponent-select").value=
+opponent;
+
+
+renderLeagueRoster(
+
+opponent,
+
+"opponent-team-roster",
+
+"opponent-team-name",
+
+"opponent-team-meta"
+
+);
+
+}
+
+else{
+
+$("opponent-team-name").textContent=
+"No Other Team";
+
+
+$("opponent-team-meta").textContent=
+"";
+
+
+$("opponent-team-roster").innerHTML=
+"";
+
+}
+
+}
+
+
+$("opponent-select").onchange=
+e=>
+
+renderLeagueRoster(
+
+e.target.value,
+
+"opponent-team-roster",
+
+"opponent-team-name",
+
+"opponent-team-meta"
+
+);
+
+
+/* =========================================================
+   RENDER SLEEPER PAGE
+   ========================================================= */
+
+function renderSleeperPage(){
+
+if(
+!syncedLeague
+){
+
+return;
+
+}
+
+
+$("sleeper-page-name").textContent=
+
+(
+syncedLeague.name
+
+||
+
+"Sleeper League"
+)
+
++
+
+" • "
+
++
+
+modeLabel(
+sleeperSettings
+);
+
+
+renderBoard(
+sleeperCtx
+);
+
+
+renderCalculator(
+sleeperCtx
+);
+
+
+buildLeagueRosters();
+
+}
+
+
+/* =========================================================
+   DISCONNECT SLEEPER
    ========================================================= */
 
 $("disconnect").onclick=
@@ -5084,38 +5555,33 @@ syncedUsers=[];
 
 sleeperPlayers={};
 
-rosterA="";
+sleeperRosterA="";
 
-rosterB="";
+sleeperRosterB="";
 
-teamA=[];
+sleeperCtx.teamA=[];
 
-teamB=[];
-
-sleeperTrendMarket={};
-
-sleeperIdByName={};
-
-
-$("sleeper-bar").style.display=
-"none";
+sleeperCtx.teamB=[];
 
 
 $("sync-button").textContent=
 "Sync Your League";
 
 
-$("league-view-button").disabled=
+$("sleeper-page-button").disabled=
 true;
 
 
+$("league-wrap").style.display=
+"none";
+
+
+$("status").textContent=
+"";
+
+
 location.hash=
-"analyzer";
-
-
-renderBoard();
-
-render();
+"home";
 
 };
 
@@ -5124,31 +5590,52 @@ render();
    START
    ========================================================= */
 
-if(!location.hash){
+if(
+!location.hash
+){
 
 history.replaceState(
 null,
 "",
-"#analyzer"
+"#home"
 );
 
 }
 
 
-setPage(
-location.hash==="#league"
-?
-"league"
-:
-"analyzer"
+renderBoard(
+homeCtx
 );
 
-renderBoard();
 
-render();
+renderCalculator(
+homeCtx
+);
 
-loadTradeForgeFeed();
 
+renderBoard(
+sleeperCtx
+);
+
+
+renderCalculator(
+sleeperCtx
+);
+
+
+setPage(
+
+location.hash==="#sleeper"
+
+?
+
+"sleeper"
+
+:
+
+"home"
+
+);
 
 </script>
 
