@@ -1,24 +1,29 @@
-name: Update TradeForge Data
+name: Update TradeForge Rankings
 
 on:
   workflow_dispatch:
 
   schedule:
-    # Daily morning refresh
-    - cron: "15 12 * * *"
 
-    # Extra Sunday refresh before games
-    - cron: "30 15 * * 0"
+    # Tuesday: major post-week recalculation
+    - cron: "15 13 * * 2"
+
+    # Friday: injury/practice refresh
+    - cron: "15 16 * * 5"
+
+    # Sunday morning: final refresh
+    - cron: "30 14 * * 0"
 
 permissions:
   contents: write
 
 concurrency:
-  group: tradeforge-data-update
+  group: tradeforge-rankings
   cancel-in-progress: true
 
 jobs:
-  update-data:
+
+  update-rankings:
 
     runs-on: ubuntu-latest
 
@@ -27,19 +32,36 @@ jobs:
       - name: Checkout TradeForge
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          node-version: "20"
+          python-version: "3.12"
 
       - name: Build TradeForge data feed
-        env:
-          FANTASYPROS_API_KEY: ${{ secrets.FANTASYPROS_API_KEY }}
-        run: |
-          node scripts/update-tradeforge-data.mjs
+        run: python scripts/update_tradeforge_data.py
 
-      - name: Commit updated player data
+      - name: Validate feed
         run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          data = json.loads(
+              Path("tradeforge-data.json").read_text()
+          )
+
+          assert data["meta"]["baselinePlayers"] >= 300
+          assert isinstance(data["players"], dict)
+
+          print(
+              "Feed valid:",
+              data["meta"]
+          )
+          PY
+
+      - name: Commit updated feed
+        run: |
+
           if git diff --quiet -- tradeforge-data.json; then
             echo "No TradeForge data changes."
             exit 0
@@ -49,5 +71,7 @@ jobs:
           git config user.email "tradeforge-bot@users.noreply.github.com"
 
           git add tradeforge-data.json
-          git commit -m "Update TradeForge player values"
+
+          git commit -m "Update TradeForge rankings"
+
           git push
