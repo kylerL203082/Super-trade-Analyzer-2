@@ -42,8 +42,24 @@ jobs:
           echo "----- git diff -----"
           git diff -- tradeforge-data.json
 
-      - name: Commit updated feed
+           - name: Commit updated feed
         run: |
+          git config user.name "TradeForge Bot"
+          git config user.email "tradeforge-bot@users.noreply.github.com"
+
+          git add -f tradeforge-data.json
+
+          echo "Git status after staging:"
+          git status --short
+
+          if git diff --cached --quiet; then
+            echo "No TradeForge data changes to commit."
+            exit 0
+          fi
+
+          git commit -m "Update TradeForge rankings"
+
+          git push origin HEAD:${GITHUB_REF_NAME}
           if git diff --quiet -- tradeforge-data.json; then
             echo "No TradeForge data changes."
             exit 0
