@@ -199,7 +199,6 @@ font-size:13px
 .top-row{
 display:flex;
 justify-content:space-between;
-gap:8px;
 font-size:12px;
 padding:5px 0
 }
@@ -237,15 +236,16 @@ max-height:320px;
 overflow:auto
 }
 
-.results.show{display:block}
+.results.show{
+display:block
+}
 
 .result-item{
 padding:9px;
 border-bottom:1px solid var(--border);
 cursor:pointer;
 display:flex;
-justify-content:space-between;
-gap:10px
+justify-content:space-between
 }
 
 .result-item:hover{
@@ -339,10 +339,21 @@ color:var(--muted);
 margin-top:6px
 }
 
-.verdict.fair{border-color:var(--good)}
-.verdict.slight{border-color:var(--warn)}
-.verdict.adv{border-color:var(--orange)}
-.verdict.major{border-color:var(--bad)}
+.verdict.fair{
+border-color:var(--good)
+}
+
+.verdict.slight{
+border-color:var(--warn)
+}
+
+.verdict.adv{
+border-color:var(--orange)
+}
+
+.verdict.major{
+border-color:var(--bad)
+}
 
 .grade{
 display:flex;
@@ -647,7 +658,6 @@ Sleeper League
 </button>
 
 </div>
-
 </div>
 
 </header>
@@ -660,112 +670,45 @@ Sleeper League
 <section class="card">
 
 <div class="settings-title">
-
-<span>
-League Settings
-</span>
-
-<span id="home-mode-label" class="mode-label">
-</span>
-
+<span>League Settings</span>
+<span id="home-mode-label" class="mode-label"></span>
 </div>
-
 
 <div class="settings">
 
 <label class="setting">
-
-<span>
-SCORING
-</span>
-
+<span>SCORING</span>
 <select id="home-scoring">
-
-<option value="ppr">
-PPR
-</option>
-
-<option value="half">
-0.5 PPR
-</option>
-
-<option value="standard">
-No PPR
-</option>
-
+<option value="ppr">PPR</option>
+<option value="half">0.5 PPR</option>
+<option value="standard">No PPR</option>
 </select>
-
 </label>
 
-
 <label class="setting">
-
-<span>
-LEAGUE
-</span>
-
+<span>LEAGUE</span>
 <select id="home-league">
-
-<option value="redraft">
-Redraft
-</option>
-
-<option value="keeper">
-Keeper
-</option>
-
-<option value="dynasty">
-Dynasty
-</option>
-
+<option value="redraft">Redraft</option>
+<option value="keeper">Keeper</option>
+<option value="dynasty">Dynasty</option>
 </select>
-
 </label>
 
-
 <label class="setting">
-
-<span>
-QB FORMAT
-</span>
-
+<span>QB FORMAT</span>
 <select id="home-qb">
-
-<option value="oneqb">
-1QB
-</option>
-
-<option value="superflex">
-Superflex
-</option>
-
+<option value="oneqb">1QB</option>
+<option value="superflex">Superflex</option>
 </select>
-
 </label>
 
-
 <label class="setting">
-
-<span>
-TE PREMIUM
-</span>
-
+<span>TE PREMIUM</span>
 <select id="home-tep">
-
-<option value="off">
-Off
-</option>
-
-<option value="half">
-+0.5 PPR
-</option>
-
-<option value="full">
-+1.0 PPR
-</option>
-
+<option value="off">Off</option>
+<option value="half">+0.5 PPR</option>
+<option value="full">+1.0 PPR</option>
 </select>
-
 </label>
 
 </div>
@@ -808,12 +751,9 @@ Top Players
 
 <div class="trade-grid">
 
-
 <section class="team card">
 
-<h2>
-Team A
-</h2>
+<h2>Team A</h2>
 
 <div class="search-wrap">
 
@@ -830,8 +770,7 @@ class="results">
 
 </div>
 
-<div id="home-team-a">
-</div>
+<div id="home-team-a"></div>
 
 <div class="totals">
 
@@ -867,15 +806,8 @@ Add players to both sides.
 </div>
 
 <div class="grade">
-
-<span>
-Trade Grade
-</span>
-
-<strong id="home-grade">
-—
-</strong>
-
+<span>Trade Grade</span>
+<strong id="home-grade">—</strong>
 </div>
 
 <div class="actions">
@@ -895,9 +827,7 @@ Clear Trade
 
 <section class="team card">
 
-<h2>
-Team B
-</h2>
+<h2>Team B</h2>
 
 <div class="search-wrap">
 
@@ -914,8 +844,7 @@ class="results">
 
 </div>
 
-<div id="home-team-b">
-</div>
+<div id="home-team-b"></div>
 
 <div class="totals">
 
@@ -1128,7 +1057,9 @@ Off
 <button
 id="disconnect"
 class="close">
+
 Disconnect Sleeper
+
 </button>
 
 </div>
@@ -1152,7 +1083,6 @@ Selecting a team now shows that team's roster below the dropdown.
 
 
 <div class="roster-select-grid">
-
 
 <div>
 
@@ -1207,26 +1137,54 @@ class="trade-roster-box">
 Top Players
 </h3>
 
+
 <div class="top-grid" style="margin-top:10px">
 
 <div class="top-box">
-<h3>RB</h3>
-<div id="sleeper-top-rb"></div>
+
+<h3>
+RB
+</h3>
+
+<div id="sleeper-top-rb">
 </div>
 
-<div class="top-box">
-<h3>WR</h3>
-<div id="sleeper-top-wr"></div>
 </div>
 
-<div class="top-box">
-<h3>QB</h3>
-<div id="sleeper-top-qb"></div>
-</div>
 
 <div class="top-box">
-<h3>TE</h3>
-<div id="sleeper-top-te"></div>
+
+<h3>
+WR
+</h3>
+
+<div id="sleeper-top-wr">
+</div>
+
+</div>
+
+
+<div class="top-box">
+
+<h3>
+QB
+</h3>
+
+<div id="sleeper-top-qb">
+</div>
+
+</div>
+
+
+<div class="top-box">
+
+<h3>
+TE
+</h3>
+
+<div id="sleeper-top-te">
+</div>
+
 </div>
 
 </div>
@@ -1235,7 +1193,6 @@ Top Players
 
 
 <div class="trade-grid">
-
 
 <section class="team card">
 
@@ -1261,16 +1218,32 @@ class="results">
 <div id="sleeper-team-a">
 </div>
 
+
 <div class="totals">
 
 <div class="total">
-<small>Base</small>
-<strong id="sleeper-base-a">0.0</strong>
+
+<small>
+Base
+</small>
+
+<strong id="sleeper-base-a">
+0.0
+</strong>
+
 </div>
 
+
 <div class="total">
-<small>Adjusted</small>
-<strong id="sleeper-adj-a">0.0</strong>
+
+<small>
+Adjusted
+</small>
+
+<strong id="sleeper-adj-a">
+0.0
+</strong>
+
 </div>
 
 </div>
@@ -1281,10 +1254,12 @@ class="results">
 <section class="result-card card">
 
 <div class="meter">
+
 <div
 id="sleeper-marker"
 class="marker">
 </div>
+
 </div>
 
 
@@ -1357,13 +1332,28 @@ class="results">
 <div class="totals">
 
 <div class="total">
-<small>Base</small>
-<strong id="sleeper-base-b">0.0</strong>
+
+<small>
+Base
+</small>
+
+<strong id="sleeper-base-b">
+0.0
+</strong>
+
 </div>
 
+
 <div class="total">
-<small>Adjusted</small>
-<strong id="sleeper-adj-b">0.0</strong>
+
+<small>
+Adjusted
+</small>
+
+<strong id="sleeper-adj-b">
+0.0
+</strong>
+
 </div>
 
 </div>
@@ -1414,7 +1404,6 @@ League Rosters
 class="roster-view-grid"
 style="margin-top:12px"
 >
-
 
 <section class="roster-card">
 
@@ -1494,7 +1483,6 @@ class="roster-list">
 
 </section>
 
-
 </div>
 
 </section>
@@ -1546,7 +1534,9 @@ autocomplete="off"
 <button
 id="find-leagues"
 class="primary">
+
 Find My Leagues
+
 </button>
 
 
@@ -1558,7 +1548,9 @@ Find My Leagues
 <button
 id="connect-league"
 class="primary">
+
 Sync Selected League
+
 </button>
 
 </div>
@@ -1990,7 +1982,6 @@ const picks=[
 ["2027 Late 1st",36,42],
 ["2027 2nd",22,25],
 ["2027 3rd",10,12],
-
 ["2028 Early 1st",47,53],
 ["2028 Mid 1st",40,46],
 ["2028 Late 1st",33,39],
@@ -2140,17 +2131,11 @@ type:"sleeper"
 
 
 let sleeperUser=null;
-
 let syncedLeague=null;
-
 let syncedRosters=[];
-
 let syncedUsers=[];
-
 let sleeperPlayers={};
-
 let sleeperRosterA="";
-
 let sleeperRosterB="";
 
 
@@ -5197,14 +5182,35 @@ sleeperSettings.tep;
 }
 
 
+/* DROPDOWN FIX */
+
+function cleanSleeperName(
+value
+){
+
+return String(
+value
+??
+""
+)
+
+.replace(
+/[\u200B-\u200D\uFEFF]/g,
+""
+)
+
+.trim();
+
+}
+
+
 function rosterName(
 r
 ){
 
 const u=
 
-syncedUsers
-.find(
+syncedUsers.find(
 x=>
 String(
 x.user_id
@@ -5216,23 +5222,80 @@ r.owner_id
 );
 
 
-return
+const teamName=
 
+cleanSleeperName(
 u?.metadata?.team_name
+);
 
-||
 
+const displayName=
+
+cleanSleeperName(
 u?.display_name
+);
 
-||
 
+const username=
+
+cleanSleeperName(
 u?.username
+);
+
+
+return teamName
 
 ||
 
-"Roster "
-+
-r.roster_id;
+displayName
+
+||
+
+username
+
+||
+
+`Roster ${r.roster_id}`;
+
+}
+
+
+function fillRosterSelect(
+selectId,
+list
+){
+
+const select=
+$(selectId);
+
+
+select.innerHTML=
+"";
+
+
+list.forEach(
+x=>{
+
+const option=
+document.createElement(
+"option"
+);
+
+
+option.value=
+x.id;
+
+
+option.textContent=
+x.name;
+
+
+select.appendChild(
+option
+);
+
+}
+);
 
 }
 
@@ -5263,30 +5326,16 @@ rosterName(r)
 );
 
 
-const html=
-
-list.map(
-x=>
-`
-
-<option value="${x.id}">
-
-${esc(x.name)}
-
-</option>
-
-`
-)
-
-.join("");
+fillRosterSelect(
+"sleeper-roster-a",
+list
+);
 
 
-$("sleeper-roster-a").innerHTML=
-html;
-
-
-$("sleeper-roster-b").innerHTML=
-html;
+fillRosterSelect(
+"sleeper-roster-b",
+list
+);
 
 
 const mine=
@@ -5347,8 +5396,7 @@ renderTradeRosterPreview(
 }
 
 
-$("sleeper-roster-a")
-.addEventListener(
+$("sleeper-roster-a").addEventListener(
 "change",
 e=>{
 
@@ -5385,8 +5433,7 @@ sleeperCtx
 );
 
 
-$("sleeper-roster-b")
-.addEventListener(
+$("sleeper-roster-b").addEventListener(
 "change",
 e=>{
 
