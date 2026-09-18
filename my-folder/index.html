@@ -1299,7 +1299,8 @@ p.sleeperId
 ||
 sleeperIdByName[
 norm(p.name)
-];
+let tradeForgeFeedMeta=null;
+   ];
 
 
 return id
@@ -2116,20 +2117,173 @@ tfHasAnyEngineData
 .length;
 
 
-$("engine-status")
-.textContent=
+let text=
 
 live
 
 ?
-`Live inputs active for ${live} players • ${playerDatabase.length} ranked players`
+
+`Live Engine • ${live} players`
 
 :
-`Baseline mode • ${playerDatabase.length} ranked players • live-data ready`;
+
+`Baseline mode • ${playerDatabase.length} ranked players`;
+
+
+if(
+tradeForgeFeedMeta?.generatedAt
+){
+
+const updated=
+new Date(
+tradeForgeFeedMeta.generatedAt
+);
+
+
+text+=
+
+` • Updated ${updated.toLocaleString()}`;
 
 }
 
 
+if(
+tradeForgeFeedMeta?.week
+){
+
+text+=
+` • Week ${tradeForgeFeedMeta.week}`;
+
+}
+
+
+$("engine-status")
+.textContent=
+text;
+
+}
+
+async function loadTradeForgeFeed(){
+
+try{
+
+const response=
+
+await fetch(
+
+`./tradeforge-data.json?v=${Date.now()}`,
+
+{
+cache:"no-store"
+}
+
+);
+
+
+if(!response.ok){
+
+throw new Error(
+"TradeForge feed unavailable"
+);
+
+}
+
+
+const feed=
+
+await response.json();
+
+
+tradeForgeFeedMeta=
+feed.meta
+||
+null;
+
+
+let applied=0;
+
+
+playerDatabase
+.forEach(
+player=>{
+
+const live=
+
+feed.players
+?.[
+norm(
+player.name
+)
+];
+
+
+if(
+live?.engine
+){
+
+player.engine=
+live.engine;
+
+
+player.liveData=
+live;
+
+
+applied++;
+
+}
+
+}
+);
+
+
+console.log(
+`TradeForge live feed applied to ${applied} players.`
+);
+
+
+renderBoard();
+
+render();
+
+
+if(
+syncedLeague
+&&
+!(
+$("league-page")
+.classList
+.contains(
+"page-hidden"
+)
+)
+){
+
+buildLeaguePage();
+
+}
+
+}
+
+catch(error){
+
+console.warn(
+"TradeForge live feed not loaded. Using baseline player values.",
+error
+);
+
+
+tradeForgeFeedMeta=
+null;
+
+
+renderBoard();
+
+render();
+
+}
+
+}
 /* =========================================================
    TRADE PACKAGE MATH
    ========================================================= */
@@ -5024,10 +5178,12 @@ location.hash==="#league"
 "analyzer"
 );
 
-
 renderBoard();
 
 render();
+
+loadTradeForgeFeed();
+
 
 </script>
 
