@@ -1,3 +1,3464 @@
+
+ok design the formula and pitch it to me.
+
+Yes. I’d move away from manually assigning every player a trade value and build a valuation engine that produces the value from several components.
+
+The goal should be simple: when someone looks at the result, it should feel like an experienced fantasy manager evaluated the trade—not like two rankings were added together.
+
+Proposed Ridge Trade Value Engine
+I would keep your user-facing scale roughly where it is now, but calculate the number underneath it.
+
+The conceptual formula would be:
+
+P
+l
+a
+y
+e
+r
+V
+a
+l
+u
+e
+=
+T
+a
+l
+e
+n
+t
+/
+P
+r
+o
+d
+u
+c
+t
+i
+o
+n
+×
+P
+o
+s
+i
+t
+i
+o
+n
+×
+S
+c
+a
+r
+c
+i
+t
+y
+×
+R
+o
+l
+e
+×
+A
+v
+a
+i
+l
+a
+b
+i
+l
+i
+t
+y
+×
+F
+o
+r
+m
+a
+t
+×
+M
+a
+r
+k
+e
+t
+×
+E
+l
+i
+t
+e
+C
+u
+r
+v
+e
+PlayerValue=Talent/Production×Position×Scarcity×Role×Availability×Format×Market×EliteCurve
+But I wouldn't literally multiply eight arbitrary numbers together. Internally, I'd build a weighted score and then run it through a nonlinear value curve.
+
+1. Player performance — 35%
+This establishes the player's underlying football/fantasy value.
+
+I'd use a combination of:
+
+Fantasy points per game
+Rest-of-season projected PPG
+Recent performance
+Expected fantasy points
+Targets / target share
+Carries / rushing share
+Red-zone opportunities
+Snap percentage
+Routes run
+QB passing/rushing production
+And importantly, the weighting changes by position.
+
+For example, target share is extremely important for a WR but meaningless for most QBs.
+
+I would weight projections more heavily than points already scored because we're valuing what someone should be worth going forward.
+
+2. Opportunity & role — 20%
+This is where we distinguish production that is sustainable from production that isn't.
+
+Imagine:
+
+RB A: 15.2 PPG, 72% snaps, 18 touches/game
+
+RB B: 15.1 PPG, 41% snaps, 10 touches/game
+
+Their box-score production looks nearly identical.
+
+Their trade values shouldn't.
+
+The engine would evaluate things such as workload, depth-chart position, target/carry share, snap share and role stability.
+
+That allows us to identify players whose opportunity suggests their value could rise or fall.
+
+3. Positional scarcity — 15%
+This is critical.
+
+We establish a replacement baseline for each position.
+
+Something approximately like:
+
+QB → QB12–15
+RB → RB30–36
+WR → WR36–42
+TE → TE12–15
+
+Then we measure how far above replacement a player sits.
+
+That means a TE scoring 14 PPG could potentially be considerably more valuable than a WR scoring 14 PPG.
+
+This becomes our VORP component:
+
+Value Over Replacement Player
+
+This should make the analyzer much smarter than simply comparing projected fantasy points.
+
+4. Market value — 10%
+I think this is something we absolutely want.
+
+Fantasy football isn't purely statistical.
+
+A player's trade value is partially determined by what fantasy managers actually believe he's worth.
+
+So I'd maintain a Market Score that could eventually incorporate outside rankings/ADP/trade-market information.
+
+For example:
+
+Our statistical model: 7.4
+Fantasy market: 8.2
+
+We don't automatically change him to 8.2.
+
+Maybe the engine settles around:
+
+7.7
+
+That keeps our model independent while acknowledging actual trading behavior.
+
+5. Risk & availability — 10%
+This would account for:
+
+Injuries
+Suspensions
+Bye-week proximity
+Uncertain role
+Committee risk
+Returning from injury
+Depth-chart competition
+
+I would be careful here.
+
+We shouldn't destroy someone's value just because he's questionable for one Sunday.
+
+Instead we'd have graduated penalties.
+
+Healthy = 1.00
+Minor concern = ~0.97
+Meaningful injury uncertainty = ~0.90
+Expected multiweek absence = progressively lower
+
+The exact numbers should be calibrated rather than hard-coded permanently.
+
+6. Consistency — 5%
+Two WRs:
+
+WR A:
+
+18
+17
+16
+19
+18
+
+WR B:
+
+4
+31
+6
+29
+5
+
+Same approximate average.
+
+They're not necessarily equally valuable.
+
+We calculate volatility and reward players who reliably deliver useful fantasy starts.
+
+But only 5%.
+
+I don't want consistency overpowering upside.
+
+7. Situation — 5%
+Small adjustment for things the basic statistics don't completely capture:
+
+Offensive environment
+QB quality
+Offensive line
+Coaching tendencies
+Team scoring expectation
+
+This should remain relatively small because otherwise we start double-counting information already reflected in projections.
+
+Then comes the important part: the Value Curve
+This is where I think we can make your analyzer noticeably better.
+
+Player values should not be linear.
+
+Suppose our raw rankings produce:
+
+Player #1 = 100
+Player #10 = 91
+Player #20 = 82
+
+That implies the difference between #1 and #10 is basically equivalent to #10 and #20.
+
+Fantasy football doesn't work that way.
+
+Elite players deserve scarcity premiums.
+
+I'd apply a nonlinear curve after calculating the underlying player score.
+
+Something conceptually like:
+
+T
+r
+a
+d
+e
+V
+a
+l
+u
+e
+=
+10
+×
+(
+P
+e
+r
+c
+e
+n
+t
+i
+l
+e
+)
+k
+TradeValue=10×(Percentile) 
+k
+ 
+We calibrate k using real trade-market data.
+
+The result might look more like:
+
+Player tier	Trade value
+Generational/overall #1 type	10.0
+Elite	9.2–9.9
+Superstar	8.3–9.1
+Strong starter	6.8–8.2
+Solid starter	5.3–6.7
+Flex	3.8–5.2
+Bench/depth	2.0–3.7
+Deep roster	0.5–1.9
+Now a 9.8 actually means something.
+
+Redraft, Keeper and Dynasty
+This is another area where your current architecture gives us an advantage.
+
+We shouldn't have three completely independent databases.
+
+We establish one underlying player profile and let league mode modify it.
+
+Redraft
+Very little age consideration.
+
+The question is essentially:
+
+"What can this player do for me for the rest of this season?"
+
+Production, projections, opportunity and health dominate.
+
+Keeper
+Now age matters somewhat.
+
+Contract/role security matters.
+
+Future upside matters.
+
+But current-season production remains extremely important.
+
+Dynasty
+Completely different emphasis.
+
+We introduce:
+
+Age curve
+Career trajectory
+Draft capital
+Long-term role security
+Young-player upside
+Position-specific longevity
+
+For example, a 31-year-old WR could be substantially more valuable than a 22-year-old WR in redraft while being substantially less valuable in dynasty.
+
+Same players.
+
+Same database.
+
+Different valuation engine.
+
+Scoring settings
+Your existing:
+
+PPR
+Half PPR
+Standard
+
+would modify the underlying projections/opportunity.
+
+A high-volume slot WR might be:
+
+Standard: 6.8
+Half PPR: 7.3
+PPR: 7.8
+
+While a touchdown-dependent RB might move in the opposite relative direction.
+
+Eventually we can add:
+
+Superflex
+2QB
+TE Premium
+
+Superflex in particular would dramatically change QB values.
+
+Then I would change how trades themselves are calculated
+This is actually separate from player valuation.
+
+Suppose:
+
+Team A gives:
+
+Elite WR — 9.4
+
+Team B gives:
+
+WR — 5.0
+RB — 4.5
+
+Your current calculator essentially sees:
+
+9.4 vs 9.5
+
+and thinks:
+
+Fair.
+
+I don't want that.
+
+We introduce a consolidation premium.
+
+The team receiving the best player gets charged a premium because elite roster spots are scarce.
+
+Something like:
+
+1-for-1 → essentially no adjustment
+
+2-for-1 → 8–15% consolidation premium
+
+3-for-1 → 15–25%
+
+But importantly, it shouldn't just be a fixed percentage.
+
+The premium increases with the quality of the best player.
+
+Trading for a 5.5 player doesn't deserve much consolidation premium.
+
+Trading for a 9.8 player absolutely does.
+
+One more feature I'd add: Confidence
+Every value should have an internal confidence score.
+
+For example:
+
+Player X
+
+Trade Value: 8.7
+
+Confidence: High
+
+versus
+
+Rookie RB
+
+Trade Value: 6.4
+
+Confidence: Low
+
+The confidence rating could consider sample size, injury uncertainty, role uncertainty, projection disagreement and rookie status.
+
+We don't necessarily need to display it everywhere, but the engine should know it.
+
+That could eventually allow the analyzer to say:
+
+This trade is numerically balanced, but Team B is taking substantially more projection risk.
+
+That's considerably more useful than simply saying Team A wins.
+
+What I would NOT do
+I wouldn't make this dependent on a giant pile of manually assigned values.
+
+We should store player information and let the algorithm calculate values.
+
+The database becomes something like:
+
+Justin Jefferson
+Position: WR
+Age: 27
+Projected PPG: X
+Target Share: X
+Snap Share: X
+Health: Healthy
+Market Rank: X
+Dynasty Rank: X
+The engine determines the rest.
+
+That means when we update projections or rankings, potentially 300 player values update automatically.
+
+Where I think this gets really interesting
+Eventually there are three separate measurements:
+
+Statistical Value
+What our model believes the player is worth.
+
+Market Value
+What fantasy managers currently pay for him.
+
+Trade Value
+The blended number the analyzer actually uses.
+
+That creates opportunities later for something like:
+
+MARKET BUY
+Our model values this player significantly higher than the current fantasy market.
+
+or:
+
+SELL HIGH
+Current market value exceeds our projected rest-of-season value.
+
+That turns your project from a trade calculator into a fantasy decision engine.
+
+And that is the direction I'd take it.
+
+The immediate next step wouldn't be entering players. I'd build the valuation engine specification first—actual variables, weights, normalization, positional replacement levels, elite curve and consolidation formula. Once those equations are locked, then we can plug them into your existing HTML and start feeding the engine a much larger player database.
+
+ok so your going to rewrite the HTML code for me don't put a file put a code I can copy and paste. I like the weighted score idea use that. But lets change risk and availibilty to 5% and consistancy to 10% besides that I love the idea. Take everything you just told me and put it in a code format. I want you to think long and hard on this,and try your best not to edit any of the code we don't need to edit this helps prevent errors in things that already work.
+
+
+Worked for 6m 26s
+Yes. I rebuilt the valuation logic around the weighted-score model you approved and kept the rest of the analyzer alone as much as possible.
+
+Your final weights are:
+
+Performance: 35%
+Opportunity/Role: 20%
+Positional Scarcity: 15%
+Market Value: 10%
+Consistency: 10%
+Risk/Availability: 5%
+Situation: 5%
+I also incorporated the nonlinear elite curve, replacement-level scarcity, dynasty age curves, keeper blending, confidence scoring, market-buy/sell-high signals, and smarter consolidation premiums. I tested the core math across all 344 current players and the existing league/scoring combinations. Untouched players continue using their existing values until we add the new underlying component data to them. That is important because it lets us upgrade the players gradually without breaking the analyzer.
+
+Because you specifically asked me not to rewrite code that doesn't need to change, the safest approach is not to repost and alter your entire 5,000+ line HTML. Instead, make these exact replacements. Everything else in your current corrected_index.html stays exactly as it is.
+
+First, you can change this one existing line:
+<strong>TradeForge Engine v1.0</strong>
+to:
+
+<strong>TradeForge Engine v2.0</strong>
+Find the section that starts with:
+const TRADEFORGE_ENGINE={
+and replace everything from there through immediately before:
+
+/* =========================================================
+   DYNAMIC FUTURE PICKS
+   ========================================================= */
+with this:
+
+const TRADEFORGE_ENGINE={
+
+enabled:true,
+
+/*
+  WEIGHTED PLAYER VALUE MODEL
+
+  FINAL WEIGHTS:
+  Performance          35%
+  Opportunity / Role   20%
+  Positional Scarcity  15%
+  Market Value         10%
+  Consistency          10%
+  Risk / Availability   5%
+  Situation             5%
+
+  TOTAL                100%
+*/
+weights:{
+performance:.35,
+opportunity:.20,
+scarcity:.15,
+market:.10,
+consistency:.10,
+availability:.05,
+situation:.05
+},
+
+/*
+  Performance itself can be generated from projection,
+  consensus and recent production when a direct
+  "performance" component has not been supplied.
+*/
+performanceInputs:{
+projection:.60,
+consensus:.25,
+recent:.15
+},
+
+/*
+  Keeper remains more current-season focused than Dynasty.
+*/
+keeperWeights:{
+redraft:.65,
+dynasty:.35
+},
+
+/*
+  Dynasty multi-year outlook.
+*/
+dynastyYears:{
+year1:.50,
+year2:.30,
+year3:.20
+},
+
+/*
+  Positional replacement anchors.
+
+  Superflex and TE Premium modify these dynamically below.
+*/
+replacementRanks:{
+QB:15,
+RB:36,
+WR:42,
+TE:15,
+K:5,
+DST:5
+},
+
+/*
+  How strongly value above replacement affects
+  the scarcity component.
+*/
+scarcityBoost:.75,
+
+/*
+  Nonlinear elite-player curve.
+
+  Higher exponent creates a larger relative premium
+  for the truly elite players without manually
+  assigning a superstar bonus to each player.
+*/
+eliteCurveExponent:1.10,
+
+/*
+  Difference required between our statistical model
+  and market value before calling someone a
+  MARKET BUY or SELL HIGH.
+*/
+marketSignalGap:8,
+
+/*
+  Existing optional features.
+*/
+useSleeperTrendingMarket:false,
+useDynamicPickValues:false,
+
+/*
+  Maximum automatic market movement from Sleeper
+  trending data when enabled.
+*/
+marketAdjustmentMax:.08,
+
+futurePickDiscounts:[
+1,
+.91,
+.84,
+.78
+]
+
+};
+
+
+/* =========================================================
+   BASIC TRADEFORGE HELPERS
+   ========================================================= */
+
+const tfClamp=(v,min,max)=>
+Math.max(
+min,
+Math.min(max,v)
+);
+
+
+const tfRound=v=>
+Math.round(v*10)/10;
+
+
+const tfNum=(v,fallback)=>
+Number.isFinite(Number(v))
+?
+Number(v)
+:
+fallback;
+
+
+const tfStoredRawValue=(p,mode)=>
+tfNum(
+p?.[mode],
+.1
+);
+
+
+/* =========================================================
+   DETECT ENGINE DATA
+   ========================================================= */
+
+function tfHasComponentData(obj){
+
+if(!obj){
+return false;
+}
+
+return [
+
+"performance",
+
+"projection",
+"consensus",
+"recent",
+"upside",
+
+"opportunity",
+"roleConfidence",
+
+"scarcity",
+"replacement",
+
+"market",
+"marketChange",
+"marketMomentum",
+
+"consistency",
+"consistencyScore",
+
+"availability",
+"availabilityScore",
+"availabilityValue",
+
+"situation",
+"situationScore",
+
+"roleSecurity",
+
+"year1",
+"year2",
+"year3",
+
+"prospect",
+"draftCapital",
+
+"age",
+"ageScore",
+"nflGames"
+
+].some(
+k=>
+Number.isFinite(
+Number(obj[k])
+)
+);
+
+}
+
+
+function tfHasRedraftData(p){
+
+return tfHasComponentData(
+p.engine?.redraft
+);
+
+}
+
+
+function tfHasDynastyData(p){
+
+const e=
+p.engine?.dynasty;
+
+return (
+tfHasComponentData(e)
+||
+e?.isRookie===true
+);
+
+}
+
+
+function tfHasAnyEngineData(p){
+
+return (
+tfHasRedraftData(p)
+||
+tfHasDynastyData(p)
+||
+tfHasComponentData(
+p.engine?.keeper
+)
+);
+
+}
+
+
+/* =========================================================
+   WEIGHTED SCORE
+   ========================================================= */
+
+function tfWeightedSum(c){
+
+const w=
+TRADEFORGE_ENGINE.weights;
+
+return (
+
+c.performance
+*
+w.performance
+
++
+
+c.opportunity
+*
+w.opportunity
+
++
+
+c.scarcity
+*
+w.scarcity
+
++
+
+c.market
+*
+w.market
+
++
+
+c.consistency
+*
+w.consistency
+
++
+
+c.availability
+*
+w.availability
+
++
+
+c.situation
+*
+w.situation
+
+);
+
+}
+
+
+/* =========================================================
+   TRAIT -> VALUE CONVERTER
+
+   Some data such as role confidence or situation score
+   describes the quality of the situation rather than
+   being a trade value itself.
+
+   This converts that 0-100 trait into an adjustment
+   around the player's underlying value.
+   ========================================================= */
+
+function tfTraitValue(
+baseline,
+trait,
+low=.80,
+high=1.05
+){
+
+if(
+!Number.isFinite(
+Number(trait)
+)
+){
+
+return baseline;
+
+}
+
+
+const t=
+
+tfClamp(
+Number(trait),
+0,
+100
+)
+
+/
+100;
+
+
+return tfClamp(
+
+baseline
+*
+(
+low
++
+(
+high-low
+)
+*
+t
+),
+
+.1,
+100
+
+);
+
+}
+
+
+/* =========================================================
+   ELITE VALUE CURVE
+   ========================================================= */
+
+function tfApplyEliteCurve(v){
+
+v=
+tfClamp(
+tfNum(v,.1),
+.1,
+100
+);
+
+
+return tfClamp(
+
+100
+*
+Math.pow(
+v/100,
+TRADEFORGE_ENGINE.eliteCurveExponent
+),
+
+.1,
+100
+
+);
+
+}
+
+
+/* =========================================================
+   DYNASTY AGE CURVES
+
+   Position-specific because RB aging is not the same
+   as WR, TE or QB aging.
+   ========================================================= */
+
+function tfDynastyAgeFactor(
+pos,
+age
+){
+
+if(
+!Number.isFinite(
+Number(age)
+)
+){
+
+return 1;
+
+}
+
+
+age=
+Number(age);
+
+
+/* RUNNING BACK */
+
+if(pos==="RB"){
+
+if(age<=23)return 1.05;
+
+if(age<=25)return 1.02;
+
+if(age===26)return .99;
+
+if(age===27)return .95;
+
+if(age===28)return .90;
+
+return .83;
+
+}
+
+
+/* WIDE RECEIVER */
+
+if(pos==="WR"){
+
+if(age<=24)return 1.04;
+
+if(age<=27)return 1.02;
+
+if(age===28)return .99;
+
+if(age===29)return .95;
+
+if(age===30)return .90;
+
+return .84;
+
+}
+
+
+/* TIGHT END */
+
+if(pos==="TE"){
+
+if(age<=25)return 1.03;
+
+if(age<=29)return 1.02;
+
+if(age===30)return .98;
+
+if(age<=32)return .94;
+
+return .88;
+
+}
+
+
+/* QUARTERBACK */
+
+if(pos==="QB"){
+
+if(age<=25)return 1.03;
+
+if(age<=32)return 1.02;
+
+if(age<=35)return .98;
+
+return .92;
+
+}
+
+
+return 1;
+
+}
+
+
+/* =========================================================
+   POSITIONAL REPLACEMENT LEVEL
+   ========================================================= */
+
+function tfReplacementRank(pos){
+
+let rank=
+
+TRADEFORGE_ENGINE
+.replacementRanks[pos]
+
+??
+
+12;
+
+
+/*
+  Superflex makes a much deeper group of QBs
+  fantasy-relevant.
+*/
+
+if(
+pos==="QB"
+&&
+qbMode==="superflex"
+){
+
+rank=28;
+
+}
+
+
+/*
+  TE Premium increases the number of meaningful
+  fantasy tight ends.
+*/
+
+if(
+pos==="TE"
+&&
+tePremiumMode!=="off"
+){
+
+rank=18;
+
+}
+
+
+return rank;
+
+}
+
+
+/* =========================================================
+   REPLACEMENT PLAYER VALUE
+   ========================================================= */
+
+function tfReplacementRaw(
+pos,
+mode
+){
+
+const list=
+
+playerDatabase
+
+.filter(
+p=>
+p.pos===pos
+)
+
+.map(
+p=>
+tfStoredRawValue(
+p,
+mode
+)
+)
+
+.filter(
+Number.isFinite
+)
+
+.sort(
+(a,b)=>
+b-a
+);
+
+
+if(!list.length){
+
+return 0;
+
+}
+
+
+const i=
+
+Math.min(
+
+list.length-1,
+
+Math.max(
+0,
+tfReplacementRank(pos)-1
+)
+
+);
+
+
+return list[i];
+
+}
+
+
+/* =========================================================
+   SCARCITY / VALUE OVER REPLACEMENT
+   ========================================================= */
+
+function tfScarcityValue(
+p,
+mode,
+anchor,
+e={}
+){
+
+/*
+  A manually supplied scarcity component always wins.
+*/
+
+if(
+Number.isFinite(
+Number(e.scarcity)
+)
+){
+
+return tfClamp(
+Number(e.scarcity),
+.1,
+100
+);
+
+}
+
+
+/*
+  Otherwise calculate scarcity automatically using
+  the player's value compared with replacement.
+*/
+
+const replacement=
+
+Number.isFinite(
+Number(e.replacement)
+)
+
+?
+
+Number(e.replacement)
+
+:
+
+tfReplacementRaw(
+p.pos,
+mode
+);
+
+
+const gap=
+anchor
+-
+replacement;
+
+
+return tfClamp(
+
+anchor
++
+gap
+*
+TRADEFORGE_ENGINE.scarcityBoost,
+
+.1,
+100
+
+);
+
+}
+
+
+/* =========================================================
+   SLEEPER MARKET MOVEMENT
+   ========================================================= */
+
+function tfAutoMarketChange(p){
+
+if(
+!TRADEFORGE_ENGINE
+.useSleeperTrendingMarket
+){
+
+return 0;
+
+}
+
+
+const id=
+
+p.sleeperId
+
+||
+
+sleeperIdByName[
+norm(p.name)
+];
+
+
+return (
+
+id
+&&
+Number.isFinite(
+sleeperTrendMarket[id]
+)
+
+)
+
+?
+
+sleeperTrendMarket[id]
+
+:
+
+0;
+
+}
+
+
+/* =========================================================
+   MARKET COMPONENT
+   ========================================================= */
+
+function tfMarketValue(
+p,
+e,
+baseline
+){
+
+let market=
+
+Number.isFinite(
+Number(e?.market)
+)
+
+?
+
+Number(e.market)
+
+:
+
+Number.isFinite(
+Number(e?.consensus)
+)
+
+?
+
+Number(e.consensus)
+
+:
+
+baseline;
+
+
+const movement=
+
+Number.isFinite(
+Number(e?.marketChange)
+)
+
+?
+
+Number(e.marketChange)
+
+:
+
+Number.isFinite(
+Number(e?.marketMomentum)
+)
+
+?
+
+Number(e.marketMomentum)
+
+:
+
+tfAutoMarketChange(p);
+
+
+/*
+  marketChange can be stored as:
+
+  .03 = +3%
+  -.04 = -4%
+
+  Large 0-100 market scores will not accidentally
+  multiply the player's value.
+*/
+
+if(
+Math.abs(movement)<=1
+){
+
+market*=
+
+1
++
+tfClamp(
+
+movement,
+
+-TRADEFORGE_ENGINE
+.marketAdjustmentMax,
+
+TRADEFORGE_ENGINE
+.marketAdjustmentMax
+
+);
+
+}
+
+
+return tfClamp(
+market,
+.1,
+100
+);
+
+}
+
+
+/* =========================================================
+   PERFORMANCE COMPONENT
+   ========================================================= */
+
+function tfPerformanceValue(
+e,
+baseline
+){
+
+/*
+  Best option:
+  use a direct performance score.
+*/
+
+if(
+Number.isFinite(
+Number(e?.performance)
+)
+){
+
+return tfClamp(
+Number(e.performance),
+.1,
+100
+);
+
+}
+
+
+/*
+  Backward compatibility with the existing
+  projection / consensus / recent data.
+*/
+
+const hasLegacy=
+
+[
+"projection",
+"consensus",
+"recent"
+]
+
+.some(
+k=>
+Number.isFinite(
+Number(e?.[k])
+)
+);
+
+
+if(!hasLegacy){
+
+return baseline;
+
+}
+
+
+const w=
+
+TRADEFORGE_ENGINE
+.performanceInputs;
+
+
+const projection=
+
+tfNum(
+e.projection,
+baseline
+);
+
+
+const consensus=
+
+tfNum(
+e.consensus,
+baseline
+);
+
+
+const recent=
+
+tfNum(
+e.recent,
+baseline
+);
+
+
+return tfClamp(
+
+projection
+*
+w.projection
+
++
+
+consensus
+*
+w.consensus
+
++
+
+recent
+*
+w.recent,
+
+.1,
+100
+
+);
+
+}
+
+
+/* =========================================================
+   OPPORTUNITY / ROLE COMPONENT
+   ========================================================= */
+
+function tfOpportunityValue(
+e,
+baseline
+){
+
+if(
+Number.isFinite(
+Number(e?.opportunity)
+)
+){
+
+return tfClamp(
+Number(e.opportunity),
+.1,
+100
+);
+
+}
+
+
+if(
+Number.isFinite(
+Number(e?.roleSecurity)
+)
+){
+
+return tfClamp(
+Number(e.roleSecurity),
+.1,
+100
+);
+
+}
+
+
+/*
+  roleConfidence is treated as a quality trait,
+  not as direct player value.
+*/
+
+if(
+Number.isFinite(
+Number(e?.roleConfidence)
+)
+){
+
+return tfTraitValue(
+
+baseline,
+
+e.roleConfidence,
+
+.75,
+
+1.08
+
+);
+
+}
+
+
+return baseline;
+
+}
+
+
+/* =========================================================
+   CONSISTENCY COMPONENT
+   ========================================================= */
+
+function tfConsistencyValue(
+e,
+baseline
+){
+
+/*
+  Direct consistency VALUE.
+*/
+
+if(
+Number.isFinite(
+Number(e?.consistency)
+)
+){
+
+return tfClamp(
+Number(e.consistency),
+.1,
+100
+);
+
+}
+
+
+/*
+  Or a 0-100 consistency TRAIT.
+*/
+
+if(
+Number.isFinite(
+Number(e?.consistencyScore)
+)
+){
+
+return tfTraitValue(
+
+baseline,
+
+e.consistencyScore,
+
+.80,
+
+1.06
+
+);
+
+}
+
+
+/*
+  Backward-compatible estimate.
+
+  Large disagreement between projected production
+  and recent production lowers confidence in repeatability.
+*/
+
+if(
+
+Number.isFinite(
+Number(e?.projection)
+)
+
+&&
+
+Number.isFinite(
+Number(e?.recent)
+)
+
+){
+
+const gap=
+
+Math.abs(
+
+Number(e.projection)
+
+-
+
+Number(e.recent)
+
+);
+
+
+const score=
+
+tfClamp(
+
+100
+-
+gap
+*
+2,
+
+35,
+100
+
+);
+
+
+return tfTraitValue(
+
+baseline,
+
+score,
+
+.82,
+
+1.05
+
+);
+
+}
+
+
+return baseline;
+
+}
+
+
+/* =========================================================
+   RISK / AVAILABILITY COMPONENT — 5%
+
+   Important:
+   This remains a true 5% component rather than secretly
+   becoming a giant multiplier.
+
+   Major injuries should also lower projection and
+   opportunity upstream.
+   ========================================================= */
+
+function tfAvailabilityValue(
+e,
+baseline
+){
+
+if(
+Number.isFinite(
+Number(e?.availabilityValue)
+)
+){
+
+return tfClamp(
+Number(e.availabilityValue),
+.1,
+100
+);
+
+}
+
+
+if(
+Number.isFinite(
+Number(e?.availabilityScore)
+)
+){
+
+return tfClamp(
+
+baseline
+*
+tfClamp(
+Number(e.availabilityScore),
+0,
+100
+)
+/
+100,
+
+.1,
+100
+
+);
+
+}
+
+
+/*
+  Existing TradeForge data used availability
+  as a 0-1 multiplier.
+*/
+
+if(
+Number.isFinite(
+Number(e?.availability)
+)
+){
+
+const a=
+Number(e.availability);
+
+
+if(a<=1.25){
+
+return tfClamp(
+
+baseline
+*
+tfClamp(
+a,
+0,
+1
+),
+
+.1,
+100
+
+);
+
+}
+
+
+/*
+  Values greater than 1.25 are interpreted
+  as direct component values.
+*/
+
+return tfClamp(
+a,
+.1,
+100
+);
+
+}
+
+
+return baseline;
+
+}
+
+
+/* =========================================================
+   SITUATION COMPONENT
+   ========================================================= */
+
+function tfSituationValue(
+e,
+baseline
+){
+
+if(
+Number.isFinite(
+Number(e?.situation)
+)
+){
+
+return tfClamp(
+Number(e.situation),
+.1,
+100
+);
+
+}
+
+
+if(
+Number.isFinite(
+Number(e?.situationScore)
+)
+){
+
+return tfTraitValue(
+
+baseline,
+
+e.situationScore,
+
+.80,
+
+1.06
+
+);
+
+}
+
+
+/*
+  Existing role confidence provides a reasonable
+  fallback for team/coaching stability until we
+  have dedicated situation data.
+*/
+
+if(
+Number.isFinite(
+Number(e?.roleConfidence)
+)
+){
+
+return tfTraitValue(
+
+baseline,
+
+e.roleConfidence,
+
+.82,
+
+1.05
+
+);
+
+}
+
+
+return baseline;
+
+}
+
+
+/* =========================================================
+   REDRAFT COMPONENTS
+   ========================================================= */
+
+function tfRedraftComponents(p){
+
+const baseline=
+
+tfStoredRawValue(
+p,
+"redraft"
+);
+
+
+const e=
+
+p.engine?.redraft
+
+||
+
+{};
+
+
+const performance=
+
+tfPerformanceValue(
+e,
+baseline
+);
+
+
+const opportunity=
+
+tfOpportunityValue(
+e,
+baseline
+);
+
+
+const scarcity=
+
+tfScarcityValue(
+p,
+"redraft",
+performance,
+e
+);
+
+
+const market=
+
+tfMarketValue(
+p,
+e,
+baseline
+);
+
+
+const consistency=
+
+tfConsistencyValue(
+e,
+baseline
+);
+
+
+const availability=
+
+tfAvailabilityValue(
+e,
+baseline
+);
+
+
+const situation=
+
+tfSituationValue(
+e,
+baseline
+);
+
+
+return{
+
+performance,
+
+opportunity,
+
+scarcity,
+
+market,
+
+consistency,
+
+availability,
+
+situation
+
+};
+
+}
+
+
+/* =========================================================
+   REDRAFT RAW VALUE
+   ========================================================= */
+
+function tfRedraftRaw(p){
+
+if(
+!tfHasRedraftData(p)
+){
+
+return tfStoredRawValue(
+p,
+"redraft"
+);
+
+}
+
+
+return tfClamp(
+
+tfRound(
+
+tfWeightedSum(
+
+tfRedraftComponents(p)
+
+)
+
+),
+
+.1,
+100
+
+);
+
+}
+
+
+/* =========================================================
+   DYNASTY MULTI-YEAR ANCHOR
+   ========================================================= */
+
+function tfDynastyAnchor(
+p,
+e,
+baseline
+){
+
+const hasYears=
+
+[
+"year1",
+"year2",
+"year3"
+]
+
+.some(
+k=>
+Number.isFinite(
+Number(e?.[k])
+)
+);
+
+
+if(!hasYears){
+
+return baseline;
+
+}
+
+
+const y=
+
+TRADEFORGE_ENGINE
+.dynastyYears;
+
+
+return tfClamp(
+
+tfNum(
+e.year1,
+baseline
+)
+*
+y.year1
+
++
+
+tfNum(
+e.year2,
+baseline
+)
+*
+y.year2
+
++
+
+tfNum(
+e.year3,
+baseline
+)
+*
+y.year3,
+
+.1,
+100
+
+);
+
+}
+
+
+/* =========================================================
+   DYNASTY SITUATION
+   ========================================================= */
+
+function tfDynastySituationValue(
+p,
+e,
+baseline
+){
+
+if(
+Number.isFinite(
+Number(e?.situation)
+)
+){
+
+return tfClamp(
+Number(e.situation),
+.1,
+100
+);
+
+}
+
+
+/*
+  Rookie value includes:
+
+  prospect quality
+  draft capital
+  expected role
+  opportunity
+*/
+
+if(
+e?.isRookie===true
+){
+
+const prospect=
+
+tfNum(
+e.prospect,
+baseline
+);
+
+
+const draft=
+
+tfNum(
+e.draftCapital,
+baseline
+);
+
+
+const role=
+
+tfNum(
+e.roleSecurity,
+baseline
+);
+
+
+const opportunity=
+
+tfNum(
+e.opportunity,
+baseline
+);
+
+
+return tfClamp(
+
+prospect*.30
+
++
+
+draft*.25
+
++
+
+role*.25
+
++
+
+opportunity*.20,
+
+.1,
+100
+
+);
+
+}
+
+
+if(
+Number.isFinite(
+Number(e?.roleSecurity)
+)
+){
+
+return tfClamp(
+Number(e.roleSecurity),
+.1,
+100
+);
+
+}
+
+
+return tfSituationValue(
+e,
+baseline
+);
+
+}
+
+
+/* =========================================================
+   DYNASTY COMPONENTS
+   ========================================================= */
+
+function tfDynastyComponents(p){
+
+const baseline=
+
+tfStoredRawValue(
+p,
+"dynasty"
+);
+
+
+const e=
+
+p.engine?.dynasty
+
+||
+
+{};
+
+
+const anchor=
+
+tfDynastyAnchor(
+p,
+e,
+baseline
+);
+
+
+/*
+  Dynasty consistency can look at stability
+  across the three-year projection.
+*/
+
+let consistency=
+baseline;
+
+
+if(
+Number.isFinite(
+Number(e.consistency)
+)
+){
+
+consistency=
+
+tfClamp(
+Number(e.consistency),
+.1,
+100
+);
+
+}
+
+else if(
+
+Number.isFinite(
+Number(e.year1)
+)
+
+&&
+
+Number.isFinite(
+Number(e.year2)
+)
+
+&&
+
+Number.isFinite(
+Number(e.year3)
+)
+
+){
+
+const years=[
+
+Number(e.year1),
+
+Number(e.year2),
+
+Number(e.year3)
+
+];
+
+
+const spread=
+
+Math.max(...years)
+
+-
+
+Math.min(...years);
+
+
+const score=
+
+tfClamp(
+
+100
+-
+spread
+*
+1.5,
+
+35,
+100
+
+);
+
+
+consistency=
+
+tfTraitValue(
+
+anchor,
+
+score,
+
+.84,
+
+1.05
+
+);
+
+}
+
+
+const redraftAvailability=
+
+p.engine?.redraft
+
+||
+
+{};
+
+
+return{
+
+performance:
+
+Number.isFinite(
+Number(e.performance)
+)
+
+?
+
+tfClamp(
+Number(e.performance),
+.1,
+100
+)
+
+:
+
+anchor,
+
+
+opportunity:
+
+tfOpportunityValue(
+e,
+anchor
+),
+
+
+scarcity:
+
+tfScarcityValue(
+p,
+"dynasty",
+anchor,
+e
+),
+
+
+market:
+
+tfMarketValue(
+p,
+e,
+baseline
+),
+
+
+consistency,
+
+
+availability:
+
+tfAvailabilityValue(
+
+Object.keys(e).length
+?
+e
+:
+redraftAvailability,
+
+anchor
+
+),
+
+
+situation:
+
+tfDynastySituationValue(
+p,
+e,
+anchor
+)
+
+};
+
+}
+
+
+/* =========================================================
+   DYNASTY RAW VALUE
+   ========================================================= */
+
+function tfDynastyRaw(p){
+
+if(
+!tfHasDynastyData(p)
+){
+
+return tfStoredRawValue(
+p,
+"dynasty"
+);
+
+}
+
+
+const e=
+
+p.engine?.dynasty
+
+||
+
+{};
+
+
+let score=
+
+tfWeightedSum(
+
+tfDynastyComponents(p)
+
+);
+
+
+/*
+  Dynasty age modifier.
+
+  Age belongs outside the current-production weights
+  because league format fundamentally changes what
+  "value" means.
+*/
+
+if(
+Number.isFinite(
+Number(e.age)
+)
+){
+
+score*=
+
+tfDynastyAgeFactor(
+
+p.pos,
+
+Number(e.age)
+
+);
+
+}
+
+
+return tfClamp(
+
+tfRound(score),
+
+.1,
+100
+
+);
+
+}
+
+
+/* =========================================================
+   KEEPER RAW VALUE
+   ========================================================= */
+
+function tfKeeperRaw(p){
+
+if(
+!tfHasAnyEngineData(p)
+){
+
+return tfStoredRawValue(
+p,
+"keeper"
+);
+
+}
+
+
+/*
+  If we eventually supply dedicated Keeper components,
+  use those directly.
+*/
+
+const direct=
+
+p.engine?.keeper;
+
+
+if(
+tfHasComponentData(direct)
+){
+
+const baseline=
+
+tfStoredRawValue(
+p,
+"keeper"
+);
+
+
+const c={
+
+performance:
+
+tfPerformanceValue(
+direct,
+baseline
+),
+
+opportunity:
+
+tfOpportunityValue(
+direct,
+baseline
+),
+
+scarcity:
+
+tfScarcityValue(
+p,
+"keeper",
+baseline,
+direct
+),
+
+market:
+
+tfMarketValue(
+p,
+direct,
+baseline
+),
+
+consistency:
+
+tfConsistencyValue(
+direct,
+baseline
+),
+
+availability:
+
+tfAvailabilityValue(
+direct,
+baseline
+),
+
+situation:
+
+tfSituationValue(
+direct,
+baseline
+)
+
+};
+
+
+return tfClamp(
+
+tfRound(
+
+tfWeightedSum(c)
+
+),
+
+.1,
+100
+
+);
+
+}
+
+
+/*
+  Otherwise Keeper =
+
+  65% Redraft
+  35% Dynasty
+*/
+
+const w=
+
+TRADEFORGE_ENGINE
+.keeperWeights;
+
+
+return tfClamp(
+
+tfRound(
+
+tfRedraftRaw(p)
+*
+w.redraft
+
++
+
+tfDynastyRaw(p)
+*
+w.dynasty
+
+),
+
+.1,
+100
+
+);
+
+}
+
+Next, find:
+/* =========================================================
+   FINAL TRADEFORGE PLAYER VALUE
+   ========================================================= */
+Replace everything from there through immediately before:
+
+async function loadTradeForgeFeed(){
+with:
+
+/* =========================================================
+   FINAL TRADEFORGE PLAYER VALUE
+   ========================================================= */
+
+function value(p){
+
+if(
+p.pos==="PICK"
+){
+
+return tfDynamicPickValue(p);
+
+}
+
+
+/*
+  SAFETY FALLBACK
+
+  If we have not yet added weighted component data
+  for this player, keep using the player's current
+  existing value.
+
+  This lets us upgrade the database player-by-player
+  without breaking unfinished players.
+*/
+
+if(
+
+!TRADEFORGE_ENGINE.enabled
+
+||
+
+!tfHasAnyEngineData(p)
+
+){
+
+return legacyValue(p);
+
+}
+
+
+let raw;
+
+
+if(
+leagueMode==="dynasty"
+){
+
+raw=
+tfDynastyRaw(p);
+
+}
+
+else if(
+leagueMode==="keeper"
+){
+
+raw=
+tfKeeperRaw(p);
+
+}
+
+else{
+
+raw=
+tfRedraftRaw(p);
+
+}
+
+
+/*
+  Apply the nonlinear elite-value curve after
+  the seven weighted components have been calculated.
+*/
+
+raw=
+tfApplyEliteCurve(raw);
+
+
+return tfApplyLeagueSettings(
+
+p,
+
+raw,
+
+leagueMode
+
+);
+
+}
+
+
+/* =========================================================
+   ENGINE BLOCK FOR CURRENT MODE
+   ========================================================= */
+
+function tfModeEngineBlock(
+p,
+mode=leagueMode
+){
+
+if(
+
+mode==="keeper"
+
+&&
+
+tfHasComponentData(
+p.engine?.keeper
+)
+
+){
+
+return p.engine.keeper;
+
+}
+
+
+return mode==="dynasty"
+
+?
+
+(
+p.engine?.dynasty
+||
+{}
+)
+
+:
+
+(
+p.engine?.redraft
+||
+{}
+);
+
+}
+
+
+/* =========================================================
+   CONFIDENCE SCORE
+   ========================================================= */
+
+function tradeForgeConfidence(p){
+
+if(
+p.pos==="PICK"
+){
+
+return 70;
+
+}
+
+
+const e=
+tfModeEngineBlock(p);
+
+
+if(
+!tfHasAnyEngineData(p)
+){
+
+return 35;
+
+}
+
+
+let groups=0;
+
+
+/* PERFORMANCE DATA */
+
+if(
+
+[
+"performance",
+"projection",
+"consensus",
+"recent"
+]
+
+.some(
+k=>
+Number.isFinite(
+Number(e[k])
+)
+)
+
+){
+
+groups++;
+
+}
+
+
+/* OPPORTUNITY DATA */
+
+if(
+
+[
+"opportunity",
+"roleConfidence",
+"roleSecurity"
+]
+
+.some(
+k=>
+Number.isFinite(
+Number(e[k])
+)
+)
+
+){
+
+groups++;
+
+}
+
+
+/* SCARCITY DATA */
+
+if(
+
+[
+"scarcity",
+"replacement"
+]
+
+.some(
+k=>
+Number.isFinite(
+Number(e[k])
+)
+)
+
+){
+
+groups++;
+
+}
+
+
+/* MARKET DATA */
+
+if(
+
+[
+"market",
+"consensus",
+"marketChange",
+"marketMomentum"
+]
+
+.some(
+k=>
+Number.isFinite(
+Number(e[k])
+)
+)
+
+){
+
+groups++;
+
+}
+
+
+/* CONSISTENCY DATA */
+
+if(
+
+[
+"consistency",
+"consistencyScore"
+]
+
+.some(
+k=>
+Number.isFinite(
+Number(e[k])
+)
+)
+
+){
+
+groups++;
+
+}
+
+
+/* AVAILABILITY DATA */
+
+if(
+
+[
+"availability",
+"availabilityScore",
+"availabilityValue"
+]
+
+.some(
+k=>
+Number.isFinite(
+Number(e[k])
+)
+)
+
+){
+
+groups++;
+
+}
+
+
+/* SITUATION DATA */
+
+if(
+
+[
+"situation",
+"situationScore",
+"roleConfidence",
+"roleSecurity"
+]
+
+.some(
+k=>
+Number.isFinite(
+Number(e[k])
+)
+)
+
+){
+
+groups++;
+
+}
+
+
+let score=
+
+35
+
++
+
+groups
+*
+8;
+
+
+/*
+  Dynasty gets extra confidence when the
+  long-term information is actually populated.
+*/
+
+if(
+leagueMode==="dynasty"
+){
+
+if(
+Number.isFinite(
+Number(e.age)
+)
+){
+score+=4;
+}
+
+
+if(
+Number.isFinite(
+Number(e.year1)
+)
+){
+score+=3;
+}
+
+
+if(
+Number.isFinite(
+Number(e.year2)
+)
+){
+score+=2;
+}
+
+
+if(
+Number.isFinite(
+Number(e.year3)
+)
+){
+score+=2;
+}
+
+
+if(
+
+e.isRookie===true
+
+&&
+
+Number.isFinite(
+Number(e.draftCapital)
+)
+
+){
+
+score+=2;
+
+}
+
+}
+
+
+/*
+  Projection disagreement creates uncertainty.
+
+  This affects confidence only.
+  It does NOT automatically lower the player's value.
+*/
+
+if(
+
+Number.isFinite(
+Number(e.projection)
+)
+
+&&
+
+Number.isFinite(
+Number(e.consensus)
+)
+
+){
+
+const gap=
+
+Math.abs(
+
+Number(e.projection)
+
+-
+
+Number(e.consensus)
+
+);
+
+
+score-=
+
+Math.min(
+10,
+gap/2
+);
+
+}
+
+
+return Math.round(
+
+tfClamp(
+score,
+0,
+100
+)
+
+);
+
+}
+
+
+/* =========================================================
+   CONFIDENCE LABEL
+   ========================================================= */
+
+function tradeForgeConfidenceLabel(p){
+
+const c=
+
+tradeForgeConfidence(p);
+
+
+return c>=80
+
+?
+
+"High"
+
+:
+
+c>=60
+
+?
+
+"Medium"
+
+:
+
+"Low";
+
+}
+
+
+/* =========================================================
+   COMPONENTS FOR CURRENT FORMAT
+   ========================================================= */
+
+function tfComponentsForMode(
+p,
+mode=leagueMode
+){
+
+if(
+mode==="dynasty"
+){
+
+return tfDynastyComponents(p);
+
+}
+
+
+if(
+
+mode==="keeper"
+
+&&
+
+tfHasComponentData(
+p.engine?.keeper
+)
+
+){
+
+const e=
+p.engine.keeper;
+
+
+const baseline=
+
+tfStoredRawValue(
+p,
+"keeper"
+);
+
+
+return{
+
+performance:
+
+tfPerformanceValue(
+e,
+baseline
+),
+
+
+opportunity:
+
+tfOpportunityValue(
+e,
+baseline
+),
+
+
+scarcity:
+
+tfScarcityValue(
+p,
+"keeper",
+baseline,
+e
+),
+
+
+market:
+
+tfMarketValue(
+p,
+e,
+baseline
+),
+
+
+consistency:
+
+tfConsistencyValue(
+e,
+baseline
+),
+
+
+availability:
+
+tfAvailabilityValue(
+e,
+baseline
+),
+
+
+situation:
+
+tfSituationValue(
+e,
+baseline
+)
+
+};
+
+}
+
+
+return tfRedraftComponents(p);
+
+}
+
+
+/* =========================================================
+   MODEL VS MARKET SIGNAL
+   ========================================================= */
+
+function tradeForgeMarketSignal(p){
+
+if(
+
+!tfHasAnyEngineData(p)
+
+||
+
+p.pos==="PICK"
+
+){
+
+return{
+
+label:"NEUTRAL",
+
+gap:0
+
+};
+
+}
+
+
+const c=
+
+tfComponentsForMode(p);
+
+
+const w=
+
+TRADEFORGE_ENGINE.weights;
+
+
+/*
+  Calculate our internal statistical model WITHOUT
+  the 10% market component, then renormalize it.
+
+  This lets us compare:
+
+  Statistical Value
+  vs.
+  Market Value
+*/
+
+const model=
+
+(
+
+c.performance
+*
+w.performance
+
++
+
+c.opportunity
+*
+w.opportunity
+
++
+
+c.scarcity
+*
+w.scarcity
+
++
+
+c.consistency
+*
+w.consistency
+
++
+
+c.availability
+*
+w.availability
+
++
+
+c.situation
+*
+w.situation
+
+)
+
+/
+
+(
+1-w.market
+);
+
+
+const gap=
+
+model
+-
+c.market;
+
+
+return{
+
+label:
+
+gap>=
+TRADEFORGE_ENGINE.marketSignalGap
+
+?
+
+"MARKET BUY"
+
+:
+
+gap<=
+-TRADEFORGE_ENGINE.marketSignalGap
+
+?
+
+"SELL HIGH"
+
+:
+
+"NEUTRAL",
+
+
+gap:
+
+tfRound(gap)
+
+};
+
+}
+
+
+/* =========================================================
+   ENGINE BREAKDOWN
+   ========================================================= */
+
+function tradeForgeBreakdown(p){
+
+const components=
+
+p.pos==="PICK"
+
+?
+
+null
+
+:
+
+tfComponentsForMode(p);
+
+
+return{
+
+player:
+p.name,
+
+mode:
+leagueMode,
+
+weights:{
+...TRADEFORGE_ENGINE.weights
+},
+
+components,
+
+baseline:
+legacyValue(p),
+
+redraftRaw:
+tfRedraftRaw(p),
+
+keeperRaw:
+tfKeeperRaw(p),
+
+dynastyRaw:
+tfDynastyRaw(p),
+
+finalValue:
+value(p),
+
+confidence:
+trade
+
+no I want you to rewrite the whole HTML. use the same info you did for the last one but give me the whole new HTML.
+
+
+Worked for 3m 55s
+Yes. Replace the entire current HTML with the version below. This is the full build, not a patch. I kept the existing structure, 344-player database, Sleeper integration, league view, search, scoring settings, and interface intact while replacing the valuation engine and trade-package math.
+
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
@@ -6114,3 +9575,124 @@ loadTradeForgeFeed();
 
 </body>
 </html>
+
+This version passed a JavaScript syntax check before I gave it to you. The next thing I would do is not change the interface again—I’d start upgrading the actual player data feeding these seven weighted categories so the new engine begins recalculating the 344 players from real inputs instead of falling back to their existing baseline values.
+
+summerize what the new engine kinda does.
+
+The new engine is basically designed to make player values feel more like real fantasy-football trade values instead of just fixed numbers.
+
+It now evaluates a player using seven weighted areas:
+
+Performance — 35%
+Opportunity / role — 20%
+Positional scarcity — 15%
+Market value — 10%
+Consistency — 10%
+Risk / availability — 5%
+Situation — 5%
+So instead of saying, “this player is worth 42 because we manually typed 42,” the engine can eventually calculate that value based on how good the player is, how secure his workload is, how hard his position is to replace, what the market thinks of him, how consistent he is, whether he’s healthy, and how good his football situation is.
+
+It also does a few bigger things behind the scenes.
+
+The elite-value curve makes top players harder to replace. That means the difference between a 95-value superstar and an 80-value player is treated as more meaningful than the difference between a 35 and a 20.
+
+Positional scarcity compares players to replacement-level players at their position. A strong TE, for example, can get more credit if there are very few usable TEs behind him.
+
+Dynasty now has its own age logic. RBs, WRs, QBs, and TEs age differently, so the engine can eventually value a 23-year-old RB differently from a 29-year-old RB even if their current production is similar.
+
+Keeper leagues blend redraft and dynasty logic rather than being completely separate. Right now the idea is roughly 65% current-season/redraft value and 35% long-term/dynasty value.
+
+The engine also still respects PPR, half-PPR, standard, Superflex, and TE Premium settings.
+
+The trade calculation itself is smarter too. A 2-for-1 trade no longer automatically counts as fair just because the raw numbers add up. The side receiving the elite player gets a consolidation premium because giving up one premium roster spot should normally require more total value in return.
+
+For example, instead of:
+
+9.5 player = 5.0 + 4.5
+
+and calling that perfectly even, the engine may decide the two-player side needs closer to 10.5 or 11.0 in value to justify giving up the 9.5 player.
+
+There is also a confidence system built in. Once we populate the detailed player data, the engine can know whether it has strong information on a player or whether that player's value is more uncertain.
+
+And we built the foundation for comparing:
+
+Statistical value
+vs.
+Market value
+
+That eventually lets us flag players as things like:
+
+MARKET BUY
+
+or
+
+SELL HIGH
+
+when our model disagrees meaningfully with what the fantasy market appears to believe.
+
+The most important part right now is that I made it backward-compatible. Your existing 344 players still use their current values until we give a player the new weighted data. So the analyzer doesn't suddenly break or radically reorder everyone because we haven't finished entering the new information yet.
+
+In short, we changed it from primarily a value table with trade math into the foundation of an actual player valuation model. The next major step is feeding better data into those seven categories so the new engine starts doing the work for us.
+
+ok so there was a big issue. when you connect to sleeper it works on the first calculator it shouldn't do that it should work on the second calculator in the sleeper page. There is no longer a calculator on the sleeper page the "second calculator". so put the sleeper calculator on the sleeper page. fix that then give me the whole new HTML. give it to me in a code block not a file so I can copy and paste it into github.
+
+
+Worked for 4m 13s
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Yes. I fixed the architecture so the two calculators are now separate:
+
+The main TradeForge calculator always uses the full player database and its own league settings.
+Connecting Sleeper no longer changes the first calculator.
+Sleeper gets its own calculator on the League View page.
+The Sleeper calculator has separate Team A/Team B selections, searches, totals, verdict, grade, fair-trade suggestions, and package suggestions.
+Sleeper automatically uses that league’s scoring, Redraft/Keeper/Dynasty setting, Superflex setting, and TE premium without changing the first calculator.
+Syncing no longer clears the trade you were working on in the first calculator.
+Disconnecting Sleeper no longer clears the first calculator.
+I also fixed the second calculator’s meter/verdict CSS so it matches the first calculator.
+JavaScript syntax, duplicate IDs, DOM references, and the separation between the two calculators all passed validation.
+Because the complete HTML is over 100,000 characters, putting it into a single chat code fence is getting truncated by the chat output layer—I verified that happened when I tried to emit the entire source. I don't want to give you a code block that silently cuts off halfway through, because that would leave you with broken GitHub code.
+
+The complete validated HTML is here as the exact source I built:
+
+Open that file, Ctrl+A → Ctrl+C, and paste the entire contents directly into your GitHub HTML file. It is the full source, not a patch. 
+
+
+trade_analyzer_sleeper_second_calculator.html
+HTML
+
+Sources
+
+
+
+C:/Users/bucks/AppData/Local/Temp/codex-file-preview-3T4vtn/trade_analyzer_sleeper_second_calculator.html
+
