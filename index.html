@@ -4279,6 +4279,11 @@ sleeper
 ? sleeperTeamB
 : teamB;
 
+
+/* ---------------------------------------------------------
+   BOTH SIDES MUST HAVE SOMETHING IN THE TRADE
+   --------------------------------------------------------- */
+
 if(
 !aTeam.length
 ||
@@ -4296,13 +4301,21 @@ return;
 
 }
 
-const currentPct=
+
+const currentDifference=
 diff(
 aa,
 ab
 );
 
-if(currentPct<=5){
+
+/* ---------------------------------------------------------
+   ALREADY FAIR
+   --------------------------------------------------------- */
+
+if(
+currentDifference<=5
+){
 
 box.innerHTML=
 `
@@ -4312,7 +4325,7 @@ box.innerHTML=
 No adjustment needed.
 </strong>
 
-<br>
+<br><br>
 
 This trade is already inside the 5% TradeForge fair range.
 
@@ -4324,20 +4337,41 @@ return;
 }
 
 
-/*
-Only the team receiving less adjusted value
-gets additional assets.
-*/
+/* =========================================================
+   IMPORTANT:
+   DETERMINE WHICH TEAM IS LOSING THE TRADE
+   =========================================================
 
-const losingSide=
-aa<ab
-? "A"
-: "B";
+   If Team A has MORE adjusted value:
+   Team B needs help.
 
-const winningSide=
-losingSide==="A"
-? "B"
-: "A";
+   If Team B has MORE adjusted value:
+   Team A needs help.
+
+   Suggestions ONLY move assets from the stronger
+   side to the weaker side.
+   ========================================================= */
+
+let strongerSide;
+let weakerSide;
+
+if(aa>ab){
+
+strongerSide="A";
+weakerSide="B";
+
+}
+else{
+
+strongerSide="B";
+weakerSide="A";
+
+}
+
+
+/* ---------------------------------------------------------
+   ASSETS ALREADY INCLUDED IN THE TRADE
+   --------------------------------------------------------- */
 
 const used=
 new Set(
@@ -4346,31 +4380,60 @@ aTeam
 .map(key)
 );
 
-let available;
+
+/* =========================================================
+   BUILD THE AVAILABLE PLAYER POOL
+   ========================================================= */
+
+let available=[];
 
 
 /*
-In Sleeper, suggestions come only from the
-higher-value team's actual selected roster.
+SLEEPER:
+
+If Team A is ahead, search TEAM A'S ACTUAL ROSTER
+for something Team A could send to Team B.
+
+If Team B is ahead, search TEAM B'S ACTUAL ROSTER
+for something Team B could send to Team A.
 */
 
 if(sleeper){
 
-const sourceRoster=
-winningSide==="A"
-? sleeperRosterA
-: sleeperRosterB;
+const strongerRosterId=
+strongerSide==="A"
+?
+sleeperRosterA
+:
+sleeperRosterB;
+
 
 available=
-rosterAssets(sourceRoster)
+rosterAssets(
+strongerRosterId
+)
 .filter(
 p=>
-!used.has(key(p))
+
+!used.has(
+key(p)
+)
+
 &&
+
 p.pos!=="PICK"
 );
 
 }
+
+
+/*
+NORMAL CALCULATOR:
+
+There are no synced rosters, so use the TradeForge
+player/pick database to find hypothetical additions
+for the weaker side.
+*/
 
 else{
 
@@ -4378,7 +4441,9 @@ available=
 assets()
 .filter(
 p=>
-!used.has(key(p))
+!used.has(
+key(p)
+)
 );
 
 }
@@ -4389,7 +4454,9 @@ if(!available.length){
 box.innerHTML=
 `
 <div class="suggestion">
-No additional assets are available for a useful suggestion.
+
+No additional assets are available to make this trade closer.
+
 </div>
 `;
 
@@ -4398,20 +4465,53 @@ return;
 }
 
 
+/* =========================================================
+   VALUE FUNCTION
+   ========================================================= */
+
+const assetValue=
+p=>
+sleeper
+?
+sleeperValue(p)
+:
+value(p);
+
+
+/* =========================================================
+   TEST A POSSIBLE ADDITION
+   ========================================================= */
+
 const evaluate=
 additions=>{
 
+
+/*
+ONLY ADD THE PLAYERS TO THE WEAKER TEAM.
+*/
+
 const newA=
-losingSide==="A"
-? aTeam.concat(additions)
-: aTeam;
+weakerSide==="A"
+?
+aTeam.concat(additions)
+:
+aTeam;
+
 
 const newB=
-losingSide==="B"
-? bTeam.concat(additions)
-: bTeam;
+weakerSide==="B"
+?
+bTeam.concat(additions)
+:
+bTeam;
 
-const pair=
+
+/*
+Recalculate the complete trade, including
+TradeForge consolidation premiums.
+*/
+
+const recalculated=
 sleeper
 ?
 withSleeperModes(
@@ -4427,170 +4527,249 @@ newA,
 newB
 );
 
-const newPct=
+
+const newDifference=
 diff(
-pair.a,
-pair.b
+recalculated.a,
+recalculated.b
 );
 
 
 /*
-Reject anything that does not improve
-the current trade enough to matter.
+The suggestion MUST improve the trade.
+
+If it does not reduce the difference,
+throw it away.
 */
 
 if(
-newPct>=currentPct-.25
+newDifference>=currentDifference
 ){
+
 return null;
+
 }
 
-const losingAfter=
-losingSide==="A"
-? pair.a
-: pair.b;
 
-const winningAfter=
-losingSide==="A"
-? pair.b
-: pair.a;
+/*
+Work out whether the weaker side has now
+gone past the stronger side.
+*/
+
+const weakerAfter=
+weakerSide==="A"
+?
+recalculated.a
+:
+recalculated.b;
+
+
+const strongerAfter=
+weakerSide==="A"
+?
+recalculated.b
+:
+recalculated.a;
+
+
+const crossed=
+weakerAfter>strongerAfter;
+
+
+/*
+A small overshoot is okay.
+
+A massive overshoot should be heavily penalized.
+*/
 
 const overshoot=
-losingAfter>winningAfter
+crossed
 ?
 diff(
-losingAfter,
-winningAfter
+weakerAfter,
+strongerAfter
 )
 :
 0;
 
+
 const fair=
-newPct<=5;
+newDifference<=5;
+
 
 const veryClose=
-newPct>5
+newDifference>5
 &&
-newPct<=8;
+newDifference<=8;
 
 
 /*
-Lower scores are better.
-Fair-range ideas always outrank non-fair ideas.
-Cleaner trades with fewer added players receive
-a small preference.
+LOWEST SCORE IS BEST.
+
+Fair trades rank first.
+
+Then prefer:
+- smallest difference
+- fewer players
+- less overshoot
 */
 
-const score=
-(
-fair
-? 0
-: veryClose
-? 100
-: 200
-)
-+
-newPct
-+
-(additions.length-1)*1.25
-+
-overshoot*.20;
+let score=0;
+
+
+if(fair){
+
+score+=0;
+
+}
+else if(veryClose){
+
+score+=100;
+
+}
+else{
+
+score+=200;
+
+}
+
+
+score+=
+newDifference;
+
+
+score+=
+(additions.length-1)
+*
+2;
+
+
+score+=
+overshoot
+*
+.5;
+
 
 return{
+
 additions,
-pair,
-newPct,
+recalculated,
+newDifference,
 fair,
 veryClose,
+overshoot,
 score
-};
 
 };
 
+};
+
+
+/* =========================================================
+   BUILD IDEAS
+   ========================================================= */
 
 const ideas=[];
 
 
-/* SINGLE PLAYER IDEAS */
+/* ---------------------------------------------------------
+   1 PLAYER
+   --------------------------------------------------------- */
 
-available.forEach(p=>{
+available.forEach(
+player=>{
 
-const idea=
-evaluate([p]);
+const result=
+evaluate(
+[player]
+);
 
-if(idea){
-ideas.push(idea);
+if(result){
+
+ideas.push(
+result
+);
+
 }
 
-});
+}
+);
 
 
-const rawGap=
+/* =========================================================
+   FIND PLAYERS NEAR THE ACTUAL VALUE GAP
+   ========================================================= */
+
+const valueGap=
 Math.abs(
 aa-ab
 );
 
-const candidateValue=
-p=>
-sleeper
-?
-sleeperValue(p)
-:
-value(p);
 
-
-/*
-Concentrate multi-player testing around
-players whose values are relevant to the gap.
-*/
-
-const relevant=
+const relevantPlayers=
 available
 .slice()
 .sort(
-(a,b)=>
+(a,b)=>{
+
+const aDistance=
 Math.abs(
-candidateValue(a)
+assetValue(a)
 -
-rawGap
-)
--
+valueGap
+);
+
+const bDistance=
 Math.abs(
-candidateValue(b)
+assetValue(b)
 -
-rawGap
-)
+valueGap
+);
+
+return aDistance-bDistance;
+
+}
 )
 .slice(
 0,
 sleeper
-? 28
-: 55
+?
+30
+:
+60
 );
 
 
-/* TWO PLAYER IDEAS */
+/* ---------------------------------------------------------
+   2 PLAYER COMBINATIONS
+   --------------------------------------------------------- */
 
 for(
 let i=0;
-i<relevant.length;
+i<relevantPlayers.length;
 i++
 ){
 
 for(
 let j=i+1;
-j<relevant.length;
+j<relevantPlayers.length;
 j++
 ){
 
-const idea=
-evaluate([
-relevant[i],
-relevant[j]
-]);
+const result=
+evaluate(
+[
+relevantPlayers[i],
+relevantPlayers[j]
+]
+);
 
-if(idea){
-ideas.push(idea);
+if(result){
+
+ideas.push(
+result
+);
+
 }
 
 }
@@ -4598,15 +4777,21 @@ ideas.push(idea);
 }
 
 
-/* THREE PLAYER IDEAS */
+/* ---------------------------------------------------------
+   3 PLAYER COMBINATIONS
+   --------------------------------------------------------- */
 
 const triplePool=
-relevant.slice(
+relevantPlayers
+.slice(
 0,
 sleeper
-? 16
-: 24
+?
+18
+:
+25
 );
+
 
 for(
 let i=0;
@@ -4626,15 +4811,21 @@ k<triplePool.length;
 k++
 ){
 
-const idea=
-evaluate([
+const result=
+evaluate(
+[
 triplePool[i],
 triplePool[j],
 triplePool[k]
-]);
+]
+);
 
-if(idea){
-ideas.push(idea);
+if(result){
+
+ideas.push(
+result
+);
+
 }
 
 }
@@ -4643,6 +4834,10 @@ ideas.push(idea);
 
 }
 
+
+/* =========================================================
+   NOTHING USEFUL FOUND
+   ========================================================= */
 
 if(!ideas.length){
 
@@ -4650,7 +4845,7 @@ box.innerHTML=
 `
 <div class="suggestion">
 
-TradeForge could not find an additional asset that improves this trade enough to recommend.
+TradeForge could not find a reasonable additional asset from Team ${strongerSide} that would improve the trade for Team ${weakerSide}.
 
 </div>
 `;
@@ -4660,119 +4855,211 @@ return;
 }
 
 
+/* =========================================================
+   SORT BEST IDEAS FIRST
+   ========================================================= */
+
 ideas.sort(
 (a,b)=>
 a.score-b.score
 );
 
 
+/* =========================================================
+   REMOVE DUPLICATES
+   ========================================================= */
+
 const finalIdeas=[];
+
 const signatures=
 new Set();
-const valueBands=[];
 
 
 for(const idea of ideas){
 
 const signature=
 idea.additions
-.map(p=>key(p))
+.map(
+p=>key(p)
+)
 .sort()
 .join("|");
 
-if(signatures.has(signature)){
-continue;
-}
 
-const additionTotal=
-idea.additions
-.reduce(
-(total,p)=>
-total+candidateValue(p),
-0
-);
-
-const tooSimilar=
-valueBands.some(
-x=>
-Math.abs(
-x-additionTotal
+if(
+signatures.has(
+signature
 )
-<
-1.25
-&&
-finalIdeas.length>=2
+){
+
+continue;
+
+}
+
+
+signatures.add(
+signature
 );
 
-if(tooSimilar){
+
+/*
+Do not show suggestions that are still terrible.
+
+If the current trade is 40% apart and the best idea
+only gets it to 35%, that's not worth recommending.
+
+Keep it only if it makes a meaningful improvement.
+*/
+
+const improvement=
+currentDifference
+-
+idea.newDifference;
+
+
+if(
+improvement<2
+){
+
 continue;
+
 }
 
-signatures.add(signature);
-valueBands.push(additionTotal);
-finalIdeas.push(idea);
 
-if(finalIdeas.length>=4){
+finalIdeas.push(
+idea
+);
+
+
+if(
+finalIdeas.length>=4
+){
+
 break;
-}
 
 }
 
+}
+
+
+/* =========================================================
+   NO GOOD FINAL IDEAS
+   ========================================================= */
+
+if(!finalIdeas.length){
+
+box.innerHTML=
+`
+<div class="suggestion">
+
+Team ${strongerSide} currently has more TradeForge value.
+
+<br><br>
+
+TradeForge could not find a good asset from Team ${strongerSide}'s available players that gets Team ${weakerSide} close enough to recommend.
+
+</div>
+`;
+
+return;
+
+}
+
+
+/* =========================================================
+   DISPLAY RESULTS
+   ========================================================= */
 
 box.innerHTML=
 finalIdeas
 .map(
-(idea,i)=>{
+(
+idea,
+index
+)=>{
 
-const names=
+
+const playerNames=
 idea.additions
 .map(
 p=>esc(p.name)
 )
 .join(" + ");
 
-const status=
-idea.fair
-? "FAIR MATCH"
-: idea.veryClose
-? "VERY CLOSE"
-: "BEST AVAILABLE";
 
-const instruction=
+let status;
+
+
+if(idea.fair){
+
+status=
+"FAIR MATCH";
+
+}
+else if(idea.veryClose){
+
+status=
+"VERY CLOSE";
+
+}
+else{
+
+status=
+"BEST AVAILABLE";
+
+}
+
+
+/*
+Sleeper wording makes the direction crystal clear.
+*/
+
+const action=
 sleeper
 ?
-`Team ${winningSide} adds ${names} to Team ${losingSide}`
+`Team ${strongerSide} sends ${playerNames} to Team ${weakerSide}`
 :
-`Add ${names} to Team ${losingSide}`;
+`Add ${playerNames} to Team ${weakerSide}`;
+
 
 return`
 <div class="suggestion">
 
 <strong>
-Idea ${i+1} — ${status}
+Idea ${index+1} — ${status}
 </strong>
 
 <br><br>
 
-${instruction}
+${action}
 
-<br>
+<br><br>
 
-New adjusted value:
-Team A ${idea.pair.a.toFixed(1)}
+Current trade:
+Team A ${aa.toFixed(1)}
 vs
-Team B ${idea.pair.b.toFixed(1)}
+Team B ${ab.toFixed(1)}
 
 <br>
 
-New difference:
-${idea.newPct.toFixed(1)}%
+After suggestion:
+Team A ${idea.recalculated.a.toFixed(1)}
+vs
+Team B ${idea.recalculated.b.toFixed(1)}
+
+<br>
+
+Difference improves from
+${currentDifference.toFixed(1)}%
+to
+${idea.newDifference.toFixed(1)}%.
 
 ${
 idea.fair
 ?
 `
-<br>
+<br><br>
+
 <strong>
 ✓ Inside the 5% TradeForge fair range
 </strong>
@@ -4789,7 +5076,6 @@ idea.fair
 .join("");
 
 }
-
 
 /* =========================================================
    MAIN SEARCH
