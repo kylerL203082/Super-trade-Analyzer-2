@@ -7,598 +7,100 @@
 
 <style>
 *{box-sizing:border-box}
-
-:root{
---bg:#f4f7fb;
---card:#fff;
---card2:#eef3f9;
---text:#142033;
---muted:#68778c;
---border:#d8e1ee;
---blue:#1976ff;
---input:#fff;
---sync:#fff
-}
-
-html[data-theme="dark"]{
---bg:#0c111b;
---card:#151d2a;
---card2:#101722;
---text:#eef4ff;
---muted:#9eabc0;
---border:#29364b;
---blue:#2583ff;
---input:#0f1622;
---sync:#000
-}
-
-body{
-margin:0;
-background:var(--bg);
-color:var(--text);
-font-family:Arial,sans-serif
-}
-
+:root{--bg:#f4f7fb;--card:#fff;--card2:#eef3f9;--text:#142033;--muted:#68778c;--border:#d8e1ee;--blue:#1976ff;--input:#fff;--sync:#fff}
+html[data-theme="dark"]{--bg:#0c111b;--card:#151d2a;--card2:#101722;--text:#eef4ff;--muted:#9eabc0;--border:#29364b;--blue:#2583ff;--input:#0f1622;--sync:#000}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
 button,input,select{font:inherit}
 button{cursor:pointer}
-
-.wrap{
-max-width:1400px;
-margin:auto;
-padding:20px
-}
-
-header{
-display:flex;
-justify-content:space-between;
-align-items:center;
-border-bottom:1px solid var(--border);
-padding-bottom:18px
-}
-
-.brand{
-display:flex;
-align-items:center;
-gap:12px
-}
-
-.logo{
-background:var(--blue);
-color:#fff;
-font-weight:900;
-font-size:20px;
-padding:15px;
-border-radius:13px
-}
-
-h1{
-margin:0;
-font-size:30px
-}
-
-.sub{
-color:var(--muted);
-font-size:13px;
-margin-top:4px
-}
-
-.header-buttons{
-display:flex;
-flex-direction:column;
-gap:7px;
-width:360px
-}
-
-.header-buttons button{
-padding:10px;
-border-radius:9px;
-font-weight:800
-}
-
-.sync-actions{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:7px
-}
-
-#theme-toggle{
-background:var(--card);
-color:var(--text);
-border:1px solid var(--border)
-}
-
-#sync-button{
-background:var(--blue);
-color:var(--sync);
-border:0
-}
-
-#league-view-button{
-background:var(--card);
-color:var(--text);
-border:1px solid var(--border)
-}
-
-#league-view-button:disabled{
-opacity:.45;
-cursor:not-allowed
-}
-
-.card,.team,.result-card{
-background:var(--card);
-border:1px solid var(--border);
-border-radius:15px;
-padding:16px;
-margin-top:16px
-}
-
-.settings{
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:12px
-}
-
-.setting{
-display:flex;
-flex-direction:column;
-gap:5px
-}
-
-.setting span{
-font-size:11px;
-font-weight:800;
-color:var(--muted)
-}
-
-select,input{
-width:100%;
-padding:10px;
-border-radius:8px;
-border:1px solid var(--border);
-background:var(--input);
-color:var(--text)
-}
-
-.settings-title{
-display:flex;
-justify-content:space-between;
-margin-bottom:12px;
-font-weight:900
-}
-
-#mode-label,
-#sleeper-mode-label{
-color:var(--blue);
-font-size:12px
-}
-
-.engine-strip{
-display:flex;
-justify-content:space-between;
-gap:12px;
-align-items:center;
-margin-top:12px;
-padding:10px 12px;
-border:1px solid var(--border);
-border-radius:10px;
-background:var(--card2);
-font-size:12px
-}
-
-.engine-strip strong{
-color:var(--blue)
-}
-
-.engine-strip span{
-color:var(--muted);
-text-align:right
-}
-
-.top-grid{
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:10px
-}
-
-.top-box{
-background:var(--card2);
-border:1px solid var(--border);
-border-radius:10px;
-padding:10px
-}
-
-.top-box h3{
-margin:0 0 8px;
-font-size:13px
-}
-
-.top-row{
-display:flex;
-justify-content:space-between;
-font-size:12px;
-padding:5px 0
-}
-
-.trade-grid{
-display:grid;
-grid-template-columns:1fr 320px 1fr;
-gap:15px;
-margin-top:16px
-}
-
-.team{
-margin-top:0
-}
-
-.team h2{
-margin-top:0
-}
-
-.search-wrap{
-position:relative
-}
-
-.results{
-display:none;
-position:absolute;
-left:0;
-right:0;
-top:46px;
-background:var(--card);
-border:1px solid var(--border);
-border-radius:9px;
-z-index:20;
-max-height:320px;
-overflow:auto
-}
-
-.results.show{
-display:block
-}
-
-.result-item{
-padding:9px;
-border-bottom:1px solid var(--border);
-cursor:pointer;
-display:flex;
-justify-content:space-between;
-gap:10px
-}
-
-.result-item:hover{
-background:var(--card2)
-}
-
-.player{
-display:grid;
-grid-template-columns:1fr auto auto;
-gap:8px;
-align-items:center;
-padding:10px 0;
-border-bottom:1px solid var(--border)
-}
-
-.player small,
-.roster-player small{
-display:block;
-color:var(--muted);
-margin-top:3px
-}
-
-.remove{
-border:1px solid var(--border);
-background:var(--card2);
-color:var(--text);
-border-radius:6px
-}
-
-.totals{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:8px;
-margin-top:15px
-}
-
-.total{
-background:var(--card2);
-padding:10px;
-border-radius:9px;
-text-align:center
-}
-
-.total small{
-display:block;
-color:var(--muted)
-}
-
-.total strong{
-font-size:20px
-}
-
-.result-card{
-margin-top:0
-}
-
-.meter{
-height:15px;
-background:linear-gradient(90deg,#3380ff,#26a269,#ff9b3d,#ef5350);
-border-radius:20px;
-position:relative;
-margin:15px 0 24px
-}
-
-#marker,
-#sleeper-marker{
-position:absolute;
-width:5px;
-height:25px;
-background:var(--text);
-top:-5px;
-left:50%;
-border-radius:3px;
-transition:.2s
-}
-
-#verdict,
-#sleeper-verdict{
-padding:18px;
-text-align:center;
-font-size:25px;
-font-weight:900;
-border:2px solid var(--border);
-border-radius:12px;
-background:var(--card2)
-}
-
-#verdict small,
-#sleeper-verdict small{
-display:block;
-font-size:11px;
-color:var(--muted);
-margin-top:6px
-}
-
-#verdict.fair,
-#sleeper-verdict.fair{
-border-color:#22a06b
-}
-
-#verdict.slight,
-#sleeper-verdict.slight{
-border-color:#e3a008
-}
-
-#verdict.adv,
-#sleeper-verdict.adv{
-border-color:#e87722
-}
-
-#verdict.major,
-#sleeper-verdict.major{
-border-color:#d64545
-}
-
-.grade{
-display:flex;
-justify-content:space-between;
-padding:12px;
-background:var(--card2);
-border-radius:9px;
-margin-top:10px
-}
-
-.actions{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:7px;
-margin-top:10px
-}
-
-.actions button,
-.close{
-padding:10px;
-border-radius:8px;
-border:1px solid var(--border);
-background:var(--card2);
-color:var(--text);
-font-weight:800
-}
-
-.analysis{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:15px
-}
-
-.suggestion{
-background:var(--card2);
-border:1px solid var(--border);
-border-radius:8px;
-padding:9px;
-margin-top:7px;
-font-size:12px
-}
-
-#sleeper-bar{
-display:none;
-border-color:var(--blue)
-}
-
-.sync-grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px;
-margin-top:12px
-}
-
-.primary{
-background:var(--blue);
-color:#fff;
-border:0;
-width:100%;
-margin-top:10px;
-padding:10px;
-border-radius:8px;
-font-weight:800
-}
-
-.modal-bg{
-display:none;
-position:fixed;
-inset:0;
-background:#000b;
-z-index:100;
-align-items:center;
-justify-content:center;
-padding:15px
-}
-
-.modal-bg.show{
-display:flex
-}
-
-.modal{
-width:min(550px,100%);
-background:var(--card);
-padding:20px;
-border-radius:15px
-}
-
-.modal-head{
-display:flex;
-justify-content:space-between;
-gap:10px
-}
-
-.modal h2{
-margin-top:0
-}
-
-#league-wrap{
-display:none;
-margin-top:12px
-}
-
-#status{
-font-size:12px;
-color:var(--muted);
-margin-top:10px
-}
-
-.page-hidden{
-display:none!important
-}
-
-.league-toolbar{
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:15px;
-margin-bottom:16px
-}
-
-.league-toolbar h2{
-margin:0
-}
-
-.league-view-grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:16px
-}
-
-.roster-card{
-background:var(--card2);
-border:1px solid var(--border);
-border-radius:14px;
-padding:16px
-}
-
-.roster-title{
-display:flex;
-justify-content:space-between;
-gap:10px;
-align-items:flex-start;
-padding-bottom:12px;
-border-bottom:1px solid var(--border)
-}
-
-.roster-title h3{
-margin:4px 0 0
-}
-
-.roster-meta{
-color:var(--muted);
-font-size:12px
-}
-
-.roster-list{
-margin-top:8px
-}
-
-.roster-player{
-display:grid;
-grid-template-columns:1fr auto;
-gap:10px;
-align-items:center;
-padding:11px 0;
-border-bottom:1px solid var(--border)
-}
-
-.roster-player:last-child{
-border-bottom:0
-}
-
-.roster-value{
-font-weight:900
-}
-
-.not-valued{
-font-size:10px;
-color:var(--muted)
-}
+.wrap{max-width:1400px;margin:auto;padding:20px}
+header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);padding-bottom:18px}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{background:var(--blue);color:#fff;font-weight:900;font-size:20px;padding:15px;border-radius:13px}
+h1{margin:0;font-size:30px}
+.sub{color:var(--muted);font-size:13px;margin-top:4px}
+.header-buttons{display:flex;flex-direction:column;gap:7px;width:360px}
+.header-buttons button{padding:10px;border-radius:9px;font-weight:800}
+.sync-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+#theme-toggle,#league-view-button{background:var(--card);color:var(--text);border:1px solid var(--border)}
+#sync-button{background:var(--blue);color:var(--sync);border:0}
+#league-view-button:disabled{opacity:.45;cursor:not-allowed}
+.card,.team,.result-card{background:var(--card);border:1px solid var(--border);border-radius:15px;padding:16px;margin-top:16px}
+.settings{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.setting{display:flex;flex-direction:column;gap:5px}
+.setting span{font-size:11px;font-weight:800;color:var(--muted)}
+select,input{width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--input);color:var(--text)}
+.settings-title{display:flex;justify-content:space-between;gap:10px;margin-bottom:12px;font-weight:900}
+#mode-label,#sleeper-mode-label{color:var(--blue);font-size:12px}
+.engine-strip{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:12px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--card2);font-size:12px}
+.engine-strip strong{color:var(--blue)}
+.engine-strip span{color:var(--muted);text-align:right}
+.top-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.top-box{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:10px}
+.top-box h3{margin:0 0 8px;font-size:13px}
+.top-row{display:flex;justify-content:space-between;font-size:12px;padding:5px 0}
+.trade-grid{display:grid;grid-template-columns:1fr 320px 1fr;gap:15px;margin-top:16px}
+.team{margin-top:0}
+.team h2{margin-top:0}
+.search-wrap{position:relative}
+.results{display:none;position:absolute;left:0;right:0;top:46px;background:var(--card);border:1px solid var(--border);border-radius:9px;z-index:20;max-height:320px;overflow:auto}
+.results.show{display:block}
+.result-item{padding:9px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;justify-content:space-between;gap:10px}
+.result-item:hover{background:var(--card2)}
+.player{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
+.player small,.roster-player small{display:block;color:var(--muted);margin-top:3px}
+.remove{border:1px solid var(--border);background:var(--card2);color:var(--text);border-radius:6px}
+.totals{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:15px}
+.total{background:var(--card2);padding:10px;border-radius:9px;text-align:center}
+.total small{display:block;color:var(--muted)}
+.total strong{font-size:20px}
+.result-card{margin-top:0}
+.meter{height:15px;background:linear-gradient(90deg,#3380ff,#26a269,#ff9b3d,#ef5350);border-radius:20px;position:relative;margin:15px 0 24px}
+#marker,#sleeper-marker{position:absolute;width:5px;height:25px;background:var(--text);top:-5px;left:50%;border-radius:3px;transition:.2s}
+#verdict,#sleeper-verdict{padding:18px;text-align:center;font-size:25px;font-weight:900;border:2px solid var(--border);border-radius:12px;background:var(--card2)}
+#verdict small,#sleeper-verdict small{display:block;font-size:11px;color:var(--muted);margin-top:6px}
+#verdict.fair,#sleeper-verdict.fair{border-color:#22a06b}
+#verdict.slight,#sleeper-verdict.slight{border-color:#e3a008}
+#verdict.adv,#sleeper-verdict.adv{border-color:#e87722}
+#verdict.major,#sleeper-verdict.major{border-color:#d64545}
+.grade{display:flex;justify-content:space-between;padding:12px;background:var(--card2);border-radius:9px;margin-top:10px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
+.actions button,.close{padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--card2);color:var(--text);font-weight:800}
+.suggestion{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:9px;margin-top:7px;font-size:12px}
+#sleeper-bar{display:none;border-color:var(--blue)}
+.sync-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.primary{background:var(--blue);color:#fff;border:0;width:100%;margin-top:10px;padding:10px;border-radius:8px;font-weight:800}
+.modal-bg{display:none;position:fixed;inset:0;background:#000b;z-index:100;align-items:center;justify-content:center;padding:15px}
+.modal-bg.show{display:flex}
+.modal{width:min(550px,100%);background:var(--card);padding:20px;border-radius:15px}
+.modal-head{display:flex;justify-content:space-between;gap:10px}
+.modal h2{margin-top:0}
+#league-wrap{display:none;margin-top:12px}
+#status{font-size:12px;color:var(--muted);margin-top:10px}
+.page-hidden{display:none!important}
+.league-toolbar{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:16px}
+.league-toolbar h2{margin:0}
+.league-view-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.roster-card{background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:16px}
+.roster-title{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.roster-title h3{margin:4px 0 0}
+.roster-meta{color:var(--muted);font-size:12px}
+.roster-list{margin-top:8px}
+.roster-player{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid var(--border)}
+.roster-player:last-child{border-bottom:0}
+.roster-value{font-weight:900}
+.not-valued{font-size:10px;color:var(--muted)}
 
 @media(max-width:900px){
-
-.trade-grid{
-grid-template-columns:1fr
-}
-
-.top-grid,
-.settings{
-grid-template-columns:1fr 1fr
-}
-
+.trade-grid{grid-template-columns:1fr}
+.top-grid,.settings{grid-template-columns:1fr 1fr}
 }
 
 @media(max-width:550px){
-
-header{
-display:block
-}
-
-.header-buttons{
-width:100%;
-margin-top:15px
-}
-
-.top-grid,
-.settings,
-.analysis,
-.sync-grid,
-.league-view-grid{
-grid-template-columns:1fr
-}
-
-.league-toolbar{
-display:block
-}
-
-.league-toolbar button{
-width:100%;
-margin-top:12px
-}
-
+header{display:block}
+.header-buttons{width:100%;margin-top:15px}
+.top-grid,.settings,.sync-grid,.league-view-grid{grid-template-columns:1fr}
+.league-toolbar{display:block}
+.league-toolbar button{width:100%;margin-top:12px}
 }
 </style>
 </head>
@@ -608,396 +110,164 @@ margin-top:12px
 <div class="wrap">
 
 <header>
-
 <div class="brand">
-
-<div class="logo">
-TF
-</div>
-
+<div class="logo">TF</div>
 <div>
-
-<h1>
-TradeForge Fantasy
-</h1>
-
-<div class="sub">
-Super Trade Analyzer
+<h1>TradeForge Fantasy</h1>
+<div class="sub">Super Trade Analyzer</div>
 </div>
-
-</div>
-
 </div>
 
 <div class="header-buttons">
-
-<button id="theme-toggle">
-☀ Light Theme
-</button>
-
+<button id="theme-toggle">☀ Light Theme</button>
 <div class="sync-actions">
-
-<button id="sync-button">
-Sync Your League
-</button>
-
-<button id="league-view-button" disabled>
-League View
-</button>
-
+<button id="sync-button">Sync Your League</button>
+<button id="league-view-button" disabled>League View</button>
 </div>
-
 </div>
-
 </header>
 
 
 <main id="analyzer-page">
 
 <section class="card">
-
 <div class="settings-title">
-
-<span>
-League Settings
-</span>
-
+<span>League Settings</span>
 <span id="mode-label"></span>
-
 </div>
 
 <div class="settings">
 
 <label class="setting">
-
-<span>
-SCORING
-</span>
-
+<span>SCORING</span>
 <select id="scoring">
-
-<option value="ppr">
-PPR
-</option>
-
-<option value="half">
-0.5 PPR
-</option>
-
-<option value="standard">
-No PPR
-</option>
-
+<option value="ppr">PPR</option>
+<option value="half">0.5 PPR</option>
+<option value="standard">No PPR</option>
 </select>
-
 </label>
 
-
 <label class="setting">
-
-<span>
-LEAGUE
-</span>
-
+<span>LEAGUE</span>
 <select id="league">
-
-<option value="redraft">
-Redraft
-</option>
-
-<option value="keeper">
-Keeper
-</option>
-
-<option value="dynasty">
-Dynasty
-</option>
-
+<option value="redraft">Redraft</option>
+<option value="keeper">Keeper</option>
+<option value="dynasty">Dynasty</option>
 </select>
-
 </label>
 
-
 <label class="setting">
-
-<span>
-QB FORMAT
-</span>
-
+<span>QB FORMAT</span>
 <select id="qb">
-
-<option value="oneqb">
-1QB
-</option>
-
-<option value="superflex">
-Superflex
-</option>
-
+<option value="oneqb">1QB</option>
+<option value="superflex">Superflex</option>
 </select>
-
 </label>
 
-
 <label class="setting">
-
-<span>
-TE PREMIUM
-</span>
-
+<span>TE PREMIUM</span>
 <select id="tep">
-
-<option value="off">
-Off
-</option>
-
-<option value="half">
-+0.5 PPR
-</option>
-
-<option value="full">
-+1.0 PPR
-</option>
-
+<option value="off">Off</option>
+<option value="half">+0.5 PPR</option>
+<option value="full">+1.0 PPR</option>
 </select>
-
 </label>
 
 </div>
 
 <div class="engine-strip">
-
-<strong>
-TradeForge Engine v2.0 • Weighted Model
-</strong>
-
-<span id="engine-status">
-Baseline mode
-</span>
-
+<strong>TradeForge Engine v2.0 • Weighted Model</strong>
+<span id="engine-status">Baseline mode</span>
 </div>
-
 </section>
 
 
 <section class="card">
-
-<h3 style="margin-top:0">
-Top Players
-</h3>
+<h3 style="margin-top:0">Top Players</h3>
 
 <div class="top-grid">
-
-<div class="top-box">
-
-<h3>
-RB
-</h3>
-
-<div id="top-rb"></div>
-
+<div class="top-box"><h3>RB</h3><div id="top-rb"></div></div>
+<div class="top-box"><h3>WR</h3><div id="top-wr"></div></div>
+<div class="top-box"><h3>QB</h3><div id="top-qb"></div></div>
+<div class="top-box"><h3>TE</h3><div id="top-te"></div></div>
 </div>
-
-
-<div class="top-box">
-
-<h3>
-WR
-</h3>
-
-<div id="top-wr"></div>
-
-</div>
-
-
-<div class="top-box">
-
-<h3>
-QB
-</h3>
-
-<div id="top-qb"></div>
-
-</div>
-
-
-<div class="top-box">
-
-<h3>
-TE
-</h3>
-
-<div id="top-te"></div>
-
-</div>
-
-</div>
-
 </section>
 
 
 <div class="trade-grid">
 
 <section class="team">
-
-<h2>
-Team A
-</h2>
+<h2>Team A</h2>
 
 <div class="search-wrap">
-
-<input
-id="search-a"
-placeholder="Search player or pick"
-autocomplete="off"
->
-
-<div
-id="results-a"
-class="results"
-></div>
-
+<input id="search-a" placeholder="Search player or pick" autocomplete="off">
+<div id="results-a" class="results"></div>
 </div>
 
 <div id="team-a"></div>
 
 <div class="totals">
-
 <div class="total">
-
-<small>
-Base
-</small>
-
-<strong id="base-a">
-0.0
-</strong>
-
+<small>Base</small>
+<strong id="base-a">0.0</strong>
 </div>
 
 <div class="total">
-
-<small>
-Adjusted
-</small>
-
-<strong id="adj-a">
-0.0
-</strong>
-
+<small>Adjusted</small>
+<strong id="adj-a">0.0</strong>
 </div>
-
 </div>
-
 </section>
 
 
 <section class="result-card">
-
-<div class="meter">
-
-<div id="marker"></div>
-
-</div>
+<div class="meter"><div id="marker"></div></div>
 
 <div id="verdict">
-
 Build a Trade
-
-<small>
-Add players to both sides.
-</small>
-
+<small>Add players to both sides.</small>
 </div>
 
 <div class="grade">
-
-<span>
-Trade Grade
-</span>
-
-<strong id="grade">
-—
-</strong>
-
+<span>Trade Grade</span>
+<strong id="grade">—</strong>
 </div>
 
 <div class="actions">
-
-<button id="swap">
-Swap Sides
-</button>
-
-<button id="clear">
-Clear Trade
-</button>
-
+<button id="swap">Swap Sides</button>
+<button id="clear">Clear Trade</button>
 </div>
-
 </section>
 
 
 <section class="team">
-
-<h2>
-Team B
-</h2>
+<h2>Team B</h2>
 
 <div class="search-wrap">
-
-<input
-id="search-b"
-placeholder="Search player or pick"
-autocomplete="off"
->
-
-<div
-id="results-b"
-class="results"
-></div>
-
+<input id="search-b" placeholder="Search player or pick" autocomplete="off">
+<div id="results-b" class="results"></div>
 </div>
 
 <div id="team-b"></div>
 
 <div class="totals">
-
 <div class="total">
-
-<small>
-Base
-</small>
-
-<strong id="base-b">
-0.0
-</strong>
-
+<small>Base</small>
+<strong id="base-b">0.0</strong>
 </div>
 
 <div class="total">
-
-<small>
-Adjusted
-</small>
-
-<strong id="adj-b">
-0.0
-</strong>
-
+<small>Adjusted</small>
+<strong id="adj-b">0.0</strong>
 </div>
-
 </div>
-
 </section>
 
 </div>
 
 
 <section class="card">
-
-<h3>
-Suggested Trade Ideas
-</h3>
+<h3>Suggested Trade Ideas</h3>
 
 <div class="sub" style="margin-bottom:10px;">
 TradeForge only adds assets to the side currently receiving less adjusted value.
@@ -1006,100 +276,54 @@ TradeForge only adds assets to the side currently receiving less adjusted value.
 <div id="trade-ideas">
 Build a trade to see suggested trade ideas.
 </div>
-
 </section>
 
 </main>
 
 
-<main
-id="league-page"
-class="page-hidden"
->
+<main id="league-page" class="page-hidden">
 
 <section class="card">
-
 <div class="league-toolbar">
-
 <div>
-
-<h2>
-League View
-</h2>
-
-<div
-id="league-page-name"
-class="sub"
-></div>
-
+<h2>League View</h2>
+<div id="league-page-name" class="sub"></div>
 </div>
 
-<button
-id="back-to-analyzer"
-class="close"
->
+<button id="back-to-analyzer" class="close">
 ← Back to Trade Analyzer
 </button>
-
 </div>
-
 </section>
 
 
-<section
-id="sleeper-bar"
-class="card"
->
+<section id="sleeper-bar" class="card">
 
 <div class="settings-title">
-
 <div>
-
-<strong id="sleeper-name">
-Sleeper League
-</strong>
-
-<div
-id="sleeper-info"
-class="sub"
-></div>
-
+<strong id="sleeper-name">Sleeper League</strong>
+<div id="sleeper-info" class="sub"></div>
 </div>
 
 <span id="sleeper-mode-label"></span>
-
 </div>
+
 
 <div class="sync-grid">
 
 <label class="setting">
-
-<span>
-TEAM A ROSTER
-</span>
-
+<span>TEAM A ROSTER</span>
 <select id="sleeper-roster-a"></select>
-
 </label>
 
-
 <label class="setting">
-
-<span>
-TEAM B ROSTER
-</span>
-
+<span>TEAM B ROSTER</span>
 <select id="sleeper-roster-b"></select>
-
 </label>
 
 </div>
 
-<button
-id="disconnect"
-class="close"
-style="margin-top:10px"
->
+<button id="disconnect" class="close" style="margin-top:10px">
 Disconnect Sleeper
 </button>
 
@@ -1109,189 +333,95 @@ Disconnect Sleeper
 <section class="card">
 
 <div class="settings-title">
-
-<span>
-Sleeper Trade Calculator
-</span>
-
+<span>Sleeper Trade Calculator</span>
 <span class="sub">
 Uses selected Sleeper rosters; dynasty leagues also include future-pick values
 </span>
-
 </div>
 
 
 <div class="trade-grid">
 
 <section class="team">
-
-<h2>
-Team A
-</h2>
+<h2>Team A</h2>
 
 <div class="search-wrap">
-
-<input
-id="sleeper-search-a"
-placeholder="Search Team A roster"
-autocomplete="off"
->
-
-<div
-id="sleeper-results-a"
-class="results"
-></div>
-
+<input id="sleeper-search-a" placeholder="Search Team A roster" autocomplete="off">
+<div id="sleeper-results-a" class="results"></div>
 </div>
 
 <div id="sleeper-team-a"></div>
 
 <div class="totals">
-
 <div class="total">
-
-<small>
-Base
-</small>
-
-<strong id="sleeper-base-a">
-0.0
-</strong>
-
+<small>Base</small>
+<strong id="sleeper-base-a">0.0</strong>
 </div>
 
 <div class="total">
-
-<small>
-Adjusted
-</small>
-
-<strong id="sleeper-adj-a">
-0.0
-</strong>
-
+<small>Adjusted</small>
+<strong id="sleeper-adj-a">0.0</strong>
 </div>
-
 </div>
-
 </section>
 
 
 <section class="result-card">
-
-<div class="meter">
-
-<div id="sleeper-marker"></div>
-
-</div>
+<div class="meter"><div id="sleeper-marker"></div></div>
 
 <div id="sleeper-verdict">
-
 Build a Trade
-
-<small>
-Add players from the synced rosters.
-</small>
-
+<small>Add players from the synced rosters.</small>
 </div>
 
 <div class="grade">
-
-<span>
-Trade Grade
-</span>
-
-<strong id="sleeper-grade">
-—
-</strong>
-
+<span>Trade Grade</span>
+<strong id="sleeper-grade">—</strong>
 </div>
 
 <div class="actions">
-
-<button id="sleeper-swap">
-Swap Sides
-</button>
-
-<button id="sleeper-clear">
-Clear Trade
-</button>
-
+<button id="sleeper-swap">Swap Sides</button>
+<button id="sleeper-clear">Clear Trade</button>
 </div>
-
 </section>
 
 
 <section class="team">
-
-<h2>
-Team B
-</h2>
+<h2>Team B</h2>
 
 <div class="search-wrap">
-
-<input
-id="sleeper-search-b"
-placeholder="Search Team B roster"
-autocomplete="off"
->
-
-<div
-id="sleeper-results-b"
-class="results"
-></div>
-
+<input id="sleeper-search-b" placeholder="Search Team B roster" autocomplete="off">
+<div id="sleeper-results-b" class="results"></div>
 </div>
 
 <div id="sleeper-team-b"></div>
 
 <div class="totals">
-
 <div class="total">
-
-<small>
-Base
-</small>
-
-<strong id="sleeper-base-b">
-0.0
-</strong>
-
+<small>Base</small>
+<strong id="sleeper-base-b">0.0</strong>
 </div>
 
 <div class="total">
-
-<small>
-Adjusted
-</small>
-
-<strong id="sleeper-adj-b">
-0.0
-</strong>
-
+<small>Adjusted</small>
+<strong id="sleeper-adj-b">0.0</strong>
 </div>
-
 </div>
-
 </section>
 
 </div>
 
 
 <section class="card">
-
-<h3>
-Suggested Trade Ideas
-</h3>
+<h3>Suggested Trade Ideas</h3>
 
 <div class="sub" style="margin-bottom:10px;">
-TradeForge only adds assets from the higher-value roster to the side currently receiving less adjusted value.
+TradeForge suggests additional assets from the lower-value team's own roster to add to its side of the trade.
 </div>
 
 <div id="sleeper-trade-ideas">
 Build a Sleeper trade to see suggested trade ideas.
 </div>
-
 </section>
 
 </section>
@@ -1304,30 +434,15 @@ Build a Sleeper trade to see suggested trade ideas.
 <section class="roster-card">
 
 <div class="roster-title">
-
 <div>
-
-<div class="roster-meta">
-YOUR TEAM
+<div class="roster-meta">YOUR TEAM</div>
+<h3 id="my-team-name">Your Team</h3>
 </div>
 
-<h3 id="my-team-name">
-Your Team
-</h3>
-
+<div id="my-team-meta" class="roster-meta"></div>
 </div>
 
-<div
-id="my-team-meta"
-class="roster-meta"
-></div>
-
-</div>
-
-<div
-id="my-team-roster"
-class="roster-list"
-></div>
+<div id="my-team-roster" class="roster-list"></div>
 
 </section>
 
@@ -1335,43 +450,20 @@ class="roster-list"
 <section class="roster-card">
 
 <label class="setting">
-
-<span>
-COMPARE WITH TEAM
-</span>
-
+<span>COMPARE WITH TEAM</span>
 <select id="opponent-select"></select>
-
 </label>
 
-<div
-class="roster-title"
-style="margin-top:15px"
->
-
+<div class="roster-title" style="margin-top:15px">
 <div>
-
-<div class="roster-meta">
-OTHER TEAM
+<div class="roster-meta">OTHER TEAM</div>
+<h3 id="opponent-team-name">Team</h3>
 </div>
 
-<h3 id="opponent-team-name">
-Team
-</h3>
-
+<div id="opponent-team-meta" class="roster-meta"></div>
 </div>
 
-<div
-id="opponent-team-meta"
-class="roster-meta"
-></div>
-
-</div>
-
-<div
-id="opponent-team-roster"
-class="roster-list"
-></div>
+<div id="opponent-team-roster" class="roster-list"></div>
 
 </section>
 
@@ -1384,66 +476,34 @@ class="roster-list"
 </div>
 
 
-<div
-id="modal"
-class="modal-bg"
->
+<div id="modal" class="modal-bg">
 
 <div class="modal">
 
 <div class="modal-head">
-
 <div>
-
-<h2>
-Sync Your Sleeper League
-</h2>
-
-<div class="sub">
-Enter your Sleeper username. No password is needed.
+<h2>Sync Your Sleeper League</h2>
+<div class="sub">Enter your Sleeper username. No password is needed.</div>
 </div>
 
+<button id="modal-close" class="close">×</button>
 </div>
 
-<button
-id="modal-close"
-class="close"
->
-×
-</button>
+<input id="username" placeholder="Sleeper username" autocomplete="off">
 
-</div>
-
-<input
-id="username"
-placeholder="Sleeper username"
-autocomplete="off"
->
-
-<button
-id="find-leagues"
-class="primary"
->
+<button id="find-leagues" class="primary">
 Find My Leagues
 </button>
 
 <div id="league-wrap">
-
 <select id="league-picker"></select>
 
-<button
-id="connect-league"
-class="primary"
->
+<button id="connect-league" class="primary">
 Sync Selected League
 </button>
-
 </div>
 
-<div
-id="status"
-aria-live="polite"
-></div>
+<div id="status" aria-live="polite"></div>
 
 </div>
 
@@ -1484,6 +544,7 @@ let sleeperIdByName={};
 
 let tradeForgeFeedMeta=null;
 
+
 const SUPERSTAR_FACTOR=1.00;
 
 const PACKAGE_WEIGHTS=[
@@ -1496,6 +557,7 @@ const PACKAGE_WEIGHTS=[
 0.80,
 0.80
 ];
+
 
 const multipliers={
 RB:{ppr:1,half:.98,standard:.95},
@@ -1891,13 +953,15 @@ const picks=[
 ["2028 Mid 3rd",8,10],
 ["2028 Late 3rd",5,7]
 
-].map((x,i)=>({
+].map(
+(x,i)=>({
 rank:1001+i,
 name:x[0],
 pos:"PICK",
 oneqb:x[1],
 superflex:x[2]
-}));
+})
+);
 
 
 const dst={
@@ -1920,7 +984,9 @@ KC:"Kansas City Chiefs DST"
 const $=id=>document.getElementById(id);
 
 const key=p=>
-p.sleeperId || p.pos+"|"+p.name;
+p.sleeperId
+||
+p.pos+"|"+p.name;
 
 const norm=s=>
 String(s||"")
@@ -1937,10 +1003,13 @@ String(s??"")
 .replace(/"/g,"&quot;")
 .replace(/'/g,"&#039;");
 
+
 const assets=()=>{
 return leagueMode==="dynasty"
-? playerDatabase.concat(picks)
-: playerDatabase;
+?
+playerDatabase.concat(picks)
+:
+playerDatabase;
 };
 
 
@@ -2005,8 +1074,10 @@ Math.round(v*10)/10;
 
 const tfNum=(v,fallback)=>
 Number.isFinite(Number(v))
-? Number(v)
-: fallback;
+?
+Number(v)
+:
+fallback;
 
 const tfStoredRawValue=(p,mode)=>
 tfNum(p?.[mode],.1);
@@ -2047,7 +1118,12 @@ return [
 "age",
 "ageScore",
 "nflGames"
-].some(k=>Number.isFinite(Number(obj[k])));
+].some(
+k=>
+Number.isFinite(
+Number(obj[k])
+)
+);
 
 }
 
@@ -2059,7 +1135,8 @@ return tfHasComponentData(p.engine?.redraft);
 
 function tfHasDynastyData(p){
 
-const e=p.engine?.dynasty;
+const e=
+p.engine?.dynasty;
 
 return (
 tfHasComponentData(e)
@@ -2085,7 +1162,8 @@ tfHasComponentData(p.engine?.keeper)
 
 function tfWeightedSum(c){
 
-const w=TRADEFORGE_ENGINE.weights;
+const w=
+TRADEFORGE_ENGINE.weights;
 
 return (
 c.performance*w.performance
@@ -2254,8 +1332,10 @@ return tfClamp(Number(e.scarcity),.1,100);
 
 const replacement=
 Number.isFinite(Number(e.replacement))
-? Number(e.replacement)
-: tfReplacementRaw(p.pos,mode);
+?
+Number(e.replacement)
+:
+tfReplacementRaw(p.pos,mode);
 
 const gap=
 anchor-replacement;
@@ -2289,8 +1369,10 @@ id
 &&
 Number.isFinite(sleeperTrendMarket[id])
 )
-? sleeperTrendMarket[id]
-: 0;
+?
+sleeperTrendMarket[id]
+:
+0;
 
 }
 
@@ -2299,17 +1381,25 @@ function tfMarketValue(p,e,baseline){
 
 let market=
 Number.isFinite(Number(e?.market))
-? Number(e.market)
-: Number.isFinite(Number(e?.consensus))
-? Number(e.consensus)
-: baseline;
+?
+Number(e.market)
+:
+Number.isFinite(Number(e?.consensus))
+?
+Number(e.consensus)
+:
+baseline;
 
 const movement=
 Number.isFinite(Number(e?.marketChange))
-? Number(e.marketChange)
-: Number.isFinite(Number(e?.marketMomentum))
-? Number(e.marketMomentum)
-: tfAutoMarketChange(p);
+?
+Number(e.marketChange)
+:
+Number.isFinite(Number(e?.marketMomentum))
+?
+Number(e.marketMomentum)
+:
+tfAutoMarketChange(p);
 
 if(Math.abs(movement)<=1){
 
@@ -2339,7 +1429,10 @@ const hasInputs=
 "projection",
 "consensus",
 "recent"
-].some(k=>Number.isFinite(Number(e?.[k])));
+].some(
+k=>
+Number.isFinite(Number(e?.[k]))
+);
 
 if(!hasInputs){
 return baseline;
@@ -2704,15 +1797,19 @@ tfClamp(
 
 const availabilitySource=
 Object.keys(e).length
-? e
-: (p.engine?.redraft || {});
+?
+e
+:
+(p.engine?.redraft || {});
 
 return{
 
 performance:
 Number.isFinite(Number(e.performance))
-? tfClamp(Number(e.performance),.1,100)
-: anchor,
+?
+tfClamp(Number(e.performance),.1,100)
+:
+anchor,
 
 opportunity:
 tfOpportunityValue(e,anchor),
@@ -2853,8 +1950,10 @@ function tfDynamicPickValue(p){
 
 const baseline=
 qbMode==="superflex"
-? p.superflex
-: p.oneqb;
+?
+p.superflex
+:
+p.oneqb;
 
 if(!TRADEFORGE_ENGINE.useDynamicPickValues){
 return baseline;
@@ -2926,10 +2025,14 @@ p.pos==="QB"
 
 v*=
 mode==="dynasty"
-? 1.45
-: mode==="keeper"
-? 1.40
-: 1.35;
+?
+1.45
+:
+mode==="keeper"
+?
+1.40
+:
+1.35;
 
 }
 
@@ -2941,12 +2044,18 @@ tePremiumMode==="half"
 
 v*=
 v>=75
-? 1.10
-: v>=50
-? 1.08
-: v>=25
-? 1.06
-: 1.04;
+?
+1.10
+:
+v>=50
+?
+1.08
+:
+v>=25
+?
+1.06
+:
+1.04;
 
 }
 
@@ -2958,12 +2067,18 @@ tePremiumMode==="full"
 
 v*=
 v>=75
-? 1.18
-: v>=50
-? 1.14
-: v>=25
-? 1.10
-: 1.06;
+?
+1.18
+:
+v>=50
+?
+1.14
+:
+v>=25
+?
+1.10
+:
+1.06;
 
 }
 
@@ -2981,8 +2096,10 @@ function legacyValue(p){
 if(p.pos==="PICK"){
 
 return qbMode==="superflex"
-? p.superflex
-: p.oneqb;
+?
+p.superflex
+:
+p.oneqb;
 
 }
 
@@ -3126,277 +2243,6 @@ return tfRedraftComponents(p);
 }
 
 
-function tradeForgeConfidence(p){
-
-if(p.pos==="PICK"){
-return 70;
-}
-
-if(!tfHasAnyEngineData(p)){
-return 35;
-}
-
-let blocks=[];
-
-if(leagueMode==="dynasty"){
-
-blocks=[
-p.engine?.dynasty || {}
-];
-
-}
-
-else if(leagueMode==="keeper"){
-
-blocks=
-tfHasComponentData(p.engine?.keeper)
-?
-[p.engine.keeper]
-:
-[
-p.engine?.redraft||{},
-p.engine?.dynasty||{}
-];
-
-}
-
-else{
-
-blocks=[
-p.engine?.redraft || {}
-];
-
-}
-
-const has=
-keys=>
-blocks.some(
-e=>
-keys.some(
-k=>
-Number.isFinite(
-Number(e?.[k])
-)
-)
-);
-
-let groups=0;
-
-if(has(["performance","projection","consensus","recent"])){
-groups++;
-}
-
-if(has(["opportunity","roleConfidence","roleSecurity"])){
-groups++;
-}
-
-if(has(["scarcity","replacement"])){
-groups++;
-}
-
-if(has(["market","consensus","marketChange","marketMomentum"])){
-groups++;
-}
-
-if(has(["consistency","consistencyScore"])){
-groups++;
-}
-
-if(has(["availability","availabilityScore","availabilityValue"])){
-groups++;
-}
-
-if(has(["situation","situationScore","roleConfidence","roleSecurity"])){
-groups++;
-}
-
-let score=
-35+groups*8;
-
-if(leagueMode!=="redraft"){
-
-const d=
-p.engine?.dynasty || {};
-
-if(Number.isFinite(Number(d.age))){
-score+=4;
-}
-
-if(Number.isFinite(Number(d.year1))){
-score+=3;
-}
-
-if(Number.isFinite(Number(d.year2))){
-score+=2;
-}
-
-if(Number.isFinite(Number(d.year3))){
-score+=2;
-}
-
-if(
-d.isRookie===true
-&&
-Number.isFinite(Number(d.draftCapital))
-){
-score+=2;
-}
-
-}
-
-const r=
-p.engine?.redraft || {};
-
-if(
-Number.isFinite(Number(r.projection))
-&&
-Number.isFinite(Number(r.consensus))
-){
-
-score-=
-Math.min(
-10,
-Math.abs(
-Number(r.projection)
--
-Number(r.consensus)
-)
-/2
-);
-
-}
-
-return Math.round(
-tfClamp(
-score,
-0,
-100
-)
-);
-
-}
-
-
-function tradeForgeConfidenceLabel(p){
-
-const c=
-tradeForgeConfidence(p);
-
-return c>=80
-? "High"
-: c>=60
-? "Medium"
-: "Low";
-
-}
-
-
-function tradeForgeMarketSignal(p){
-
-if(
-!tfHasAnyEngineData(p)
-||
-p.pos==="PICK"
-){
-
-return{
-label:"NEUTRAL",
-gap:0
-};
-
-}
-
-const c=
-tfComponentsForMode(p);
-
-const w=
-TRADEFORGE_ENGINE.weights;
-
-const model=
-(
-c.performance*w.performance
-+
-c.opportunity*w.opportunity
-+
-c.scarcity*w.scarcity
-+
-c.consistency*w.consistency
-+
-c.availability*w.availability
-+
-c.situation*w.situation
-)
-/
-(1-w.market);
-
-const gap=
-model-c.market;
-
-return{
-
-label:
-gap>=TRADEFORGE_ENGINE.marketSignalGap
-? "MARKET BUY"
-: gap<=-TRADEFORGE_ENGINE.marketSignalGap
-? "SELL HIGH"
-: "NEUTRAL",
-
-gap:
-tfRound(gap)
-
-};
-
-}
-
-
-function tradeForgeBreakdown(p){
-
-return{
-
-player:p.name,
-mode:leagueMode,
-
-weights:{
-...TRADEFORGE_ENGINE.weights
-},
-
-components:
-p.pos==="PICK"
-? null
-: tfComponentsForMode(p),
-
-baseline:
-legacyValue(p),
-
-redraftRaw:
-tfRedraftRaw(p),
-
-keeperRaw:
-tfKeeperRaw(p),
-
-dynastyRaw:
-tfDynastyRaw(p),
-
-finalValue:
-value(p),
-
-confidence:
-tradeForgeConfidence(p),
-
-confidenceLabel:
-tradeForgeConfidenceLabel(p),
-
-marketSignal:
-tradeForgeMarketSignal(p),
-
-liveInputs:
-tfHasAnyEngineData(p)
-
-};
-
-}
-
-
 function updateEngineStatus(){
 
 const live=
@@ -3413,19 +2259,6 @@ live
 
 if(tradeForgeFeedMeta?.week){
 text+=` • Week ${tradeForgeFeedMeta.week}`;
-}
-
-if(tradeForgeFeedMeta?.generatedAt){
-
-const d=
-new Date(
-tradeForgeFeedMeta.generatedAt
-);
-
-if(!Number.isNaN(d.getTime())){
-text+=` • Updated ${d.toLocaleString()}`;
-}
-
 }
 
 $("engine-status").textContent=
@@ -3447,11 +2280,9 @@ cache:"no-store"
 );
 
 if(!response.ok){
-
 throw new Error(
 `Feed HTTP ${response.status}`
 );
-
 }
 
 const feed=
@@ -3459,8 +2290,6 @@ await response.json();
 
 tradeForgeFeedMeta=
 feed.meta || null;
-
-let applied=0;
 
 playerDatabase.forEach(player=>{
 
@@ -3470,25 +2299,15 @@ norm(player.name)
 ];
 
 if(live?.engine){
-
 player.engine=
 live.engine;
-
 player.liveData=
 live;
-
-applied++;
-
 }
 
 });
 
-console.log(
-`TradeForge nflverse feed applied to ${applied} players.`
-);
-
 renderBoard();
-
 render();
 
 if(
@@ -3500,9 +2319,7 @@ $("league-page")
 .contains("page-hidden")
 )
 ){
-
 buildLeaguePage();
-
 }
 
 }
@@ -3517,7 +2334,6 @@ error
 tradeForgeFeedMeta=null;
 
 renderBoard();
-
 render();
 
 }
@@ -3530,11 +2346,7 @@ render();
    ========================================================= */
 
 function adjustedPlayer(v){
-
-return v<=0
-? 0
-: v;
-
+return v<=0 ? 0 : v;
 }
 
 
@@ -3570,9 +2382,7 @@ if(
 ||
 team.length>=opponent.length
 ){
-
 return 0;
-
 }
 
 const best=
@@ -3595,9 +2405,7 @@ team.length===1
 &&
 opponent.length===2
 ){
-
 return .08+.07*elite;
-
 }
 
 if(
@@ -3605,15 +2413,11 @@ team.length===1
 &&
 opponent.length>=3
 ){
-
 return .15+.10*elite;
-
 }
 
 if(gap>=2){
-
 return .15+.10*elite;
-
 }
 
 return .05+.05*elite;
@@ -3648,19 +2452,10 @@ return total;
 function adjustedTradeValues(a,b){
 
 return{
-
-a:
-adjusted(a,b),
-
-b:
-adjusted(b,a),
-
-premiumA:
-consolidationPremium(a,b),
-
-premiumB:
-consolidationPremium(b,a)
-
+a:adjusted(a,b),
+b:adjusted(b,a),
+premiumA:consolidationPremium(a,b),
+premiumB:consolidationPremium(b,a)
 };
 
 }
@@ -3699,10 +2494,14 @@ function modeLabel(){
 
 const s=
 scoringMode==="ppr"
-? "PPR"
-: scoringMode==="half"
-? "0.5 PPR"
-: "No PPR";
+?
+"PPR"
+:
+scoringMode==="half"
+?
+"0.5 PPR"
+:
+"No PPR";
 
 const l=
 leagueMode[0].toUpperCase()
@@ -3711,15 +2510,21 @@ leagueMode.slice(1);
 
 const q=
 qbMode==="superflex"
-? "Superflex"
-: "1QB";
+?
+"Superflex"
+:
+"1QB";
 
 const t=
 tePremiumMode==="half"
-? " • TEP +0.5"
-: tePremiumMode==="full"
-? " • TEP +1.0"
-: "";
+?
+" • TEP +0.5"
+:
+tePremiumMode==="full"
+?
+" • TEP +1.0"
+:
+"";
 
 return `${s} • ${l} • ${q}${t}`;
 
@@ -3730,10 +2535,14 @@ function sleeperModeLabel(){
 
 const s=
 sleeperScoringMode==="ppr"
-? "PPR"
-: sleeperScoringMode==="half"
-? "0.5 PPR"
-: "No PPR";
+?
+"PPR"
+:
+sleeperScoringMode==="half"
+?
+"0.5 PPR"
+:
+"No PPR";
 
 const l=
 sleeperLeagueMode[0].toUpperCase()
@@ -3742,15 +2551,21 @@ sleeperLeagueMode.slice(1);
 
 const q=
 sleeperQbMode==="superflex"
-? "Superflex"
-: "1QB";
+?
+"Superflex"
+:
+"1QB";
 
 const t=
 sleeperTePremiumMode==="half"
-? " • TEP +0.5"
-: sleeperTePremiumMode==="full"
-? " • TEP +1.0"
-: "";
+?
+" • TEP +0.5"
+:
+sleeperTePremiumMode==="full"
+?
+" • TEP +1.0"
+:
+"";
 
 return `${s} • ${l} • ${q}${t}`;
 
@@ -3787,9 +2602,7 @@ sleeperCalculationContext=
 true;
 
 try{
-
 return fn();
-
 }
 
 finally{
@@ -3855,15 +2668,8 @@ top.map(
 (p,i)=>
 `
 <div class="top-row">
-
-<span>
-#${i+1} ${esc(p.name)}
-</span>
-
-<strong>
-${value(p).toFixed(1)}
-</strong>
-
+<span>#${i+1} ${esc(p.name)}</span>
+<strong>${value(p).toFixed(1)}</strong>
 </div>
 `
 ).join("")
@@ -3900,24 +2706,25 @@ function renderTeam(side){
 
 const team=
 side==="A"
-? teamA
-: teamB;
+?
+teamA
+:
+teamB;
 
 const box=
 $(
 side==="A"
-? "team-a"
-: "team-b"
+?
+"team-a"
+:
+"team-b"
 );
 
 if(!team.length){
 
 box.innerHTML=
 `
-<div
-class="sub"
-style="padding:20px 0"
->
+<div class="sub" style="padding:20px 0">
 Search above to add players.
 </div>
 `;
@@ -3933,16 +2740,12 @@ team.map(
 <div class="player">
 
 <div>
-
-<strong>
-${esc(p.name)}
-</strong>
+<strong>${esc(p.name)}</strong>
 
 <small>
 ${esc(p.pos)}
 ${p.nflTeam ? " • "+esc(p.nflTeam) : ""}
 </small>
-
 </div>
 
 <strong>
@@ -3967,8 +2770,10 @@ function removePlayer(side,i){
 
 (
 side==="A"
-? teamA
-: teamB
+?
+teamA
+:
+teamB
 )
 .splice(i,1);
 
@@ -4055,10 +2860,7 @@ if(
 v.innerHTML=
 `
 Build a Trade
-
-<small>
-Add players to both sides.
-</small>
+<small>Add players to both sides.</small>
 `;
 
 $("grade").textContent=
@@ -4132,8 +2934,10 @@ d>5
 +
 (
 aa>ab
-? "Team A"
-: "Team B"
+?
+"Team A"
+:
+"Team B"
 )
 +
 " has more adjusted value"
@@ -4146,16 +2950,26 @@ aa>ab
 
 $("grade").textContent=
 d<=5
-? "A+"
-: d<=10
-? "A"
-: d<=20
-? "B"
-: d<=30
-? "C"
-: d<=40
-? "D"
-: "F";
+?
+"A+"
+:
+d<=10
+?
+"A"
+:
+d<=20
+?
+"B"
+:
+d<=30
+?
+"C"
+:
+d<=40
+?
+"D"
+:
+"F";
 
 tradeIdeas(
 false,
@@ -4171,9 +2985,7 @@ ab
    ========================================================= */
 
 function pool(){
-
 return assets();
-
 }
 
 
@@ -4221,8 +3033,10 @@ sleeperValue(a)
 function sleeperSelectedRoster(side){
 
 return side==="A"
-? sleeperRosterA
-: sleeperRosterB;
+?
+sleeperRosterA
+:
+sleeperRosterB;
 
 }
 
@@ -4253,7 +3067,7 @@ r;
 
 
 /* =========================================================
-   SUGGESTED TRADE IDEAS
+   MAIN SUGGESTED TRADE IDEAS
    ========================================================= */
 
 function tradeIdeas(
@@ -4265,24 +3079,25 @@ ab
 const box=
 $(
 sleeper
-? "sleeper-trade-ideas"
-: "trade-ideas"
+?
+"sleeper-trade-ideas"
+:
+"trade-ideas"
 );
 
 const aTeam=
 sleeper
-? sleeperTeamA
-: teamA;
+?
+sleeperTeamA
+:
+teamA;
 
 const bTeam=
 sleeper
-? sleeperTeamB
-: teamB;
-
-
-/* ---------------------------------------------------------
-   BOTH SIDES MUST HAVE SOMETHING IN THE TRADE
-   --------------------------------------------------------- */
+?
+sleeperTeamB
+:
+teamB;
 
 if(
 !aTeam.length
@@ -4301,21 +3116,13 @@ return;
 
 }
 
-
-const currentDifference=
+const currentPct=
 diff(
 aa,
 ab
 );
 
-
-/* ---------------------------------------------------------
-   ALREADY FAIR
-   --------------------------------------------------------- */
-
-if(
-currentDifference<=5
-){
+if(currentPct<=5){
 
 box.innerHTML=
 `
@@ -4336,42 +3143,19 @@ return;
 
 }
 
+const losingSide=
+aa<ab
+?
+"A"
+:
+"B";
 
-/* =========================================================
-   IMPORTANT:
-   DETERMINE WHICH TEAM IS LOSING THE TRADE
-   =========================================================
-
-   If Team A has MORE adjusted value:
-   Team B needs help.
-
-   If Team B has MORE adjusted value:
-   Team A needs help.
-
-   Suggestions ONLY move assets from the stronger
-   side to the weaker side.
-   ========================================================= */
-
-let strongerSide;
-let weakerSide;
-
-if(aa>ab){
-
-strongerSide="A";
-weakerSide="B";
-
-}
-else{
-
-strongerSide="B";
-weakerSide="A";
-
-}
-
-
-/* ---------------------------------------------------------
-   ASSETS ALREADY INCLUDED IN THE TRADE
-   --------------------------------------------------------- */
+const winningSide=
+losingSide==="A"
+?
+"B"
+:
+"A";
 
 const used=
 new Set(
@@ -4380,60 +3164,29 @@ aTeam
 .map(key)
 );
 
-
-/* =========================================================
-   BUILD THE AVAILABLE PLAYER POOL
-   ========================================================= */
-
-let available=[];
-
-
-/*
-SLEEPER:
-
-If Team A is ahead, search TEAM A'S ACTUAL ROSTER
-for something Team A could send to Team B.
-
-If Team B is ahead, search TEAM B'S ACTUAL ROSTER
-for something Team B could send to Team A.
-*/
+let available;
 
 if(sleeper){
 
-const strongerRosterId=
-strongerSide==="A"
+const sourceRoster=
+winningSide==="A"
 ?
 sleeperRosterA
 :
 sleeperRosterB;
 
-
 available=
 rosterAssets(
-strongerRosterId
+sourceRoster
 )
 .filter(
 p=>
-
-!used.has(
-key(p)
-)
-
+!used.has(key(p))
 &&
-
 p.pos!=="PICK"
 );
 
 }
-
-
-/*
-NORMAL CALCULATOR:
-
-There are no synced rosters, so use the TradeForge
-player/pick database to find hypothetical additions
-for the weaker side.
-*/
 
 else{
 
@@ -4441,22 +3194,17 @@ available=
 assets()
 .filter(
 p=>
-!used.has(
-key(p)
-)
+!used.has(key(p))
 );
 
 }
-
 
 if(!available.length){
 
 box.innerHTML=
 `
 <div class="suggestion">
-
-No additional assets are available to make this trade closer.
-
+No additional assets are available for a useful suggestion.
 </div>
 `;
 
@@ -4465,53 +3213,24 @@ return;
 }
 
 
-/* =========================================================
-   VALUE FUNCTION
-   ========================================================= */
-
-const assetValue=
-p=>
-sleeper
-?
-sleeperValue(p)
-:
-value(p);
-
-
-/* =========================================================
-   TEST A POSSIBLE ADDITION
-   ========================================================= */
-
 const evaluate=
 additions=>{
 
-
-/*
-ONLY ADD THE PLAYERS TO THE WEAKER TEAM.
-*/
-
 const newA=
-weakerSide==="A"
+losingSide==="A"
 ?
 aTeam.concat(additions)
 :
 aTeam;
 
-
 const newB=
-weakerSide==="B"
+losingSide==="B"
 ?
 bTeam.concat(additions)
 :
 bTeam;
 
-
-/*
-Recalculate the complete trade, including
-TradeForge consolidation premiums.
-*/
-
-const recalculated=
+const pair=
 sleeper
 ?
 withSleeperModes(
@@ -4527,271 +3246,176 @@ newA,
 newB
 );
 
-
-const newDifference=
+const newPct=
 diff(
-recalculated.a,
-recalculated.b
+pair.a,
+pair.b
 );
 
-
-/*
-The suggestion MUST improve the trade.
-
-If it does not reduce the difference,
-throw it away.
-*/
-
 if(
-newDifference>=currentDifference
+newPct>=currentPct-.25
 ){
-
 return null;
-
 }
 
-
-/*
-Work out whether the weaker side has now
-gone past the stronger side.
-*/
-
-const weakerAfter=
-weakerSide==="A"
+const losingAfter=
+losingSide==="A"
 ?
-recalculated.a
+pair.a
 :
-recalculated.b;
+pair.b;
 
-
-const strongerAfter=
-weakerSide==="A"
+const winningAfter=
+losingSide==="A"
 ?
-recalculated.b
+pair.b
 :
-recalculated.a;
-
-
-const crossed=
-weakerAfter>strongerAfter;
-
-
-/*
-A small overshoot is okay.
-
-A massive overshoot should be heavily penalized.
-*/
+pair.a;
 
 const overshoot=
-crossed
+losingAfter>winningAfter
 ?
 diff(
-weakerAfter,
-strongerAfter
+losingAfter,
+winningAfter
 )
 :
 0;
 
-
 const fair=
-newDifference<=5;
-
+newPct<=5;
 
 const veryClose=
-newDifference>5
+newPct>5
 &&
-newDifference<=8;
+newPct<=8;
 
-
-/*
-LOWEST SCORE IS BEST.
-
-Fair trades rank first.
-
-Then prefer:
-- smallest difference
-- fewer players
-- less overshoot
-*/
-
-let score=0;
-
-
-if(fair){
-
-score+=0;
-
-}
-else if(veryClose){
-
-score+=100;
-
-}
-else{
-
-score+=200;
-
-}
-
-
-score+=
-newDifference;
-
-
-score+=
-(additions.length-1)
-*
-2;
-
-
-score+=
-overshoot
-*
-.5;
-
+const score=
+(
+fair
+?
+0
+:
+veryClose
+?
+100
+:
+200
+)
++
+newPct
++
+(additions.length-1)*1.25
++
+overshoot*.20;
 
 return{
-
 additions,
-recalculated,
-newDifference,
+pair,
+newPct,
 fair,
 veryClose,
-overshoot,
 score
-
 };
 
 };
 
-
-/* =========================================================
-   BUILD IDEAS
-   ========================================================= */
 
 const ideas=[];
 
-
-/* ---------------------------------------------------------
-   1 PLAYER
-   --------------------------------------------------------- */
-
 available.forEach(
-player=>{
+p=>{
 
-const result=
-evaluate(
-[player]
-);
+const idea=
+evaluate([p]);
 
-if(result){
-
-ideas.push(
-result
-);
-
+if(idea){
+ideas.push(idea);
 }
 
 }
 );
 
 
-/* =========================================================
-   FIND PLAYERS NEAR THE ACTUAL VALUE GAP
-   ========================================================= */
-
-const valueGap=
+const rawGap=
 Math.abs(
 aa-ab
 );
 
+const candidateValue=
+p=>
+sleeper
+?
+sleeperValue(p)
+:
+value(p);
 
-const relevantPlayers=
+const relevant=
 available
 .slice()
 .sort(
-(a,b)=>{
-
-const aDistance=
+(a,b)=>
 Math.abs(
-assetValue(a)
+candidateValue(a)-rawGap
+)
 -
-valueGap
-);
-
-const bDistance=
 Math.abs(
-assetValue(b)
--
-valueGap
-);
-
-return aDistance-bDistance;
-
-}
+candidateValue(b)-rawGap
+)
 )
 .slice(
 0,
 sleeper
 ?
-30
+28
 :
-60
+55
 );
 
 
-/* ---------------------------------------------------------
-   2 PLAYER COMBINATIONS
-   --------------------------------------------------------- */
-
 for(
 let i=0;
-i<relevantPlayers.length;
+i<relevant.length;
 i++
 ){
 
 for(
 let j=i+1;
-j<relevantPlayers.length;
+j<relevant.length;
 j++
 ){
 
-const result=
-evaluate(
-[
-relevantPlayers[i],
-relevantPlayers[j]
-]
+const idea=
+evaluate([
+relevant[i],
+relevant[j]
+]);
+
+if(idea){
+ideas.push(idea);
+}
+
+}
+
+}
+
+
+const alreadyFair=
+ideas.some(
+idea=>idea.fair
 );
 
-if(result){
-
-ideas.push(
-result
-);
-
-}
-
-}
-
-}
-
-
-/* ---------------------------------------------------------
-   3 PLAYER COMBINATIONS
-   --------------------------------------------------------- */
+if(!alreadyFair){
 
 const triplePool=
-relevantPlayers
-.slice(
+relevant.slice(
 0,
 sleeper
 ?
-18
+16
 :
-25
+24
 );
-
 
 for(
 let i=0;
@@ -4811,20 +3435,16 @@ k<triplePool.length;
 k++
 ){
 
-const result=
-evaluate(
-[
+const idea=
+evaluate([
 triplePool[i],
 triplePool[j],
 triplePool[k]
-]
-);
+]);
 
-if(result){
-
-ideas.push(
-result
-);
+if(idea){
+ideas.push(idea);
+}
 
 }
 
@@ -4834,232 +3454,110 @@ result
 
 }
 
-
-/* =========================================================
-   NOTHING USEFUL FOUND
-   ========================================================= */
 
 if(!ideas.length){
 
 box.innerHTML=
 `
 <div class="suggestion">
-
-TradeForge could not find a reasonable additional asset from Team ${strongerSide} that would improve the trade for Team ${weakerSide}.
-
+TradeForge could not find an additional asset that improves this trade enough to recommend.
 </div>
 `;
 
 return;
 
 }
-
-
-/* =========================================================
-   SORT BEST IDEAS FIRST
-   ========================================================= */
 
 ideas.sort(
 (a,b)=>
 a.score-b.score
 );
 
-
-/* =========================================================
-   REMOVE DUPLICATES
-   ========================================================= */
-
 const finalIdeas=[];
-
 const signatures=
 new Set();
-
 
 for(const idea of ideas){
 
 const signature=
 idea.additions
-.map(
-p=>key(p)
-)
+.map(p=>key(p))
 .sort()
 .join("|");
 
-
-if(
-signatures.has(
-signature
-)
-){
-
+if(signatures.has(signature)){
 continue;
-
 }
 
+signatures.add(signature);
 
-signatures.add(
-signature
-);
+finalIdeas.push(idea);
 
-
-/*
-Do not show suggestions that are still terrible.
-
-If the current trade is 40% apart and the best idea
-only gets it to 35%, that's not worth recommending.
-
-Keep it only if it makes a meaningful improvement.
-*/
-
-const improvement=
-currentDifference
--
-idea.newDifference;
-
-
-if(
-improvement<2
-){
-
-continue;
-
-}
-
-
-finalIdeas.push(
-idea
-);
-
-
-if(
-finalIdeas.length>=4
-){
-
+if(finalIdeas.length>=4){
 break;
-
 }
 
 }
 
-
-/* =========================================================
-   NO GOOD FINAL IDEAS
-   ========================================================= */
-
-if(!finalIdeas.length){
-
-box.innerHTML=
-`
-<div class="suggestion">
-
-Team ${strongerSide} currently has more TradeForge value.
-
-<br><br>
-
-TradeForge could not find a good asset from Team ${strongerSide}'s available players that gets Team ${weakerSide} close enough to recommend.
-
-</div>
-`;
-
-return;
-
-}
-
-
-/* =========================================================
-   DISPLAY RESULTS
-   ========================================================= */
 
 box.innerHTML=
 finalIdeas
 .map(
-(
-idea,
-index
-)=>{
+(idea,i)=>{
 
-
-const playerNames=
+const names=
 idea.additions
 .map(
 p=>esc(p.name)
 )
 .join(" + ");
 
-
-let status;
-
-
-if(idea.fair){
-
-status=
-"FAIR MATCH";
-
-}
-else if(idea.veryClose){
-
-status=
-"VERY CLOSE";
-
-}
-else{
-
-status=
+const status=
+idea.fair
+?
+"FAIR MATCH"
+:
+idea.veryClose
+?
+"VERY CLOSE"
+:
 "BEST AVAILABLE";
 
-}
-
-
-/*
-Sleeper wording makes the direction crystal clear.
-*/
-
-const action=
+const instruction=
 sleeper
 ?
-`Team ${strongerSide} sends ${playerNames} to Team ${weakerSide}`
+`Team ${winningSide} adds ${names} to Team ${losingSide}`
 :
-`Add ${playerNames} to Team ${weakerSide}`;
-
+`Add ${names} to Team ${losingSide}`;
 
 return`
 <div class="suggestion">
 
 <strong>
-Idea ${index+1} — ${status}
+Idea ${i+1} — ${status}
 </strong>
 
 <br><br>
 
-${action}
-
-<br><br>
-
-Current trade:
-Team A ${aa.toFixed(1)}
-vs
-Team B ${ab.toFixed(1)}
+${instruction}
 
 <br>
 
-After suggestion:
-Team A ${idea.recalculated.a.toFixed(1)}
+New adjusted value:
+Team A ${idea.pair.a.toFixed(1)}
 vs
-Team B ${idea.recalculated.b.toFixed(1)}
+Team B ${idea.pair.b.toFixed(1)}
 
 <br>
 
-Difference improves from
-${currentDifference.toFixed(1)}%
-to
-${idea.newDifference.toFixed(1)}%.
+New difference:
+${idea.newPct.toFixed(1)}%
 
 ${
 idea.fair
 ?
 `
-<br><br>
-
+<br>
 <strong>
 ✓ Inside the 5% TradeForge fair range
 </strong>
@@ -5077,6 +3575,7 @@ idea.fair
 
 }
 
+
 /* =========================================================
    MAIN SEARCH
    ========================================================= */
@@ -5086,15 +3585,19 @@ function setupSearch(side){
 const input=
 $(
 side==="A"
-? "search-a"
-: "search-b"
+?
+"search-a"
+:
+"search-b"
 );
 
 const results=
 $(
 side==="A"
-? "results-a"
-: "results-b"
+?
+"results-a"
+:
+"results-b"
 );
 
 input.oninput=
@@ -5172,11 +3675,7 @@ ${value(p).toFixed(1)}
 :
 `
 <div class="result-item">
-
-<span>
-No matching players found
-</span>
-
+<span>No matching players found</span>
 </div>
 `;
 
@@ -5191,8 +3690,10 @@ el.onclick=
 
 (
 side==="A"
-? teamA
-: teamB
+?
+teamA
+:
+teamB
 )
 .push({
 ...found[i]
@@ -5307,16 +3808,20 @@ document.documentElement;
 
 const next=
 html.dataset.theme==="dark"
-? "light"
-: "dark";
+?
+"light"
+:
+"dark";
 
 html.dataset.theme=
 next;
 
 $("theme-toggle").textContent=
 next==="dark"
-? "☀ Light Theme"
-: "☾ Dark Theme";
+?
+"☀ Light Theme"
+:
+"☾ Dark Theme";
 
 };
 
@@ -5333,24 +3838,25 @@ function renderSleeperTeam(side){
 
 const team=
 side==="A"
-? sleeperTeamA
-: sleeperTeamB;
+?
+sleeperTeamA
+:
+sleeperTeamB;
 
 const box=
 $(
 side==="A"
-? "sleeper-team-a"
-: "sleeper-team-b"
+?
+"sleeper-team-a"
+:
+"sleeper-team-b"
 );
 
 if(!team.length){
 
 box.innerHTML=
 `
-<div
-class="sub"
-style="padding:20px 0"
->
+<div class="sub" style="padding:20px 0">
 Search the selected Sleeper roster above to add players.
 </div>
 `;
@@ -5366,7 +3872,6 @@ team.map(
 <div class="player">
 
 <div>
-
 <strong>
 ${esc(p.name)}
 </strong>
@@ -5375,7 +3880,6 @@ ${esc(p.name)}
 ${esc(p.pos)}
 ${p.nflTeam ? " • "+esc(p.nflTeam) : ""}
 </small>
-
 </div>
 
 <strong>
@@ -5403,8 +3907,10 @@ i
 
 (
 side==="A"
-? sleeperTeamA
-: sleeperTeamB
+?
+sleeperTeamA
+:
+sleeperTeamB
 )
 .splice(i,1);
 
@@ -5428,10 +3934,14 @@ withSleeperModes(
 ()=>{
 
 const ba=
-base(sleeperTeamA);
+base(
+sleeperTeamA
+);
 
 const bb=
-base(sleeperTeamB);
+base(
+sleeperTeamB
+);
 
 const tradeValues=
 adjustedTradeValues(
@@ -5571,8 +4081,10 @@ d>5
 +
 (
 aa>ab
-? "Team A"
-: "Team B"
+?
+"Team A"
+:
+"Team B"
 )
 +
 " has more adjusted value"
@@ -5585,25 +4097,826 @@ aa>ab
 
 $("sleeper-grade").textContent=
 d<=5
-? "A+"
-: d<=10
-? "A"
-: d<=20
-? "B"
-: d<=30
-? "C"
-: d<=40
-? "D"
-: "F";
+?
+"A+"
+:
+d<=10
+?
+"A"
+:
+d<=20
+?
+"B"
+:
+d<=30
+?
+"C"
+:
+d<=40
+?
+"D"
+:
+"F";
 
-tradeIdeas(
-true,
+
+/*
+SLEEPER NOW USES ITS OWN DEDICATED
+SUGGESTION LOGIC.
+*/
+
+sleeperTradeIdeas(
 aa,
 ab
 );
 
 }
 );
+
+}
+
+
+/* =========================================================
+   SLEEPER SUGGESTED TRADE IDEAS
+   ========================================================= */
+
+function sleeperTradeIdeas(
+aa,
+ab
+){
+
+const box=
+$("sleeper-trade-ideas");
+
+
+/*
+aa and ab are the exact adjusted values
+shown on the Sleeper calculator.
+
+If Team A has more value:
+Team B is the team that needs to add.
+
+If Team B has more value:
+Team A is the team that needs to add.
+*/
+
+if(
+!sleeperTeamA.length
+||
+!sleeperTeamB.length
+){
+
+box.textContent=
+"Build a Sleeper trade to see suggested trade ideas.";
+
+return;
+
+}
+
+
+const currentDifference=
+diff(
+aa,
+ab
+);
+
+
+if(
+currentDifference<=5
+){
+
+box.innerHTML=
+`
+<div class="suggestion">
+
+<strong>
+No adjustment needed.
+</strong>
+
+<br><br>
+
+This trade is already inside the 5% TradeForge fair range.
+
+</div>
+`;
+
+return;
+
+}
+
+
+/* =========================================================
+   DETERMINE THE SIDE THAT NEEDS MORE VALUE
+   ========================================================= */
+
+/*
+EXAMPLE:
+
+Team A = 90
+Team B = 60
+
+Team B is lower.
+
+Therefore:
+- search Team B's roster
+- add a Team B player
+- add that player to Team B's trade package
+
+We NEVER search Team A's roster in this situation.
+*/
+
+const weakerSide=
+aa>ab
+?
+"B"
+:
+"A";
+
+
+const strongerSide=
+weakerSide==="A"
+?
+"B"
+:
+"A";
+
+
+const weakerRosterId=
+weakerSide==="A"
+?
+sleeperRosterA
+:
+sleeperRosterB;
+
+
+const used=
+new Set(
+sleeperTeamA
+.concat(
+sleeperTeamB
+)
+.map(
+key
+)
+);
+
+
+/* =========================================================
+   ONLY SEARCH THE WEAKER TEAM'S ACTUAL ROSTER
+   ========================================================= */
+
+const available=
+rosterAssets(
+weakerRosterId
+)
+.filter(
+p=>
+!used.has(
+key(p)
+)
+&&
+p.pos!=="PICK"
+);
+
+
+if(
+!available.length
+){
+
+box.innerHTML=
+`
+<div class="suggestion">
+
+<strong>
+Team ${weakerSide} needs more value.
+</strong>
+
+<br><br>
+
+TradeForge could not find another valued player on Team ${weakerSide}'s roster to add to the trade.
+
+</div>
+`;
+
+return;
+
+}
+
+
+const assetValue=
+p=>
+sleeperValue(p);
+
+
+/* =========================================================
+   TEST AN ADDITION
+   ========================================================= */
+
+const evaluate=
+additions=>{
+
+
+/*
+ONLY add suggestions to the weaker side.
+*/
+
+const newA=
+weakerSide==="A"
+?
+sleeperTeamA.concat(
+additions
+)
+:
+sleeperTeamA;
+
+
+const newB=
+weakerSide==="B"
+?
+sleeperTeamB.concat(
+additions
+)
+:
+sleeperTeamB;
+
+
+/*
+Recalculate the entire trade using the
+actual Sleeper league settings.
+*/
+
+const recalculated=
+withSleeperModes(
+()=>
+adjustedTradeValues(
+newA,
+newB
+)
+);
+
+
+const newDifference=
+diff(
+recalculated.a,
+recalculated.b
+);
+
+
+/*
+Reject any suggestion that makes the
+trade worse or leaves it unchanged.
+*/
+
+if(
+newDifference>=currentDifference
+){
+
+return null;
+
+}
+
+
+const fair=
+newDifference<=5;
+
+
+const close=
+newDifference>5
+&&
+newDifference<=10;
+
+
+const weakerAfter=
+weakerSide==="A"
+?
+recalculated.a
+:
+recalculated.b;
+
+
+const strongerAfter=
+weakerSide==="A"
+?
+recalculated.b
+:
+recalculated.a;
+
+
+const crossed=
+weakerAfter>
+strongerAfter;
+
+
+return{
+
+additions,
+
+recalculated,
+
+newDifference,
+
+fair,
+
+close,
+
+crossed,
+
+improvement:
+currentDifference-newDifference
+
+};
+
+};
+
+
+/* =========================================================
+   BUILD POSSIBLE IDEAS
+   ========================================================= */
+
+const ideas=[];
+
+
+/* ONE PLAYER */
+
+available.forEach(
+player=>{
+
+const idea=
+evaluate(
+[player]
+);
+
+if(
+idea
+){
+
+ideas.push(
+idea
+);
+
+}
+
+}
+);
+
+
+/*
+Use the current value gap to focus
+combination searches around useful assets.
+*/
+
+const valueGap=
+Math.abs(
+aa-ab
+);
+
+
+const relevant=
+available
+.slice()
+.sort(
+(a,b)=>
+
+Math.abs(
+assetValue(a)-valueGap
+)
+
+-
+
+Math.abs(
+assetValue(b)-valueGap
+)
+
+)
+.slice(
+0,
+30
+);
+
+
+/* TWO PLAYERS */
+
+for(
+let i=0;
+i<relevant.length;
+i++
+){
+
+for(
+let j=i+1;
+j<relevant.length;
+j++
+){
+
+const idea=
+evaluate(
+[
+relevant[i],
+relevant[j]
+]
+);
+
+if(
+idea
+){
+
+ideas.push(
+idea
+);
+
+}
+
+}
+
+}
+
+
+/*
+Only test three-player additions if
+one- and two-player ideas did not already
+find something inside the fair range.
+*/
+
+const alreadyHasFair=
+ideas.some(
+idea=>
+idea.fair
+);
+
+
+if(
+!alreadyHasFair
+){
+
+const triplePool=
+relevant.slice(
+0,
+16
+);
+
+
+for(
+let i=0;
+i<triplePool.length;
+i++
+){
+
+for(
+let j=i+1;
+j<triplePool.length;
+j++
+){
+
+for(
+let k=j+1;
+k<triplePool.length;
+k++
+){
+
+const idea=
+evaluate(
+[
+triplePool[i],
+triplePool[j],
+triplePool[k]
+]
+);
+
+if(
+idea
+){
+
+ideas.push(
+idea
+);
+
+}
+
+}
+
+}
+
+}
+
+}
+
+
+/* =========================================================
+   NOTHING USEFUL FOUND
+   ========================================================= */
+
+if(
+!ideas.length
+){
+
+box.innerHTML=
+`
+<div class="suggestion">
+
+<strong>
+Team ${weakerSide} needs more value.
+</strong>
+
+<br><br>
+
+TradeForge could not find an additional player or combination from Team ${weakerSide}'s roster that improves the trade.
+
+</div>
+`;
+
+return;
+
+}
+
+
+/* =========================================================
+   RANK THE IDEAS
+   ========================================================= */
+
+/*
+Ranking priority:
+
+1. Anything inside the 5% fair range.
+2. Inside the fair range, prefer fewer players.
+3. Then prefer the smallest difference.
+4. Outside fair range, closest outcome first.
+5. If outcomes are nearly equal, prefer fewer players.
+*/
+
+ideas.sort(
+(a,b)=>{
+
+if(
+a.fair!==b.fair
+){
+
+return a.fair
+?
+-1
+:
+1;
+
+}
+
+
+if(
+a.fair
+&&
+b.fair
+){
+
+if(
+a.additions.length
+!==
+b.additions.length
+){
+
+return a.additions.length
+-
+b.additions.length;
+
+}
+
+return a.newDifference
+-
+b.newDifference;
+
+}
+
+
+if(
+a.close!==b.close
+){
+
+return a.close
+?
+-1
+:
+1;
+
+}
+
+
+if(
+Math.abs(
+a.newDifference
+-
+b.newDifference
+)
+>
+.25
+){
+
+return a.newDifference
+-
+b.newDifference;
+
+}
+
+
+return a.additions.length
+-
+b.additions.length;
+
+}
+);
+
+
+/* =========================================================
+   REMOVE DUPLICATES / WEAK IDEAS
+   ========================================================= */
+
+const finalIdeas=[];
+
+const seen=
+new Set();
+
+
+for(
+const idea of ideas
+){
+
+const signature=
+idea.additions
+.map(
+p=>key(p)
+)
+.sort()
+.join("|");
+
+
+if(
+seen.has(
+signature
+)
+){
+
+continue;
+
+}
+
+
+seen.add(
+signature
+);
+
+
+/*
+If an idea isn't fair, it needs to improve
+the trade by at least 2 percentage points
+to be worth showing.
+*/
+
+if(
+!idea.fair
+&&
+idea.improvement<2
+){
+
+continue;
+
+}
+
+
+finalIdeas.push(
+idea
+);
+
+
+if(
+finalIdeas.length>=3
+){
+
+break;
+
+}
+
+}
+
+
+/* =========================================================
+   NO REASONABLE FINAL IDEA
+   ========================================================= */
+
+if(
+!finalIdeas.length
+){
+
+box.innerHTML=
+`
+<div class="suggestion">
+
+<strong>
+Team ${weakerSide} needs more value.
+</strong>
+
+<br><br>
+
+TradeForge could not find a reasonable addition from Team ${weakerSide}'s roster that gets the trade close enough to recommend.
+
+</div>
+`;
+
+return;
+
+}
+
+
+/* =========================================================
+   DISPLAY
+   ========================================================= */
+
+box.innerHTML=
+finalIdeas
+.map(
+(
+idea,
+index
+)=>{
+
+const names=
+idea.additions
+.map(
+p=>esc(
+p.name
+)
+)
+.join(
+" + "
+);
+
+
+const label=
+idea.fair
+?
+"FAIR MATCH"
+:
+idea.close
+?
+"VERY CLOSE"
+:
+"BEST AVAILABLE";
+
+
+return`
+<div class="suggestion">
+
+<strong>
+Idea ${index+1} — ${label}
+</strong>
+
+<br><br>
+
+<strong>
+Team ${weakerSide} adds ${names} to Team ${weakerSide}'s side of the trade.
+</strong>
+
+<br><br>
+
+Current trade:
+
+<br>
+
+Team A ${aa.toFixed(1)}
+vs
+Team B ${ab.toFixed(1)}
+
+<br><br>
+
+After suggestion:
+
+<br>
+
+Team A ${idea.recalculated.a.toFixed(1)}
+vs
+Team B ${idea.recalculated.b.toFixed(1)}
+
+<br><br>
+
+Difference improves from
+${currentDifference.toFixed(1)}%
+to
+${idea.newDifference.toFixed(1)}%.
+
+${
+idea.fair
+?
+`
+<br><br>
+
+<strong>
+✓ Inside the 5% TradeForge fair range
+</strong>
+`
+:
+""
+}
+
+</div>
+`;
+
+}
+)
+.join("");
 
 }
 
@@ -5617,15 +4930,19 @@ function setupSleeperSearch(side){
 const input=
 $(
 side==="A"
-? "sleeper-search-a"
-: "sleeper-search-b"
+?
+"sleeper-search-a"
+:
+"sleeper-search-b"
 );
 
 const results=
 $(
 side==="A"
-? "sleeper-results-a"
-: "sleeper-results-b"
+?
+"sleeper-results-a"
+:
+"sleeper-results-b"
 );
 
 input.oninput=
@@ -5646,7 +4963,9 @@ return;
 const used=
 new Set(
 sleeperTeamA
-.concat(sleeperTeamB)
+.concat(
+sleeperTeamB
+)
 .map(key)
 );
 
@@ -5705,11 +5024,7 @@ ${sleeperValue(p).toFixed(1)}
 :
 `
 <div class="result-item">
-
-<span>
-No matching players found on this roster
-</span>
-
+<span>No matching players found on this roster</span>
 </div>
 `;
 
@@ -5724,8 +5039,10 @@ el.onclick=
 
 (
 side==="A"
-? sleeperTeamA
-: sleeperTeamB
+?
+sleeperTeamA
+:
+sleeperTeamB
 )
 .push({
 ...found[i]
@@ -6187,7 +5504,9 @@ if(syncedLeague){
 location.hash=
 "league";
 
-setPage("league");
+setPage(
+"league"
+);
 
 }
 
@@ -6200,7 +5519,9 @@ $("back-to-analyzer").onclick=
 location.hash=
 "analyzer";
 
-setPage("analyzer");
+setPage(
+"analyzer"
+);
 
 };
 
@@ -6474,7 +5795,9 @@ renderSleeper();
 location.hash=
 "league";
 
-setPage("league");
+setPage(
+"league"
+);
 
 if(
 TRADEFORGE_ENGINE.useSleeperTrendingMarket
@@ -6985,7 +6308,9 @@ true;
 location.hash=
 "analyzer";
 
-setPage("analyzer");
+setPage(
+"analyzer"
+);
 
 renderBoard();
 render();
